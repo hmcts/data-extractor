@@ -1,5 +1,6 @@
 plugins {
   id 'application'
+  id 'java'
   id 'checkstyle'
   id 'jacoco'
   id 'pmd'
@@ -32,15 +33,23 @@ tasks.withType(JavaCompile) {
 
 test {
   useJUnitPlatform()
+  testLogging {
+    exceptionFormat = 'full'
+  }
 }
 
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
   classpath = sourceSets.integrationTest.runtimeClasspath
   useJUnitPlatform()
+  mustRunAfter test
   testLogging {
     exceptionFormat = 'full'
   }
+}
+
+check {
+  dependsOn integration
 }
 
 checkstyle {
@@ -98,6 +107,7 @@ dependencyCheck {
   analyzers {
     // Disable scanning of .NET related binaries
     assemblyEnabled = false
+
   }
 }
 
@@ -110,8 +120,14 @@ repositories {
   mavenCentral()
 }
 
+jar {
+  manifest {
+    attributes 'Implementation-Title': project.name, 'Implementation-Version': project.version
+  }
+}
+
 def versions = [
-  junit: '5.3.2',
+  junit: '5.4.2',
   logging: '5.0.1',
 ]
 
@@ -119,7 +135,7 @@ dependencies {
   compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
 
   compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
-  compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310'
+
   compile group: 'org.apache.commons', name: 'commons-csv', version: '1.6'
 
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.logging
@@ -127,10 +143,13 @@ dependencies {
 
   testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
   testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
-  testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
-  testCompile group: 'org.junit.vintage', name: 'junit-vintage-engine', version: versions.junit
+  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
+  testRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: versions.junit
+  testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '2.25.0'
 
-  testCompile 'org.testcontainers:postgresql:1.10.6'
+  integrationTestCompile 'org.testcontainers:postgresql:1.11.2'
+  integrationTestCompile 'org.testcontainers:junit-jupiter:1.11.2'
+  integrationTestCompile 'com.ninja-squad:DbSetup:2.1.0'
 
   integrationTestCompile sourceSets.main.runtimeClasspath
   integrationTestCompile sourceSets.test.runtimeClasspath
