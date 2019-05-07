@@ -12,8 +12,8 @@ plugins {
 group 'uk.gov.hmcts.reform'
 version '1.0.0'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 
 sourceSets {
   integrationTest {
@@ -64,6 +64,10 @@ pmd {
   sourceSets = [sourceSets.main, sourceSets.test, sourceSets.integrationTest]
   reportsDir = file("$project.buildDir/reports/pmd")
   ruleSetFiles = files("config/pmd/ruleset.xml")
+}
+
+jacoco {
+  toolVersion = "0.8.3"
 }
 
 jacocoTestReport {
