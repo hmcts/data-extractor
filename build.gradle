@@ -60,7 +60,7 @@ checkstyle {
 }
 
 pmd {
-  toolVersion = "6.9.0"
+  toolVersion = "6.11.0"
   sourceSets = [sourceSets.main, sourceSets.test, sourceSets.integrationTest]
   reportsDir = file("$project.buildDir/reports/pmd")
   ruleSetFiles = files("config/pmd/ruleset.xml")
@@ -144,6 +144,9 @@ dependencies {
 
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.logging
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: versions.logging
+
+  // needed for app insights
+  compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
 
   testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
   testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
