@@ -1,0 +1,32 @@
+language: java
+
+jdk:
+  - openjdk11
+
+addons:
+  sonarcloud:
+    organization: "hmcts"
+    token:
+      secure: "O5K2QXBDO7l6TaPxw8sE4/Sv6NGo+kll9Sn2TgbM7Fw8VnjYZs2qN0hdKs97v/s2lV553dNEXh8KQdhRdF7iVXUT49KozcBVDCYmYV6HCN2r5wcRdLEK7MoMMYtcZl2tGNJiI8jxZps53rgiLCfqzz2JU/BgOn+B3pVx8Oj/cYZCorwr2xfj3cRNCvGL+5ND732qWHNYCNOy2Bcglv8rU0jLClK70ajHFLgGHYB4gmX6EQ7X8rDHKplpoII5aaGbQ+HByjZjQKqbhe+Sp3cXpKc1/wk4+hAWTTet5RPpLxwzB4RcEQrbjt6+tSksT3OWzr3cTBsXrahoKyA5q0pQ4/lKl8X5OO1L24a0bEcyRtEpWNlOrjpRC2MBfgsWMCKpgqrCDs8+o4rdFoQ+qpXWxq/Dp7KbvUk/1RAwmmJ5Oxi0fPpWm9dgjq/hoFUB86nfICEXNCS87eTdh+vVoUugUjoulmAYGNYr3WqGX8LPJ0+TAt1vX+5GcE/r9ayfCgSvEqLuc/7fcutMwfIx3IBfJPI0T+f01Yh4B6dEwLC04skT0uBs6oII1sNVIoctju9jYZchRwGv5ZgTSbXQ11je0TUUipdPFxokn7R7N5sEmtWGURSWZTqHwS3lwwVAgLF2b2U+fHIFRwf/e7nMmLNNJ87V/8ENZaZeV8zdWJTzwqk="
+
+services:
+  - docker
+  if: branch = master
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+
+script:
+  - ./gradlew test
+  - ./gradlew integration
+
+after_success:
+  - ./gradlew jacocoTestReport
+  - bash <(curl -s https://codecov.io/bash)
+  - ./gradlew sonarqube -i
