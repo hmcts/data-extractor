@@ -5,7 +5,8 @@ public class DataExtractorApplication {
 
     enum Output {
         CSV("csv"),
-        JSON("json");
+        JSON("json"),
+        JSON_LINES("json_lines");
 
         private String label;
 
