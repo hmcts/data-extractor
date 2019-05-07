@@ -12,8 +12,8 @@ plugins {
 group 'uk.gov.hmcts.reform'
 version '1.0.0'
 
-sourceCompatibility = 1.11
-targetCompatibility = 1.11
+sourceCompatibility = 11
+targetCompatibility = 11
 
 sourceSets {
   integrationTest {
