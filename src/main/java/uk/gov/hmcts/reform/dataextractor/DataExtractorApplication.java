@@ -7,7 +7,7 @@ public class DataExtractorApplication {
         CSV("csv"),
         JSON("json"),
         JSON_LINES("json_lines");
-
+        
         private String label;
 
         Output(String label) {
