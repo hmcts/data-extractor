@@ -1,0 +1,6 @@
+name: data-extractor
+home: https://github.com/hmcts/data-extractor
+version: 0.0.1
+description: HMCTS data extractor
+maintainers:
+  - name: HMCTS Platform engineering team
