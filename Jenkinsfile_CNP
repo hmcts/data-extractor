@@ -1,0 +1,15 @@
+#!groovy
+
+@Library("Infrastructure")
+
+def type = "java"
+def product = "data-extractor"
+def component = "job"
+
+withPipeline(type, product, component) {
+  enableDockerBuild()
+  installCharts()
+  disableLegacyDeployment()
+  nonServiceApp()
+
+}
