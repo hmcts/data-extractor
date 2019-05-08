@@ -10,18 +10,18 @@ import java.util.regex.Pattern;
 
 /**
  * Allows the use of custom types in Postgresql.
- * <p>
- * Append the type to the value using the ::objectType notation to
+ *
+ * <p>Append the type to the value using the ::objectType notation to
  * attempt to set the {@link PGobject} type appropriately
- * <p>
- * For example, given a table FOO with a column VAL of type jsonb
+ *
+ * <p>For example, given a table FOO with a column VAL of type jsonb
+ *
  * <pre>
  * Insert ins = Insert.into("FOO")
  *                    .columns("VAL")
  *                    .values("{\"somekey\": \"somevalue\"}"::jsonb")
  *                    .build();
  * </pre>
- *
  * See: https://github.com/Ninja-Squad/DbSetup/issues/55
  */
 public class PostgresqlCustomTypeBinder implements Binder {
