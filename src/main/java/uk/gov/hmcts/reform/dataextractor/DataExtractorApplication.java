@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.dataextractor;
 
+
 @SuppressWarnings({"PMD", "checkstyle:hideutilityclassconstructor"})
 public class DataExtractorApplication {
 
@@ -15,11 +16,19 @@ public class DataExtractorApplication {
                 this.label = label.toLowerCase();
             }
         }
+
+        public static Output defaultOutput() {
+            return Output.JSON_LINES;
+        }
     }
 
 
-    public static void main(String[] args) {
+    private ExtractorConfig extractorConfig;
 
+
+    public static void main(String[] args) {
+        DataExtractorApplication application = new DataExtractorApplication();
+        application.extractorConfig = new ExtractorConfig();
     }
 
 }
