@@ -38,7 +38,7 @@ public class QueryExecutor implements AutoCloseable {
             this.connection = connect();
             this.resultSet = this.connection.createStatement().executeQuery(sql);
         } catch (SQLException ex) {
-            throw new ExtractorException(ex);
+            throw new ExecutorException(ex);
         }
         return this.resultSet;
     }
