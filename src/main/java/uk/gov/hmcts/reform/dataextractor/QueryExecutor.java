@@ -7,7 +7,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 
 public class QueryExecutor implements AutoCloseable {
@@ -20,7 +19,6 @@ public class QueryExecutor implements AutoCloseable {
     private final String sql;
 
     private Connection connection;
-    private Statement statement;
     private ResultSet resultSet;
 
     public QueryExecutor(String jdbcUrl, String user, String password, String sql) {
@@ -37,8 +35,7 @@ public class QueryExecutor implements AutoCloseable {
     public ResultSet execute() {
         try {
             this.connection = connect();
-            this.statement = this.connection.createStatement();
-            this.resultSet = this.statement.executeQuery(sql);
+            this.resultSet = this.connection.createStatement().executeQuery(sql);
         } catch (SQLException ex) {
             throw new ExtractorException(ex);
         }
@@ -50,11 +47,6 @@ public class QueryExecutor implements AutoCloseable {
             resultSet.close();
         } catch (SQLException e) {
             log.warn("SQL Exception thrown while closing result set.", e);
-        }
-        try {
-            statement.close();
-        } catch (SQLException e) {
-            log.warn("SQL Exception thrown while closing statement.", e);
         }
         try {
             connection.close();

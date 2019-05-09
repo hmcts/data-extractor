@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.dataextractor;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+
 
 @SuppressWarnings({"PMD", "checkstyle:hideutilityclassconstructor"})
 public class DataExtractorApplication {
@@ -19,6 +22,26 @@ public class DataExtractorApplication {
 
         public static Output defaultOutput() {
             return Output.JSON_LINES;
+        }
+    }
+
+    private static class ExtractorConfig {
+        private final String etlDbUrl;
+        private final String etlDbUser;
+        private final String etlDbPassword;
+        private final String etlSql;
+        private final String etlContainer;
+        private final String etlAccount;
+
+
+        public ExtractorConfig() {
+            Config config = ConfigFactory.load();
+            this.etlDbUrl = config.getString("etl-db-url");
+            this.etlDbUser = config.getString("etl-db-user");
+            this.etlDbPassword = config.getString("etl-db-password");
+            this.etlSql = config.getString("etl-sql");
+            this.etlAccount = config.getString("etl-account");
+            this.etlContainer = config.getString("etl-container");
         }
     }
 
