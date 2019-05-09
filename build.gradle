@@ -151,9 +151,6 @@ def versions = [
 dependencies {
   compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
 
-  compile group: 'com.microsoft.azure', name: 'azure-storage', version: '8.3.0'
-  compile group: 'com.microsoft.azure', name: 'azure-client-authentication', version: '1.6.6'
-  
   compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
 
   compile group: 'org.apache.commons', name: 'commons-csv', version: '1.6'

@@ -11,9 +11,7 @@ public class DataExtractorApplication {
         private String label;
 
         Output(String label) {
-            if (label != null) {
-                this.label = label.toLowerCase();
-            }
+            this.label = label.toLowerCase();
         }
 
         public static Output defaultOutput() {
@@ -21,9 +19,7 @@ public class DataExtractorApplication {
         }
     }
 
-
     public static void main(String[] args) {
-        DataExtractorApplication application = new DataExtractorApplication();
     }
 
 }
