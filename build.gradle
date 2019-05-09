@@ -7,10 +7,14 @@ plugins {
   id 'org.owasp.dependencycheck' version '4.0.2'
   id 'com.github.ben-manes.versions' version '0.17.0'
   id 'org.sonarqube' version '2.6.2'
+  id 'com.github.johnrengelman.shadow' version '4.0.4'
 }
 
 group 'uk.gov.hmcts.reform'
 version '1.0.0'
+archivesBaseName = 'data-extractor'
+mainClassName = 'uk.gov.hmcts.reform.dataextractor.DataExtractorApplication'
+
 
 sourceCompatibility = 11
 targetCompatibility = 11
@@ -126,8 +130,16 @@ repositories {
 
 jar {
   manifest {
-    attributes 'Implementation-Title': project.name, 'Implementation-Version': project.version
+    attributes 'Main-Class': 'uk.gov.hmcts.reform.dataextractor.DataExtractorApplication', 
+      'Implementation-Title': project.name, 
+      'Implementation-Version': project.version
   }
+}
+
+shadowJar {
+  baseName = 'data-extractor'
+  classifier = null
+  version = '1.0.0'
 }
 
 def versions = [
