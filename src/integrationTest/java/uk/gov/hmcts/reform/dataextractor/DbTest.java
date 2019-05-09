@@ -54,15 +54,9 @@ public class DbTest {
                             .build(),
                     insertInto("child")
                             .columns("id", "name", "data", "created_date", "parent_id")
-                            .values(1, "A1", "{\"a1Data\": {\"name\": \"A1\", \"subject\": "
-                                    + "{\"name\": {\"lastName\": \"A1S\", \"firstName\": \"Harry\"}, "
-                                    + "\"address\": \"a1Address\" }}}::json", "2019-04-12 23:45:46", 1)
-                            .values(2, "A2", "{\"a2Data\": {\"name\": \"A2\", \"subject\": "
-                                    + "{\"name\": {\"lastName\": \"A2S\", \"firstName\": \"Harry\"}, "
-                                    + "\"address\": \"a2Address\" }}}::json", "2019-04-12 23:45:47",1)
-                            .values(3, "B1", "{\"b1Data\": {\"name\": \"B2\", \"subject\": "
-                                    + "{\"name\": {\"lastName\": \"B1S\", \"firstName\": \"Harry\"}, "
-                                    + "\"address\": \"b1Address\" }}}::json", "2019-04-12 23:45:46", 2)
+                            .values(1, "A1", getDataFromFile("dataA1.json"), "2019-04-12 23:45:46", 1)
+                            .values(2, "A2", getDataFromFile("dataA2.json"), "2019-04-12 23:45:47", 1)
+                            .values(3, "B1", getDataFromFile("dataB1.json"), "2019-04-12 23:45:46", 2)
                             .build());
 
     @BeforeAll
@@ -92,8 +86,8 @@ public class DbTest {
      * @param filePath needed
      * @return string
      */
-    protected String getDataFromFile(String filePath) {
-        ClassLoader classLoader = getClass().getClassLoader();
+    protected static String getDataFromFile(String filePath) {
+        ClassLoader classLoader = DbTest.class.getClassLoader();
         File file = new File(classLoader.getResource(filePath).getFile());
         try {
             return FileUtils.readFileToString(file, "UTF-8");

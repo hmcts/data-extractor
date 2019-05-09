@@ -1,5 +1,5 @@
 job:
-  image: hmctssandbox.azurecr.io/hmcts/data-extractor:latest
+  image: hmcts.azurecr.io/hmcts/data-extractor:latest
   schedule: "0 2 * * *"
 global:
   job:
