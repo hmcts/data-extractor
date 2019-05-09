@@ -18,7 +18,7 @@ import static com.ninja_squad.dbsetup.Operations.sql;
 public class DbTest {
 
     @Container
-    public static final PostgreSQLContainer postgresContainer = new PostgreSQLContainer();
+    public static final PostgreSQLContainer postgresContainer = new PostgreSQLContainer("postgres:9.6.12-alpine");
 
     protected static String jdbcUrl;
     protected static String username;
