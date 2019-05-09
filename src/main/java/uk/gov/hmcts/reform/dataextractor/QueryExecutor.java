@@ -32,6 +32,7 @@ public class QueryExecutor implements AutoCloseable {
         return DriverManager.getConnection(jdbcUrl, user, password);
     }
 
+    @SuppressWarnings("squid:S2095")
     public ResultSet execute() {
         try {
             this.connection = connect();
