@@ -86,7 +86,8 @@ jacocoTestReport {
 project.tasks['sonarqube'].dependsOn test, integration
 sonarqube {
   properties {
-    property "sonar.projectName", "Reform :: Data Extractor"
+    property "sonar.projectName", "data-extractor-job"
+    property "sonar.projectKey", "data-extractor-job"
     property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
     property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/integration.exec"
 
