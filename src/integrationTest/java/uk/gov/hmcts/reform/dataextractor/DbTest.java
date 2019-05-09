@@ -7,7 +7,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.shaded.org.apache.commons.io.FileUtils;
 import uk.gov.hmcts.reform.dataextractor.utils.PostgresqlBinderConfiguration;
+
+import java.io.File;
+import java.io.IOException;
 
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.Operations.sequenceOf;
@@ -80,6 +84,22 @@ public class DbTest {
 
     protected DbTest() {
         // This constructor is intentionally empty. Nothing special is needed here.
+    }
+
+    /**
+     * Returns string by reading from file given file path.
+     *
+     * @param filePath needed
+     * @return string
+     */
+    protected String getDataFromFile(String filePath) {
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource(filePath).getFile());
+        try {
+            return FileUtils.readFileToString(file, "UTF-8");
+        } catch (IOException e) {
+            return "";
+        }
     }
     
 }
