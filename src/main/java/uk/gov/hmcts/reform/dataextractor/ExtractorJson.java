@@ -33,7 +33,7 @@ public class ExtractorJson implements Extractor {
         while (resultSet.next()) {
             jsonGenerator.writeStartObject();
             for (int i = 1; i <= columnCount; i++) {
-                writeJsonLine(jsonGenerator, metaData.getColumnName(i), resultSet.getObject(i),
+                writeRow(jsonGenerator, metaData.getColumnName(i), resultSet.getObject(i),
                         metaData.getColumnTypeName(i));
             }
             jsonGenerator.writeEndObject();
@@ -41,7 +41,7 @@ public class ExtractorJson implements Extractor {
         jsonGenerator.writeEndArray();
     }
 
-    protected void writeJsonLine(JsonGenerator jsonGenerator, String columnName, Object data, String dataType)
+    protected void writeRow(JsonGenerator jsonGenerator, String columnName, Object data, String dataType)
         throws IOException {
         jsonGenerator.writeObjectField(columnName, data);
     }
