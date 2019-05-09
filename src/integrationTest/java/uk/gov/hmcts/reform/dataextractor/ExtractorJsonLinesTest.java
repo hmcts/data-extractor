@@ -17,7 +17,8 @@ public class ExtractorJsonLinesTest extends DbTest {
     @Test
     public void whenSimpleSelectQueryExecuted_thenJsonLinesReturned() throws Exception {
         try (Connection conn = DriverManager.getConnection(jdbcUrl, username, password);
-             ResultSet resultSet = conn.createStatement().executeQuery("SELECT ID, NAME FROM parent WHERE ID IN (1, 2)")) {
+             ResultSet resultSet = conn.createStatement()
+                     .executeQuery("SELECT ID, NAME FROM parent WHERE ID IN (1, 2)")) {
 
             ExtractorJson extractor = new ExtractorJsonLines();
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -37,11 +38,7 @@ public class ExtractorJsonLinesTest extends DbTest {
             ExtractorJson extractor = new ExtractorJsonLines();
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             extractor.apply(resultSet, out);
-            assertEquals(
-                "{\"id\":1,\"name\":\"A\",\"child id\":1,\"data\":{\"a1Data\": {\"name\": \"A1\", \"subject\": {\"name\": {\"lastName\": \"A1S\", \"firstName\": \"Harry\"}, \"address\": \"a1Address\"}}},\"child name\":\"A1\"}\n"
-                        + "{\"id\":1,\"name\":\"A\",\"child id\":2,\"data\":{\"a2Data\": {\"name\": \"A2\", \"subject\": {\"name\": {\"lastName\": \"A2S\", \"firstName\": \"Harry\"}, \"address\": \"a2Address\"}}},\"child name\":\"A2\"}\n",
-                out.toString()
-            );
+            assertEquals(getDataFromFile("joinSelectQueryExpectedResult.json"), out.toString());
         }
 
     }

@@ -7,6 +7,7 @@ def product = "data-extractor"
 def component = "job"
 
 withPipeline(type, product, component) {
+  env.TESTCONTAINERS_RYUK_DISABLED = 'true'
   enableDockerBuild()
   installCharts()
   disableLegacyDeployment()
