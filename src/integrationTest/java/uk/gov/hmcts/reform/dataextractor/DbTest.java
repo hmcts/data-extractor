@@ -7,11 +7,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.shaded.org.apache.commons.io.FileUtils;
 import uk.gov.hmcts.reform.dataextractor.utils.PostgresqlBinderConfiguration;
-
-import java.io.File;
-import java.io.IOException;
+import uk.gov.hmcts.reform.dataextractor.utils.TestUtils;
 
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.Operations.sequenceOf;
@@ -54,9 +51,9 @@ public class DbTest {
                             .build(),
                     insertInto("child")
                             .columns("id", "name", "data", "created_date", "parent_id")
-                            .values(1, "A1", getDataFromFile("dataA1.json"), "2019-04-12 23:45:46", 1)
-                            .values(2, "A2", getDataFromFile("dataA2.json"), "2019-04-12 23:45:47", 1)
-                            .values(3, "B1", getDataFromFile("dataB1.json"), "2019-04-12 23:45:46", 2)
+                            .values(1, "A1", TestUtils.getDataFromFile("dataA1.json"), "2019-04-12 23:45:46", 1)
+                            .values(2, "A2", TestUtils.getDataFromFile("dataA2.json"), "2019-04-12 23:45:47", 1)
+                            .values(3, "B1", TestUtils.getDataFromFile("dataB1.json"), "2019-04-12 23:45:46", 2)
                             .build());
 
     @BeforeAll
@@ -80,20 +77,4 @@ public class DbTest {
         // This constructor is intentionally empty. Nothing special is needed here.
     }
 
-    /**
-     * Returns string by reading from file given file path.
-     *
-     * @param filePath needed
-     * @return string
-     */
-    protected static String getDataFromFile(String filePath) {
-        ClassLoader classLoader = DbTest.class.getClassLoader();
-        File file = new File(classLoader.getResource(filePath).getFile());
-        try {
-            return FileUtils.readFileToString(file, "UTF-8");
-        } catch (IOException e) {
-            return "";
-        }
-    }
-    
 }
