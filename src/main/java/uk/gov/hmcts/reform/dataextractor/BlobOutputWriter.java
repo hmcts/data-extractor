@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.dataextractor;
 
-import com.microsoft.azure.credentials.MSICredentials;
+import com.microsoft.azure.msiAuthTokenProvider.AzureMSICredentialException;
+import com.microsoft.azure.msiAuthTokenProvider.MSICredentials;
 import com.microsoft.azure.storage.StorageCredentials;
 import com.microsoft.azure.storage.StorageCredentialsToken;
 import com.microsoft.azure.storage.StorageException;
@@ -19,32 +20,37 @@ import java.time.format.DateTimeFormatter;
 import static java.time.ZoneOffset.UTC;
 
 
-public class OutputWriter implements AutoCloseable {
+public class BlobOutputWriter implements AutoCloseable {
 
+    private static final String STORAGE_RESOURCE = "https://storage.azure.com/";
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
     private static final String CONNECTION_URI_TPL = "https://%s.blob.core.windows.net";
-    
+
+    private final String clientId;
     private final String accountName;
-    private final String container;
+    private final String containerName;
     private final String filePrefix;
     private final DataExtractorApplication.Output outputType;
     private OutputStream outputStream;
 
-    public OutputWriter(
-        String accountName, String container, String filePrefix, DataExtractorApplication.Output outputType
+    public BlobOutputWriter(
+            String clientId, String accountName, String containerName,
+            String filePrefix, DataExtractorApplication.Output outputType
     ) {
+        this.clientId = clientId;
         this.accountName = accountName;
-        this.container = container;
+        this.containerName = containerName;
         this.filePrefix = filePrefix;
         this.outputType = outputType;
     }
 
     private StorageCredentials getCredentials() {
-        MSICredentials credsProvider = new MSICredentials(); //MSICredentials.getMSICredentials();
+        MSICredentials credsProvider = MSICredentials.getMSICredentials();
+        credsProvider.updateClientId(clientId);
         try {
-            String accessToken = credsProvider.getToken(null);
+            String accessToken = credsProvider.getToken(STORAGE_RESOURCE).accessToken();
             return new StorageCredentialsToken(accountName, accessToken);
-        } catch (IOException e) {
+        } catch (IOException | AzureMSICredentialException e) {
             throw new WriterException(e);
         }
     }
@@ -82,7 +88,7 @@ public class OutputWriter implements AutoCloseable {
                 .toString();
         CloudBlobContainer container = null;
         try {
-            container = client.getContainerReference(this.container);
+            container = client.getContainerReference(this.containerName);
             CloudBlockBlob blob = container.getBlockBlobReference(fileName);
             blob.getProperties().setContentType(outputType.getApplicationContent());
             outputStream = blob.openOutputStream();

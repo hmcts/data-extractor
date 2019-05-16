@@ -34,6 +34,9 @@ public class DataExtractorApplication {
         }
 
         public static Output from(String val) {
+            if (val == null) {
+                return defaultOutput();
+            }
             String normalisedVal = val
                 .toLowerCase()
                 .replaceAll("[-_\\p{Space}]", "");
@@ -54,6 +57,7 @@ public class DataExtractorApplication {
         private final String etlDbUser;
         private final String etlDbPassword;
         private final String etlSql;
+        private final String etlMsiClientId;
         private final String etlAccount;
         private final String etlContainer;
         private final Output etlFileType;
@@ -65,9 +69,14 @@ public class DataExtractorApplication {
             this.etlDbUser = config.getString("etl-db-user");
             this.etlDbPassword = config.getString("etl-db-password");
             this.etlSql = config.getString("etl-sql");
+            this.etlMsiClientId = config.getString("etl-msi-client-id");
             this.etlAccount = config.getString("etl-account");
             this.etlContainer = config.getString("etl-container");
-            this.etlFileType = Output.from(config.getString("etl-file-type"));
+            if (config.hasPath("etl-file-type")) {
+                this.etlFileType = Output.from(config.getString("etl-file-type"));
+            } else {
+                this.etlFileType = Output.defaultOutput();
+            }
             this.etlFilePrefix = config.getString("etl-file-prefix");
         }
     }
@@ -90,14 +99,18 @@ public class DataExtractorApplication {
     }
 
     public void run() {
-        try (QueryExecutor executor =
-                new QueryExecutor(config.etlDbUrl, config.etlDbUser, config.etlDbPassword, config.etlSql);
-            OutputWriter writer =
-                new OutputWriter(config.etlAccount, config.etlContainer, config.etlFilePrefix, config.etlFileType)
+        try (QueryExecutor executor = new QueryExecutor(
+                config.etlDbUrl, config.etlDbUser, config.etlDbPassword, config.etlSql);
+            BlobOutputWriter writer = new BlobOutputWriter(
+                config.etlMsiClientId, config.etlAccount, config.etlContainer, config.etlFilePrefix, config.etlFileType)
             ) {
             Extractor extractor = extractorFactory(config.etlFileType);
             extractor.apply(executor.execute(), writer.outputStream());
         }
+    }
+
+    public ExtractorConfig getConfig() {
+        return config;
     }
 
 

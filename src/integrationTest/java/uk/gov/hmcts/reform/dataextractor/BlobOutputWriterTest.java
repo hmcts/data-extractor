@@ -26,10 +26,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Testcontainers
-public class OutputWriterTest {
+public class BlobOutputWriterTest {
 
     private CloudBlobClient cloudBlobClient;
 
+    private static final String CLIENT_ID = "testclientid";
     private static final String CONTAINER = "testcontainer";
     private static final String BLOB_PREFIX = "testblob";
     private static final String ACCOUNT = "devstoreaccount1";
@@ -61,8 +62,8 @@ public class OutputWriterTest {
     @Test
     public void whenfileUploaded_thenAvailableInBlobStorage() throws Exception {
         String filePath = "dataA1.json";
-        try (OutputWriter writer = new OutputWriter(
-            ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES)) {
+        try (BlobOutputWriter writer = new BlobOutputWriter(
+            CLIENT_ID, ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES)) {
             OutputStream outputStream = writer.outputStream(cloudBlobClient);
             assertNotNull(outputStream);
             InputStream inputStream = TestUtils.getStreamFromFile(filePath);
@@ -88,8 +89,9 @@ public class OutputWriterTest {
     @Test
     public void whenContainerMissing_thenFileUploadFails() throws Exception {
         Assertions.assertThrows(WriterException.class, () -> {
-            try (OutputWriter writer = new OutputWriter(
-                    ACCOUNT, "somenewcontainer", BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES)) {
+            try (BlobOutputWriter writer = new BlobOutputWriter(
+                    CLIENT_ID, ACCOUNT, "somenewcontainer",
+                    BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES)) {
                 OutputStream outputStream = writer.outputStream(cloudBlobClient);
                 assertNotNull(outputStream);
                 String filePath = "dataA1.json";
