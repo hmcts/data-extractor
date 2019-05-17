@@ -127,7 +127,7 @@ public class BlobOutputWriterTest {
     }
 
     @Test
-    public void whenOutputStreamExisats_thenSameInstanceIsReturned() throws Exception {
+    public void whenOutputStreamExists_thenSameInstanceIsReturned() throws Exception {
         try (BlobOutputWriter writer = new BlobOutputWriter(
                 CLIENT_ID, ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES)) {
             OutputStream outputStream = writer.outputStream(cloudBlobClient);
