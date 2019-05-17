@@ -26,6 +26,7 @@ import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Testcontainers
@@ -123,6 +124,39 @@ public class BlobOutputWriterTest {
         // retrieve uploaded blob
         CloudBlobContainer container = cloudBlobClient.getContainerReference(CONTAINER);
         TestUtils.hasBlobThatStartsWith(container, BLOB_PREFIX);
+    }
+
+    @Test
+    public void whenOutputStreamExisats_thenSameInstanceIsReturned() throws Exception {
+        try (BlobOutputWriter writer = new BlobOutputWriter(
+                CLIENT_ID, ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES)) {
+            OutputStream outputStream = writer.outputStream(cloudBlobClient);
+            assertNotNull(outputStream);
+            OutputStream newOutputStream = writer.outputStream(cloudBlobClient);
+            assertSame(outputStream, newOutputStream);
+        }
+    }
+
+    @Test
+    public void whenInvalidUriUsed_thenCannotGetClientInstance() throws Exception {
+        Assertions.assertThrows(WriterException.class, () -> {
+            try (BlobOutputWriter writer = new BlobOutputWriter(
+                    CLIENT_ID, "someotheraccount", CONTAINER,
+                    BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES)) {
+                writer.getClient();
+            }
+        });
+    }
+
+    @Test
+    public void whenAadNotAvailable_thenCannotGetCredentialsInstance() throws Exception {
+        Assertions.assertThrows(WriterException.class, () -> {
+            try (BlobOutputWriter writer = new BlobOutputWriter(
+                    CLIENT_ID, "someotheraccount", CONTAINER,
+                    BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES)) {
+                writer.getCredentials();
+            }
+        });
     }
 
 }
