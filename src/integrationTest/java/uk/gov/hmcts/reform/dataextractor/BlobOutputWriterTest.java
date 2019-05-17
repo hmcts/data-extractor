@@ -9,6 +9,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -26,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Testcontainers
+@ExtendWith(MockitoExtension.class)
 public class BlobOutputWriterTest {
 
     private CloudBlobClient cloudBlobClient;
@@ -99,6 +103,26 @@ public class BlobOutputWriterTest {
                 IOUtils.copy(inputStream, outputStream);
             }
         });
+    }
+
+    @Test
+    public void whenAuthorisedClientAvailable_thenBlobStorageCanBeAccessed() throws Exception {
+        String filePath = "dataA1.json";
+        try (BlobOutputWriter writer = new BlobOutputWriter(
+                CLIENT_ID, ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES)) {
+
+            // stub aad identity client
+            BlobOutputWriter writerSpy = Mockito.spy(writer);
+            Mockito.doReturn(cloudBlobClient).when(writerSpy).getClient();
+
+            OutputStream outputStream = writerSpy.outputStream();
+            assertNotNull(outputStream);
+            InputStream inputStream = TestUtils.getStreamFromFile(filePath);
+            IOUtils.copy(inputStream, outputStream);
+        }
+        // retrieve uploaded blob
+        CloudBlobContainer container = cloudBlobClient.getContainerReference(CONTAINER);
+        TestUtils.hasBlobThatStartsWith(container, BLOB_PREFIX);
     }
 
 }

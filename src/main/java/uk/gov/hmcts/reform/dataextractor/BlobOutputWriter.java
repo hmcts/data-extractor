@@ -44,7 +44,7 @@ public class BlobOutputWriter implements AutoCloseable {
         this.outputType = outputType;
     }
 
-    private StorageCredentials getCredentials() {
+    protected StorageCredentials getCredentials() {
         MSICredentials credsProvider = MSICredentials.getMSICredentials();
         credsProvider.updateClientId(clientId);
         try {
@@ -55,7 +55,7 @@ public class BlobOutputWriter implements AutoCloseable {
         }
     }
 
-    private CloudBlobClient getClient() {
+    protected CloudBlobClient getClient() {
         URI connectionUri = null;
         try {
             connectionUri = new URI(String.format(CONNECTION_URI_TPL, accountName));

@@ -31,8 +31,38 @@ public class DataExtractorApplicationTest {
     }
 
     @Test
+    public void whenFromIsJsonLines_thenJsonLinesOutputIsReturned() {
+        assertEquals(DataExtractorApplication.Output.JSON_LINES, DataExtractorApplication.Output.from("jSonLiNes"));
+        assertEquals(DataExtractorApplication.Output.JSON_LINES, DataExtractorApplication.Output.from("JSONLINES"));
+    }
+
+    @Test
     public void whenFromIsNotSpecified_thenJsonLinesOutputIsReturned() {
         assertEquals(DataExtractorApplication.Output.JSON_LINES, DataExtractorApplication.Output.from(null));
+    }
+
+    @Test
+    public void whenFactoryOutputIsJson_thenExtractorJsonIsReturned() {
+        assertEquals(
+            ExtractorJson.class,
+            DataExtractorApplication.extractorFactory(DataExtractorApplication.Output.JSON).getClass()
+        );
+    }
+
+    @Test
+    public void whenFactoryOutputIsCsv_thenExtractorCsvIsReturned() {
+        assertEquals(
+            ExtractorCsv.class,
+            DataExtractorApplication.extractorFactory(DataExtractorApplication.Output.CSV).getClass()
+        );
+    }
+
+    @Test
+    public void whenFactoryOutputIsJsonLines_thenExtractorJsonLinesIsReturned() {
+        assertEquals(
+            ExtractorJsonLines.class,
+            DataExtractorApplication.extractorFactory(DataExtractorApplication.Output.JSON_LINES).getClass()
+        );
     }
 
 }

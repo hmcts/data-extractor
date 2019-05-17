@@ -89,7 +89,7 @@ public class DataExtractorApplication {
         this.config = new ExtractorConfig();
     }
 
-    private Extractor extractorFactory(Output outputType) {
+    protected static Extractor extractorFactory(Output outputType) {
         switch (outputType) {
             case JSON_LINES: return new ExtractorJsonLines();
             case JSON: return new ExtractorJson();
@@ -104,7 +104,7 @@ public class DataExtractorApplication {
             BlobOutputWriter writer = new BlobOutputWriter(
                 config.etlMsiClientId, config.etlAccount, config.etlContainer, config.etlFilePrefix, config.etlFileType)
             ) {
-            Extractor extractor = extractorFactory(config.etlFileType);
+            Extractor extractor = DataExtractorApplication.extractorFactory(config.etlFileType);
             extractor.apply(executor.execute(), writer.outputStream());
         }
     }
