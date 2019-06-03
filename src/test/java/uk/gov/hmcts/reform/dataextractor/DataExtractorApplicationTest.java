@@ -19,13 +19,13 @@ public class DataExtractorApplicationTest {
     }
 
     @Test
-    public void whenApplicationCreated_thenConfigurationRead(@TempDir Path tempDir) throws Exception {
+    public void whenApplicationCreated_thenConfigurationRead() {
         ConfigFactory.invalidateCaches();
         System.setProperty("config.resource", "application-alt.conf");
         DataExtractorApplication application = new DataExtractorApplication();
         assertNotNull(application.getConfig());
-        assertEquals(application.getConfig().etlDbUser, "user");
-        assertEquals(application.getConfig().etlDbPassword, "password");
+        assertEquals("user", application.getConfig().etlDbUser);
+        assertEquals("password", application.getConfig().etlDbPassword);
     }
 
     @Test
@@ -80,8 +80,8 @@ public class DataExtractorApplicationTest {
         Files.write(tempDir.resolve("password-file"), "password1\npassword2".getBytes());
         String baseDir = tempDir.normalize().toString();
         DataExtractorApplication application = new DataExtractorApplication(baseDir);
-        assertEquals(application.getConfig().etlDbUser, "username");
-        assertEquals(application.getConfig().etlDbPassword, "password1");
+        assertEquals("username", application.getConfig().etlDbUser);
+        assertEquals("password1", application.getConfig().etlDbPassword);
     }
 
 }

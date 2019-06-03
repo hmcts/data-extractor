@@ -108,7 +108,7 @@ public class DataExtractorApplication {
                 return Files.readAllLines(Paths.get(baseDir, fileName))
                     .stream()
                     .findFirst()
-                    .get();
+                    .orElseThrow();
             } catch (IOException e) {
                 throw new ExtractorException(e);
             }
