@@ -3,6 +3,10 @@ package uk.gov.hmcts.reform.dataextractor;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 
 @SuppressWarnings({"PMD", "checkstyle:hideutilityclassconstructor"})
 public class DataExtractorApplication {
@@ -52,10 +56,12 @@ public class DataExtractorApplication {
         }
     }
 
-    private static class ExtractorConfig {
+    static class ExtractorConfig {
+        private String baseDir = "/mnt/secrets/";
+
         private final String etlDbUrl;
-        private final String etlDbUser;
-        private final String etlDbPassword;
+        final String etlDbUser;
+        final String etlDbPassword;
         private final String etlSql;
         private final String etlMsiClientId;
         private final String etlAccount;
@@ -63,11 +69,24 @@ public class DataExtractorApplication {
         private final Output etlFileType;
         private final String etlFilePrefix;
 
-        public ExtractorConfig() {
+        ExtractorConfig(String baseDir) {
+            if (baseDir != null) {
+                this.baseDir = baseDir;
+            }
             Config config = ConfigFactory.load();
             this.etlDbUrl = config.getString("etl-db-url");
-            this.etlDbUser = config.getString("etl-db-user");
-            this.etlDbPassword = config.getString("etl-db-password");
+            if (config.hasPath("etl-db-user-file")) {
+                String etlDbUserFile = config.getString("etl-db-user-file");
+                this.etlDbUser = readFirstLine(etlDbUserFile);
+            } else {
+                this.etlDbUser = config.getString("etl-db-user");
+            }
+            if (config.hasPath("etl-db-password-file")) {
+                String etlDbPasswordFile = config.getString("etl-db-password-file");
+                this.etlDbPassword = readFirstLine(etlDbPasswordFile);
+            } else {
+                this.etlDbPassword = config.getString("etl-db-password");
+            }
             this.etlSql = config.getString("etl-sql");
             this.etlMsiClientId = config.getString("etl-msi-client-id");
             this.etlAccount = config.getString("etl-account");
@@ -79,6 +98,21 @@ public class DataExtractorApplication {
             }
             this.etlFilePrefix = config.getString("etl-file-prefix");
         }
+
+        ExtractorConfig() {
+            this(null);
+        }
+
+        private String readFirstLine(String fileName) {
+            try {
+                return Files.readAllLines(Paths.get(baseDir, fileName))
+                    .stream()
+                    .findFirst()
+                    .orElseThrow();
+            } catch (IOException e) {
+                throw new ExtractorException(e);
+            }
+        }
     }
 
 
@@ -87,6 +121,10 @@ public class DataExtractorApplication {
 
     public DataExtractorApplication() {
         this.config = new ExtractorConfig();
+    }
+
+    DataExtractorApplication(String baseDir) {
+        this.config = new ExtractorConfig(baseDir);
     }
 
     protected static Extractor extractorFactory(Output outputType) {
