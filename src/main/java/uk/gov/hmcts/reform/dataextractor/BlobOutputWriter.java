@@ -93,6 +93,7 @@ public class BlobOutputWriter implements AutoCloseable {
                 .append(filePrefix)
                 .append("-")
                 .append(DATE_TIME_FORMATTER.format(LocalDateTime.now(ZoneId.from(UTC))))
+                .append(".")
                 .append(outputType.getExtension())
                 .toString();
         CloudBlobContainer container = null;
