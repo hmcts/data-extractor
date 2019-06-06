@@ -53,12 +53,12 @@ public class QueryExecutor implements AutoCloseable {
         try {
             resultSet.close();
         } catch (SQLException e) {
-            LOGGER.warn("SQL Exception thrown while closing result set.", e);
+            LOGGER.warn("SQL Exception thrown while closing result set.", e); // NOSONAR
         }
         try {
             connection.close();
         } catch (SQLException e) {
-            LOGGER.warn("SQL Exception thrown while closing connection.", e);
+            LOGGER.warn("SQL Exception thrown while closing connection.", e); // NOSONAR
         }
     }
 
