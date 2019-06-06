@@ -9,6 +9,8 @@ import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.blob.CloudBlobClient;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -22,6 +24,8 @@ import static java.time.ZoneOffset.UTC;
 
 
 public class BlobOutputWriter implements AutoCloseable {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BlobOutputWriter.class);
 
     private static final String STORAGE_RESOURCE = "https://storage.azure.com/";
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
@@ -48,10 +52,10 @@ public class BlobOutputWriter implements AutoCloseable {
     protected StorageCredentials getCredentials() {
         MSICredentials credsProvider = MSICredentials.getMSICredentials();
         credsProvider.updateClientId(clientId);
-        System.out.println("MSICredentials: " + credsProvider);
+        LOGGER.info("MSICredentials: " + credsProvider);
         try {
             String accessToken = credsProvider.getToken(STORAGE_RESOURCE).accessToken();
-            System.out.println("Access token: " + accessToken);
+            LOGGER.info("Access token: " + accessToken);
             return new StorageCredentialsToken(accountName, accessToken);
         } catch (IOException | AzureMSICredentialException e) {
             throw new WriterException(e);
@@ -62,7 +66,7 @@ public class BlobOutputWriter implements AutoCloseable {
         URI connectionUri = null;
         try {
             connectionUri = new URI(String.format(CONNECTION_URI_TPL, accountName));
-            System.out.println("blobUri: " + connectionUri.toString());
+            LOGGER.info("blobUri: " + connectionUri.toString());
         } catch (URISyntaxException e) {
             throw new WriterException(e);
         }
