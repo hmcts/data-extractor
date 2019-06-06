@@ -66,7 +66,7 @@ public class BlobOutputWriter implements AutoCloseable {
         URI connectionUri = null;
         try {
             connectionUri = new URI(String.format(CONNECTION_URI_TPL, accountName));
-            LOGGER.info("blobUri: {}", connectionUri.toString());
+            LOGGER.info("connectionUri: {}", connectionUri);
         } catch (URISyntaxException e) {
             throw new WriterException(e);
         }
