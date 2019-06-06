@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.dataextractor;
 
 import com.microsoft.azure.msiAuthTokenProvider.AzureMSICredentialException;
 import com.microsoft.azure.msiAuthTokenProvider.MSICredentials;
+import com.microsoft.azure.storage.OperationContext;
 import com.microsoft.azure.storage.StorageCredentials;
 import com.microsoft.azure.storage.StorageCredentialsToken;
 import com.microsoft.azure.storage.StorageException;
@@ -47,8 +48,10 @@ public class BlobOutputWriter implements AutoCloseable {
     protected StorageCredentials getCredentials() {
         MSICredentials credsProvider = MSICredentials.getMSICredentials();
         credsProvider.updateClientId(clientId);
+        System.out.println("MSICredentials: " + credsProvider);
         try {
             String accessToken = credsProvider.getToken(STORAGE_RESOURCE).accessToken();
+            System.out.println("Access token: " + accessToken);
             return new StorageCredentialsToken(accountName, accessToken);
         } catch (IOException | AzureMSICredentialException e) {
             throw new WriterException(e);
@@ -59,6 +62,7 @@ public class BlobOutputWriter implements AutoCloseable {
         URI connectionUri = null;
         try {
             connectionUri = new URI(String.format(CONNECTION_URI_TPL, accountName));
+            System.out.println("blobUri: " + connectionUri.toString());
         } catch (URISyntaxException e) {
             throw new WriterException(e);
         }
@@ -70,6 +74,7 @@ public class BlobOutputWriter implements AutoCloseable {
         if (outputStream != null) {
             return outputStream;
         }
+        OperationContext.setLoggingEnabledByDefault(true);
 
         CloudBlobClient client = getClient();
         return outputStream(client);
