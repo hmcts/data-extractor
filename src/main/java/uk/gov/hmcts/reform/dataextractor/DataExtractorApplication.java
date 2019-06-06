@@ -120,6 +120,7 @@ public class DataExtractorApplication {
 
 
     public DataExtractorApplication() {
+        System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "TRACE");
         this.config = new ExtractorConfig();
     }
 
