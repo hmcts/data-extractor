@@ -111,7 +111,9 @@ public class BlobOutputWriter implements AutoCloseable {
                 outputStream.close();
             }
         } catch (IOException e) {
-            // Do nothing. Azure blob storage has already closed the stream.
+            // Blob storage client has already closed the stream. This exception cannot be
+            // re-thrown as otherwise if this is run as a kubernetes job, it will keep being
+            // restarted and the same file generated again and again.
             LOGGER.warn("Could not close stream. Root cause is: " + e.getMessage());
         }
     }
