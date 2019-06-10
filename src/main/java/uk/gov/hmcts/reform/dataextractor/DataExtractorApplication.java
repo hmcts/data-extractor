@@ -153,8 +153,6 @@ public class DataExtractorApplication {
 
 
     public static void main(String[] args) {
-        // Enable this for (very) detailed operations logging (see BlobWriterOutput.java for storage logging)
-        //System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "TRACE");
         new DataExtractorApplication().run();
     }
 
