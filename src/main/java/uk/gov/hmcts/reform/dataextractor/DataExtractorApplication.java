@@ -153,7 +153,8 @@ public class DataExtractorApplication {
 
 
     public static void main(String[] args) {
-        System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "TRACE");
+        // Enable this for (very) detailed blob storage operations logging
+        //System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "TRACE");
         new DataExtractorApplication().run();
     }
 

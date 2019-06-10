@@ -110,7 +110,7 @@ public class BlobOutputWriter implements AutoCloseable {
         try {
             if (outputStream != null) {
                 outputStream.flush();
-                outputStream.close();
+                //outputStream.close();
             }
         } catch (IOException e) {
             throw new WriterException(e);
