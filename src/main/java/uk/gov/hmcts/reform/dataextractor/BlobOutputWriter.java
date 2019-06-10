@@ -76,7 +76,8 @@ public class BlobOutputWriter implements AutoCloseable {
         if (outputStream != null) {
             return outputStream;
         }
-        OperationContext.setLoggingEnabledByDefault(true);
+        // Enable this for (very) detailed blob storage operations logging
+        //OperationContext.setLoggingEnabledByDefault(true);
 
         CloudBlobClient client = getClient();
         return outputStream(client);
