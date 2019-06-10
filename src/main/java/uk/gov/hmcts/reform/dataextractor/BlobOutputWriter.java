@@ -112,7 +112,7 @@ public class BlobOutputWriter implements AutoCloseable {
             }
         } catch (IOException e) {
             // Do nothing. Azure blob storage has already closed the stream.
-            LOGGER.warn(e.getMessage(), e);
+            LOGGER.warn("Could not close stream. Root cause is: " + e.getMessage());
         }
     }
 
