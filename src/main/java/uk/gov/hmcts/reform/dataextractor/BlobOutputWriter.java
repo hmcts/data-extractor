@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.dataextractor;
 
 import com.microsoft.azure.msiAuthTokenProvider.AzureMSICredentialException;
 import com.microsoft.azure.msiAuthTokenProvider.MSICredentials;
-import com.microsoft.azure.storage.OperationContext;
 import com.microsoft.azure.storage.StorageCredentials;
 import com.microsoft.azure.storage.StorageCredentialsToken;
 import com.microsoft.azure.storage.StorageException;
