@@ -111,10 +111,11 @@ public class BlobOutputWriter implements AutoCloseable {
     public void close() {
         try {
             if (outputStream != null) {
+                outputStream.flush();
                 outputStream.close();
             }
         } catch (IOException e) {
-            throw new WriterException(e);
+            // Do nothing. Azure blob storage has already closed the stream.
         }
     }
 
