@@ -53,11 +53,7 @@ public class BlobOutputWriter implements AutoCloseable {
         credsProvider.updateClientId(clientId);
         try {
             String accessToken = credsProvider.getToken(STORAGE_RESOURCE).accessToken();
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Access token: {}", accessToken);
-            } else {
-                LOGGER.info("Access token: {}", accessToken != null ? accessToken.substring(0,5) + "..." : "null");
-            }
+            LOGGER.info("Got access token: {}", accessToken != null ? accessToken.substring(0,5) + "..." : "null");
             return new StorageCredentialsToken(accountName, accessToken);
         } catch (IOException | AzureMSICredentialException e) {
             throw new WriterException(e);
