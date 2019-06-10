@@ -8,6 +8,8 @@ import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.blob.CloudBlobClient;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -21,6 +23,8 @@ import static java.time.ZoneOffset.UTC;
 
 
 public class BlobOutputWriter implements AutoCloseable {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BlobOutputWriter.class);
 
     private static final String STORAGE_RESOURCE = "https://storage.azure.com/";
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
@@ -49,6 +53,7 @@ public class BlobOutputWriter implements AutoCloseable {
         credsProvider.updateClientId(clientId);
         try {
             String accessToken = credsProvider.getToken(STORAGE_RESOURCE).accessToken();
+            LOGGER.info("Got access token: {}", accessToken != null ? accessToken.substring(0,5) + "..." : "null");
             return new StorageCredentialsToken(accountName, accessToken);
         } catch (IOException | AzureMSICredentialException e) {
             throw new WriterException(e);
@@ -84,6 +89,7 @@ public class BlobOutputWriter implements AutoCloseable {
                 .append(filePrefix)
                 .append("-")
                 .append(DATE_TIME_FORMATTER.format(LocalDateTime.now(ZoneId.from(UTC))))
+                .append(".")
                 .append(outputType.getExtension())
                 .toString();
         CloudBlobContainer container = null;
@@ -105,7 +111,10 @@ public class BlobOutputWriter implements AutoCloseable {
                 outputStream.close();
             }
         } catch (IOException e) {
-            throw new WriterException(e);
+            // Blob storage client has already closed the stream. This exception cannot be
+            // re-thrown as otherwise if this is run as a kubernetes job, it will keep being
+            // restarted and the same file generated again and again.
+            LOGGER.warn("Could not close stream. Root cause is: " + e.getMessage());
         }
     }
 

@@ -18,6 +18,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.shaded.org.apache.commons.io.IOUtils;
 import uk.gov.hmcts.reform.dataextractor.utils.TestUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
@@ -92,8 +93,8 @@ public class BlobOutputWriterTest {
     }
 
     @Test
-    public void whenContainerMissing_thenFileUploadFails() throws Exception {
-        Assertions.assertThrows(WriterException.class, () -> {
+    public void whenContainerMissing_thenFileUploadFails() {
+        Assertions.assertThrows(IOException.class, () -> {
             try (BlobOutputWriter writer = new BlobOutputWriter(
                     CLIENT_ID, ACCOUNT, "somenewcontainer",
                     BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES)) {
@@ -102,6 +103,8 @@ public class BlobOutputWriterTest {
                 String filePath = "dataA1.json";
                 InputStream inputStream = TestUtils.getStreamFromFile(filePath);
                 IOUtils.copy(inputStream, outputStream);
+                outputStream.flush();
+                outputStream.close();
             }
         });
     }
