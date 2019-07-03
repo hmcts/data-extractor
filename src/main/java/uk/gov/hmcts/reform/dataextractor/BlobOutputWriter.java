@@ -18,6 +18,7 @@ import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 import static java.time.ZoneOffset.UTC;
 
@@ -53,7 +54,7 @@ public class BlobOutputWriter implements AutoCloseable {
         credsProvider.updateClientId(clientId);
         try {
             String accessToken = credsProvider.getToken(STORAGE_RESOURCE).accessToken();
-            LOGGER.info("Got access token: {}", accessToken != null ? accessToken.substring(0,5) + "..." : "null");
+            LOGGER.info("Got access token: {}", Optional.ofNullable(accessToken).orElse("null").substring(0,4));
             return new StorageCredentialsToken(accountName, accessToken);
         } catch (IOException | AzureMSICredentialException e) {
             throw new WriterException(e);
@@ -114,7 +115,7 @@ public class BlobOutputWriter implements AutoCloseable {
             // Blob storage client has already closed the stream. This exception cannot be
             // re-thrown as otherwise if this is run as a kubernetes job, it will keep being
             // restarted and the same file generated again and again.
-            LOGGER.warn("Could not close stream. Root cause is: " + e.getMessage());
+            LOGGER.warn("Could not close stream. Root cause is: {}", e.getMessage());
         }
     }
 
