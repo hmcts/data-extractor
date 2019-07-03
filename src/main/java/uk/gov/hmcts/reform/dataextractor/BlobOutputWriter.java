@@ -18,7 +18,6 @@ import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 
 import static java.time.ZoneOffset.UTC;
 
@@ -54,7 +53,11 @@ public class BlobOutputWriter implements AutoCloseable {
         credsProvider.updateClientId(clientId);
         try {
             String accessToken = credsProvider.getToken(STORAGE_RESOURCE).accessToken();
-            LOGGER.info("Got access token: {}", Optional.ofNullable(accessToken).orElse("null").substring(0,4));
+            if (accessToken == null) {
+                LOGGER.warn("Got null access token");
+            } else {
+                LOGGER.info("Got access token: {}", accessToken.substring(0, 5));
+            }
             return new StorageCredentialsToken(accountName, accessToken);
         } catch (IOException | AzureMSICredentialException e) {
             throw new WriterException(e);
