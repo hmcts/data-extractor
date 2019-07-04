@@ -15,29 +15,39 @@ public class ExtractorJson implements Extractor {
 
     public void apply(ResultSet resultSet, OutputStream outputStream) {
         final ObjectMapper objectMapper = new ObjectMapper();
-        try (JsonGenerator jsonGenerator =
-            objectMapper.getFactory().createGenerator(outputStream, JsonEncoding.UTF8)
+        try (JsonGenerator jsonGenerator = objectMapper.getFactory()
+            .configure(JsonGenerator.Feature.FLUSH_PASSED_TO_STREAM, false)
+            .createGenerator(outputStream, JsonEncoding.UTF8)
         ) {
-            writeResultSetToJson(resultSet, jsonGenerator);
+            write(resultSet, jsonGenerator);
         } catch (IOException | SQLException e) {
             throw new ExtractorException(e);
         }
+    }
+
+    protected void write(ResultSet resultSet, JsonGenerator jsonGenerator)
+        throws SQLException, IOException {
+        jsonGenerator.writeStartArray();
+        writeResultSetToJson(resultSet, jsonGenerator);
+        jsonGenerator.writeEndArray();
     }
 
     protected void writeResultSetToJson(ResultSet resultSet, JsonGenerator jsonGenerator)
         throws SQLException, IOException {
         final ResultSetMetaData metaData = resultSet.getMetaData();
         final int columnCount = metaData.getColumnCount();
-        jsonGenerator.writeStartArray();
         while (resultSet.next()) {
             jsonGenerator.writeStartObject();
             for (int i = 1; i <= columnCount; i++) {
                 writeRow(jsonGenerator, metaData.getColumnName(i), resultSet.getObject(i),
                         metaData.getColumnTypeName(i));
             }
-            jsonGenerator.writeEndObject();
+            writeEndObject(jsonGenerator);
         }
-        jsonGenerator.writeEndArray();
+    }
+
+    protected void writeEndObject(JsonGenerator jsonGenerator) throws IOException {
+        jsonGenerator.writeEndObject();
     }
 
     protected void writeRow(JsonGenerator jsonGenerator, String columnName, Object data, String dataType)
