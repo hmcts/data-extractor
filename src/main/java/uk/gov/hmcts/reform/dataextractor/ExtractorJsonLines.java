@@ -10,12 +10,14 @@ import java.sql.SQLException;
 
 public class ExtractorJsonLines extends ExtractorJson {
 
+    @Override
     protected void write(ResultSet resultSet, JsonGenerator jsonGenerator)
         throws SQLException, IOException {
         jsonGenerator.setPrettyPrinter(new MinimalPrettyPrinter(""));
         writeResultSetToJson(resultSet, jsonGenerator);
     }
 
+    @Override
     protected void writeEndObject(JsonGenerator jsonGenerator) throws IOException {
         jsonGenerator.writeEndObject();
         jsonGenerator.writeRaw("\n");
