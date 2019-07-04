@@ -11,6 +11,7 @@ import com.microsoft.azure.storage.blob.CloudBlockBlob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
@@ -29,6 +30,7 @@ public class BlobOutputWriter implements AutoCloseable {
     private static final String STORAGE_RESOURCE = "https://storage.azure.com/";
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
     private static final String CONNECTION_URI_TPL = "https://%s.blob.core.windows.net";
+    private static final int OUTPUT_BUFFER_SIZE = 100_000_000;
 
     private final String clientId;
     private final String accountName;
@@ -99,7 +101,7 @@ public class BlobOutputWriter implements AutoCloseable {
             container = client.getContainerReference(this.containerName);
             CloudBlockBlob blob = container.getBlockBlobReference(fileName);
             blob.getProperties().setContentType(outputType.getApplicationContent());
-            outputStream = blob.openOutputStream();
+            outputStream = new BufferedOutputStream(blob.openOutputStream(), OUTPUT_BUFFER_SIZE);
         } catch (URISyntaxException | StorageException e) {
             throw new WriterException(e);
         }

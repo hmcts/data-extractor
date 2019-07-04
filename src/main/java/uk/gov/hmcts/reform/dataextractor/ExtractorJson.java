@@ -19,7 +19,6 @@ public class ExtractorJson implements Extractor {
             objectMapper.getFactory().createGenerator(outputStream, JsonEncoding.UTF8)
         ) {
             writeResultSetToJson(resultSet, jsonGenerator);
-            jsonGenerator.flush();
         } catch (IOException | SQLException e) {
             throw new ExtractorException(e);
         }

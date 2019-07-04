@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testcontainers.containers.GenericContainer;
@@ -65,15 +67,17 @@ public class BlobOutputWriterTest {
         blobStorageContainer.stop();
     }
 
-    @Test
-    public void whenfileUploaded_thenAvailableInBlobStorage() throws Exception {
-        String filePath = "dataA1.json";
+    @ParameterizedTest
+    @ValueSource(strings = {"dataA1.json", "dataA1.csv"})
+    public void whenfileUploaded_thenAvailableInBlobStorage(String filePath) throws Exception {
         try (BlobOutputWriter writer = new BlobOutputWriter(
             CLIENT_ID, ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES)) {
             OutputStream outputStream = writer.outputStream(cloudBlobClient);
             assertNotNull(outputStream);
             InputStream inputStream = TestUtils.getStreamFromFile(filePath);
             IOUtils.copy(inputStream, outputStream);
+            outputStream.flush();
+            outputStream.close();
         }
         // retrieve uploaded blob
         CloudBlobContainer container = cloudBlobClient.getContainerReference(CONTAINER);

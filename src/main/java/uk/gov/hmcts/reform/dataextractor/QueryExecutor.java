@@ -13,6 +13,8 @@ import java.sql.Statement;
 public class QueryExecutor implements AutoCloseable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QueryExecutor.class);
+    private static final int QUERY_BATCH_SIZE = 200;
+
 
     private final String jdbcUrl;
     private final String user;
@@ -42,7 +44,7 @@ public class QueryExecutor implements AutoCloseable {
             this.connection.setAutoCommit(false);
             LOGGER.info("Executing sql...");
             this.statement = this.connection.createStatement();
-            this.statement.setFetchSize(50);
+            this.statement.setFetchSize(QUERY_BATCH_SIZE);
             long startTime = System.nanoTime();
             this.resultSet = this.statement.executeQuery(sql);
             long endTime = System.nanoTime();
