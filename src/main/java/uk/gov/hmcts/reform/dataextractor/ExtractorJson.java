@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.dataextractor;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -15,10 +17,11 @@ public class ExtractorJson implements Extractor {
 
     public void apply(ResultSet resultSet, OutputStream outputStream) {
         final ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(SerializationFeature.FLUSH_AFTER_WRITE_VALUE, false);
+        objectMapper.configure(JsonGenerator.Feature.FLUSH_PASSED_TO_STREAM, false);
         try (JsonGenerator jsonGenerator =
             objectMapper.getFactory().createGenerator(outputStream, JsonEncoding.UTF8)
         ) {
-            jsonGenerator.disable(JsonGenerator.Feature.FLUSH_PASSED_TO_STREAM);
             write(resultSet, jsonGenerator);
         } catch (IOException | SQLException e) {
             throw new ExtractorException(e);
