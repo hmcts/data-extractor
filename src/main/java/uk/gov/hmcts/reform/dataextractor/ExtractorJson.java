@@ -15,10 +15,10 @@ public class ExtractorJson implements Extractor {
 
     public void apply(ResultSet resultSet, OutputStream outputStream) {
         final ObjectMapper objectMapper = new ObjectMapper();
-        try (JsonGenerator jsonGenerator = objectMapper.getFactory()
-            .configure(JsonGenerator.Feature.FLUSH_PASSED_TO_STREAM, false)
-            .createGenerator(outputStream, JsonEncoding.UTF8)
+        try (JsonGenerator jsonGenerator =
+            objectMapper.getFactory().createGenerator(outputStream, JsonEncoding.UTF8)
         ) {
+            jsonGenerator.disable(JsonGenerator.Feature.FLUSH_PASSED_TO_STREAM);
             write(resultSet, jsonGenerator);
         } catch (IOException | SQLException e) {
             throw new ExtractorException(e);
