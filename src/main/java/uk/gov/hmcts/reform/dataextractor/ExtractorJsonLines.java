@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.dataextractor;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.MinimalPrettyPrinter;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,10 +12,12 @@ import java.sql.SQLException;
 public class ExtractorJsonLines extends ExtractorJson {
 
     @Override
-    protected void write(ResultSet resultSet, JsonGenerator jsonGenerator)
+    protected void write(ResultSet resultSet, JsonGenerator jsonGenerator, ByteArrayOutputStream bufferedStream)
         throws SQLException, IOException {
         jsonGenerator.setPrettyPrinter(new MinimalPrettyPrinter(""));
-        writeResultSetToJson(resultSet, jsonGenerator);
+        writeResultSetToJson(resultSet, jsonGenerator, bufferedStream);
+        jsonGenerator.flush();
+        bufferedStream.writeTo(terminalOutputStream);
     }
 
     @Override
