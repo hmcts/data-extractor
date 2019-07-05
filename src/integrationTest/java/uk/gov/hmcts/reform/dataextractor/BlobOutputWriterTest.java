@@ -167,15 +167,4 @@ public class BlobOutputWriterTest {
         });
     }
 
-    @Test
-    public void whenAadNotAvailable_thenCannotGetCredentialsInstance() throws Exception {
-        Assertions.assertThrows(WriterException.class, () -> {
-            try (BlobOutputWriter writer = new BlobOutputWriter(
-                    CLIENT_ID, "someotheraccount", CONTAINER,
-                    BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES)) {
-                writer.getCredentials();
-            }
-        });
-    }
-
 }

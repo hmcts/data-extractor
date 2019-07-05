@@ -1,9 +1,6 @@
 package uk.gov.hmcts.reform.dataextractor;
 
-import com.microsoft.azure.msiAuthTokenProvider.AzureMSICredentialException;
-import com.microsoft.azure.msiAuthTokenProvider.MSICredentials;
 import com.microsoft.azure.storage.StorageCredentials;
-import com.microsoft.azure.storage.StorageCredentialsToken;
 import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.blob.CloudBlobClient;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
@@ -50,20 +47,6 @@ public class BlobOutputWriter implements AutoCloseable {
         this.outputType = outputType;
     }
 
-    protected StorageCredentials getCredentials() {
-        MSICredentials credsProvider = MSICredentials.getMSICredentials();
-        credsProvider.updateClientId(clientId);
-        try {
-            String accessToken = credsProvider.getToken(STORAGE_RESOURCE).accessToken();
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Got access token: {}", accessToken != null ? accessToken.substring(0, 5) + "..." : "null");
-            }
-            return new StorageCredentialsToken(accountName, accessToken);
-        } catch (IOException | AzureMSICredentialException e) {
-            throw new WriterException(e);
-        }
-    }
-
     protected CloudBlobClient getClient() {
         URI connectionUri = null;
         try {
@@ -71,7 +54,7 @@ public class BlobOutputWriter implements AutoCloseable {
         } catch (URISyntaxException e) {
             throw new WriterException(e);
         }
-        StorageCredentials storageCredentials = getCredentials();
+        StorageCredentials storageCredentials = Credentials.get(clientId, STORAGE_RESOURCE, accountName);
         return new CloudBlobClient(connectionUri, storageCredentials);
     }
 
