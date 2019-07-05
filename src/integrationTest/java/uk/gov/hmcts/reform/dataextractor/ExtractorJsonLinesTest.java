@@ -21,7 +21,7 @@ public class ExtractorJsonLinesTest extends DbTest {
              ResultSet resultSet = conn.createStatement()
                      .executeQuery("SELECT ID, NAME FROM parent WHERE ID IN (1, 2)")) {
 
-            ExtractorJson extractor = new ExtractorJsonLines();
+            ExtractorJsonLines extractor = new ExtractorJsonLines();
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             extractor.apply(resultSet, out);
             assertEquals("{\"id\":1,\"name\":\"A\"}\n{\"id\":2,\"name\":\"B\"}\n", out.toString());
@@ -36,7 +36,7 @@ public class ExtractorJsonLinesTest extends DbTest {
                      "SELECT P.ID, P.NAME, C.ID as \"child id\", C.DATA as data, C.NAME as \"child name\" "
                          + "FROM parent P JOIN child C on P.ID = C.PARENT_ID WHERE P.ID = 1")) {
 
-            ExtractorJson extractor = new ExtractorJsonLines();
+            ExtractorJsonLines extractor = new ExtractorJsonLines();
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             extractor.apply(resultSet, out);
             assertEquals(TestUtils.getDataFromFile("joinSelectQueryExpectedResult.json"), out.toString());

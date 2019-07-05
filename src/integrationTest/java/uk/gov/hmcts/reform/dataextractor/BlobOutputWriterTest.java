@@ -20,6 +20,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.shaded.org.apache.commons.io.IOUtils;
 import uk.gov.hmcts.reform.dataextractor.utils.TestUtils;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -27,6 +28,8 @@ import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.util.NoSuchElementException;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -65,6 +68,15 @@ public class BlobOutputWriterTest {
     @AfterEach
     public void tearDown() {
         blobStorageContainer.stop();
+    }
+
+    @Test
+    public void whenBlobOutputWriterCreated_thenBufferedOutputAvailable() {
+        try (BlobOutputWriter writer = new BlobOutputWriter(
+                CLIENT_ID, ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES)) {
+            OutputStream outputStream = writer.outputStream(cloudBlobClient);
+            assertThat(outputStream, instanceOf(BufferedOutputStream.class));
+        }
     }
 
     @ParameterizedTest
