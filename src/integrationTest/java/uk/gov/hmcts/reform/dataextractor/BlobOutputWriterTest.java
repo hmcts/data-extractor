@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testcontainers.containers.GenericContainer;
@@ -18,6 +20,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.shaded.org.apache.commons.io.IOUtils;
 import uk.gov.hmcts.reform.dataextractor.utils.TestUtils;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,6 +28,8 @@ import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.util.NoSuchElementException;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -66,14 +71,25 @@ public class BlobOutputWriterTest {
     }
 
     @Test
-    public void whenfileUploaded_thenAvailableInBlobStorage() throws Exception {
-        String filePath = "dataA1.json";
+    public void whenBlobOutputWriterCreated_thenBufferedOutputAvailable() {
+        try (BlobOutputWriter writer = new BlobOutputWriter(
+                CLIENT_ID, ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES)) {
+            OutputStream outputStream = writer.outputStream(cloudBlobClient);
+            assertThat(outputStream, instanceOf(BufferedOutputStream.class));
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"dataA1.json", "dataA1.csv"})
+    public void whenfileUploaded_thenAvailableInBlobStorage(String filePath) throws Exception {
         try (BlobOutputWriter writer = new BlobOutputWriter(
             CLIENT_ID, ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES)) {
             OutputStream outputStream = writer.outputStream(cloudBlobClient);
             assertNotNull(outputStream);
             InputStream inputStream = TestUtils.getStreamFromFile(filePath);
             IOUtils.copy(inputStream, outputStream);
+            outputStream.flush();
+            outputStream.close();
         }
         // retrieve uploaded blob
         CloudBlobContainer container = cloudBlobClient.getContainerReference(CONTAINER);
@@ -81,7 +97,6 @@ public class BlobOutputWriterTest {
         CloudBlockBlob blob = TestUtils.downloadFirstBlobThatStartsWith(container, BLOB_PREFIX);
         assertTrue(blob.exists());
         assertEquals(TestUtils.getDataFromFile(filePath), blob.downloadText());
-
     }
 
     @Test
