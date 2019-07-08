@@ -90,7 +90,6 @@ sonarqube {
     property "sonar.projectName", "data-extractor-job"
     property "sonar.projectKey", "data-extractor-job"
     property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
-    property 'sonar.coverage.exclusions', "**/uk/gov/hmcts/reform/dataextractor/*.java"
   }
 }
 
