@@ -14,7 +14,7 @@ public class ExtractorCsv implements Extractor {
 
     public void apply(ResultSet resultSet, OutputStream outputStream) {
         try (CSVPrinter printer =
-            new CSVPrinter(new PrintWriter(outputStream, true), CSVFormat.DEFAULT.withHeader(resultSet))
+            new CSVPrinter(new PrintWriter(outputStream, false), CSVFormat.DEFAULT.withHeader(resultSet))
         ) {
             printer.printRecords(resultSet);
             printer.flush();

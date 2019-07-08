@@ -16,7 +16,9 @@ public class ExtractorJson implements Extractor {
     public void apply(ResultSet resultSet, OutputStream outputStream) {
         final ObjectMapper objectMapper = new ObjectMapper();
         try (JsonGenerator jsonGenerator =
-            objectMapper.getFactory().createGenerator(outputStream, JsonEncoding.UTF8)
+            objectMapper.getFactory()
+            .configure(JsonGenerator.Feature.FLUSH_PASSED_TO_STREAM, false)
+            .createGenerator(outputStream, JsonEncoding.UTF8)
         ) {
             writeResultSetToJson(resultSet, jsonGenerator);
             jsonGenerator.flush();
