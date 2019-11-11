@@ -14,8 +14,8 @@
 
   <suppress>
     <notes><![CDATA[Used only for testing not used in prod]]></notes>
-    <filePath regex="true">.*postgresql-1\.11\.2\.jar</filePath>
-    <cpe>cpe:/a:postgresql:postgresql:1.11.2</cpe>
+    <filePath regex="true">.*postgresql-1\.12\.3\.jar</filePath>
+    <cpe>cpe:/a:postgresql:postgresql:1.12.3</cpe>
   </suppress>
 
   <suppress>

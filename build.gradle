@@ -145,15 +145,21 @@ shadowJar {
 
 def versions = [
   junit: '5.4.2',
-  logging: '5.0.1',
-  jackson: '2.9.9'
+  logging: '5.1.1',
+  jackson: '2.10.0',
+  commonsBeanUtils: '1.9.4'
+
 ]
 
 configurations.all {
   resolutionStrategy {
     eachDependency { DependencyResolveDetails details ->
       if (details.requested.group in ['com.fasterxml.jackson.core', 'com.fasterxml.jackson.module', 'com.fasterxml.jackson.datatype']) {
-        details.useVersion '2.9.9'
+        details.useVersion versions.jackson
+      }
+
+      if (details.requested.group in ['commons-beanutils']) {
+        details.useVersion versions.commonsBeanUtils
       }
     }
   }
@@ -173,8 +179,8 @@ dependencies {
   
   compile group: 'com.typesafe', name: 'config', version: '1.3.4'
 
-  compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.logging
-  compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: versions.logging
+  compile group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.logging
+  compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.logging
 
   compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.26'
 
@@ -187,8 +193,8 @@ dependencies {
   testRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: versions.junit
   testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '2.25.0'
 
-  integrationTestCompile 'org.testcontainers:postgresql:1.11.2'
-  integrationTestCompile 'org.testcontainers:junit-jupiter:1.11.2'
+  integrationTestCompile 'org.testcontainers:postgresql:1.12.3'
+  integrationTestCompile 'org.testcontainers:junit-jupiter:1.12.3'
   integrationTestCompile 'com.ninja-squad:DbSetup:2.1.0'
 
   integrationTestCompile sourceSets.main.runtimeClasspath
