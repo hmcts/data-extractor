@@ -5,8 +5,8 @@ job:
   "data-extractor":
     resourceGroup: data-extractor
     secrets:
-      - {{ .Values.global.environment }}-ccdro-user
-      - {{ .Values.global.environment }}-ccdro-password
+      - aat-ccdro-user
+      - aat-ccdro-password
   memoryLimits: '2048Mi'
   cpuLimits: '2000m'
   labels:
