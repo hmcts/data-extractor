@@ -23,11 +23,12 @@ job:
       WHERE created_date >= (current_date-1 + time '00:00')
       AND created_date < (current_date + time '00:00')
       ORDER BY created_date ASC;
-    ETL_ACCOUNT: midatastg
+    ETL_ACCOUNT: miphasetwostorage1
     ETL_CONTAINER: probate
     ETL_FILE_TYPE: jsonlines
     ETL_FILE_PREFIX: test01
-    ETL_MSI_CLIENT_ID: 1461ff03-675c-423c-95a4-fb50d31254ff
+    ETL_MSI_CLIENT_ID: d97865b7-49ce-4449-b9d8-6de89375b63f
+
 global:
   job:
     kind: Job
