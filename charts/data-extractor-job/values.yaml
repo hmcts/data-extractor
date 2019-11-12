@@ -2,11 +2,11 @@ job:
   image: ${IMAGE_NAME}
   aadIdentityName: mi
   keyVaults:
-  "data-extractor":
-    resourceGroup: data-extractor
-    secrets:
-      - aat-ccdro-user
-      - aat-ccdro-password
+    "data-extractor":
+      resourceGroup: data-extractor
+      secrets:
+        - aat-ccdro-user
+        - aat-ccdro-password
   memoryLimits: '2048Mi'
   cpuLimits: '2000m'
   labels:
