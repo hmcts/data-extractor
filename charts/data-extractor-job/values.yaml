@@ -2,8 +2,8 @@ job:
   image: ${IMAGE_NAME}
   aadIdentityName: mi
   keyVaults:
-    "data-extractor":
-      resourceGroup: data-extractor
+    "data-extractor-aat":
+      resourceGroup: data-extractor-aat
       secrets:
         - aat-ccdro-user
         - aat-ccdro-password
