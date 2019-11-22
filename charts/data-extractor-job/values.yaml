@@ -32,4 +32,3 @@ job:
 global:
   job:
     kind: Job
-    
