@@ -20,7 +20,7 @@ public class ApiKeyStreamProvider implements OutputStreamProvider {
         this.connectStr = connectStr;
     }
 
-    private BlobServiceClient getBlobServiceClient () {
+    protected BlobServiceClient getBlobServiceClient() {
         try {
             return new BlobServiceClientBuilder().connectionString(connectStr).buildClient();
         } catch (IllegalArgumentException e) {
@@ -36,16 +36,16 @@ public class ApiKeyStreamProvider implements OutputStreamProvider {
         container = client.getBlobContainerClient(containerName);
         if (!container.exists()) {
             container.create();
-            LOGGER.info("Created container {}" ,  containerName);
+            LOGGER.info("Created container {}", containerName);
         }
         BlobClient blob = container.getBlobClient(fileName);
 
-        BlobOutputStream blobOutputStream ;
+        BlobOutputStream blobOutputStream;
         if (!blob.exists()) {
             blobOutputStream = blob.getBlockBlobClient().getBlobOutputStream();
 
         } else {
-            blobOutputStream =  blob.getAppendBlobClient().getBlobOutputStream();
+            blobOutputStream = blob.getAppendBlobClient().getBlobOutputStream();
         }
 
         return blobOutputStream;

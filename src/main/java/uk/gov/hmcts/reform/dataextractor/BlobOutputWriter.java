@@ -32,9 +32,9 @@ public class BlobOutputWriter implements AutoCloseable {
 
 
     public BlobOutputWriter(
-            String clientId, String accountName, String containerName,
-            String filePrefix, DataExtractorApplication.Output outputType,
-            String connectionString
+        String clientId, String accountName, String containerName,
+        String filePrefix, DataExtractorApplication.Output outputType,
+        String connectionString
     ) {
         this.clientId = clientId;
         this.accountName = accountName;
@@ -42,8 +42,7 @@ public class BlobOutputWriter implements AutoCloseable {
         this.filePrefix = filePrefix;
         this.outputType = outputType;
         this.connectionString = connectionString;
-        String connectStr = "DefaultEndpointsProtocol=https;AccountName=midatastgsbox;AccountKey=9NjPuuZ8ol1qikuKNJTTlMQsJFAkxXsfoq2OW+HQMXq7TkaROcX2oXNAunE0z+93jPZGCeDm8CpWDrd0U/GvaQ==;EndpointSuffix=core.windows.net";
-     }
+    }
 
     public OutputStream outputStream() {
         if (outputStream != null) {
@@ -77,7 +76,7 @@ public class BlobOutputWriter implements AutoCloseable {
     }
 
     private String fileName() {
-        return  new StringBuilder()
+        return new StringBuilder()
             .append(filePrefix)
             .append("-")
             .append(DATE_TIME_FORMATTER.format(LocalDateTime.now(ZoneId.from(UTC))))

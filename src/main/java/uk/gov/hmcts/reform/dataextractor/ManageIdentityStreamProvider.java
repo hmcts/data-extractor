@@ -16,7 +16,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class ManageIdentityStreamProvider implements  OutputStreamProvider{
+public class ManageIdentityStreamProvider implements OutputStreamProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ManageIdentityStreamProvider.class);
     private static final String STORAGE_RESOURCE = "https://storage.azure.com/";
@@ -58,7 +58,7 @@ public class ManageIdentityStreamProvider implements  OutputStreamProvider{
     public OutputStream getOutputStream(String containerName, String fileName, DataExtractorApplication.Output outputType) {
         CloudBlobClient client = getClient();
         try {
-            CloudBlobContainer  container = client.getContainerReference(containerName);
+            CloudBlobContainer container = client.getContainerReference(containerName);
 
             if (!container.exists()) {
                 container.create();
@@ -66,7 +66,7 @@ public class ManageIdentityStreamProvider implements  OutputStreamProvider{
             CloudBlockBlob blob = container.getBlockBlobReference(fileName);
             blob.getProperties().setContentType(outputType.getApplicationContent());
             return blob.openOutputStream();
-        } catch (URISyntaxException | StorageException  e) {
+        } catch (URISyntaxException | StorageException e) {
             throw new WriterException(e);
         }
     }

@@ -149,7 +149,6 @@ public class BlobOutputWriterTest {
         try (BlobOutputWriter writer = new BlobOutputWriter(
                 CLIENT_ID, ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES, EMPTY_CONNECTION_STRING)) {
 
-//            // stub aad identity client
             BlobOutputWriter writerSpy = getSpyWritterWithMockClient(writer);
 
             OutputStream outputStream = writerSpy.outputStream();
