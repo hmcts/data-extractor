@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -34,6 +33,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 @Testcontainers
 @ExtendWith(MockitoExtension.class)
@@ -45,6 +47,7 @@ public class BlobOutputWriterTest {
     private static final String CONTAINER = "testcontainer";
     private static final String BLOB_PREFIX = "testblob";
     private static final String ACCOUNT = "devstoreaccount1";
+    private static final String EMPTY_CONNECTION_STRING = "";
 
     @Container
     public static final GenericContainer blobStorageContainer =
@@ -73,8 +76,8 @@ public class BlobOutputWriterTest {
     @Test
     public void whenBlobOutputWriterCreated_thenBufferedOutputAvailable() {
         try (BlobOutputWriter writer = new BlobOutputWriter(
-                CLIENT_ID, ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES)) {
-            OutputStream outputStream = writer.outputStream(cloudBlobClient);
+                CLIENT_ID, ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES, EMPTY_CONNECTION_STRING)) {
+            OutputStream outputStream = writer.outputStream();
             assertThat(outputStream, instanceOf(BufferedOutputStream.class));
         }
     }
@@ -83,8 +86,8 @@ public class BlobOutputWriterTest {
     @ValueSource(strings = {"dataA1.json", "dataA1.csv"})
     public void whenfileUploaded_thenAvailableInBlobStorage(String filePath) throws Exception {
         try (BlobOutputWriter writer = new BlobOutputWriter(
-            CLIENT_ID, ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES)) {
-            OutputStream outputStream = writer.outputStream(cloudBlobClient);
+            CLIENT_ID, ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES, EMPTY_CONNECTION_STRING)) {
+            OutputStream outputStream = writer.outputStream();
             assertNotNull(outputStream);
             InputStream inputStream = TestUtils.getStreamFromFile(filePath);
             IOUtils.copy(inputStream, outputStream);
@@ -112,8 +115,8 @@ public class BlobOutputWriterTest {
         Assertions.assertThrows(IOException.class, () -> {
             try (BlobOutputWriter writer = new BlobOutputWriter(
                     CLIENT_ID, ACCOUNT, "somenewcontainer",
-                    BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES)) {
-                OutputStream outputStream = writer.outputStream(cloudBlobClient);
+                    BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES, EMPTY_CONNECTION_STRING)) {
+                OutputStream outputStream = writer.outputStream();
                 assertNotNull(outputStream);
                 String filePath = "dataA1.json";
                 InputStream inputStream = TestUtils.getStreamFromFile(filePath);
@@ -128,11 +131,13 @@ public class BlobOutputWriterTest {
     public void whenAuthorisedClientAvailable_thenBlobStorageCanBeAccessed() throws Exception {
         String filePath = "dataA1.json";
         try (BlobOutputWriter writer = new BlobOutputWriter(
-                CLIENT_ID, ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES)) {
+                CLIENT_ID, ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES, EMPTY_CONNECTION_STRING)) {
 
-            // stub aad identity client
-            BlobOutputWriter writerSpy = Mockito.spy(writer);
-            Mockito.doReturn(cloudBlobClient).when(writerSpy).getClient();
+//            // stub aad identity client
+            BlobOutputWriter writerSpy = spy(writer);
+            ManageIdentityStreamProvider spyManageIdentityStreamProvider =  spy(new ManageIdentityStreamProvider(CLIENT_ID, ACCOUNT));
+            when(writerSpy  .getOutputStreamProvider()).thenReturn(spyManageIdentityStreamProvider);
+            doReturn(cloudBlobClient).when(spyManageIdentityStreamProvider).getClient();
 
             OutputStream outputStream = writerSpy.outputStream();
             assertNotNull(outputStream);
@@ -147,10 +152,10 @@ public class BlobOutputWriterTest {
     @Test
     public void whenOutputStreamExists_thenSameInstanceIsReturned() throws Exception {
         try (BlobOutputWriter writer = new BlobOutputWriter(
-                CLIENT_ID, ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES)) {
-            OutputStream outputStream = writer.outputStream(cloudBlobClient);
+                CLIENT_ID, ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES, EMPTY_CONNECTION_STRING)) {
+            OutputStream outputStream = writer.outputStream();
             assertNotNull(outputStream);
-            OutputStream newOutputStream = writer.outputStream(cloudBlobClient);
+            OutputStream newOutputStream = writer.outputStream();
             assertSame(outputStream, newOutputStream);
         }
     }
@@ -160,8 +165,8 @@ public class BlobOutputWriterTest {
         Assertions.assertThrows(WriterException.class, () -> {
             try (BlobOutputWriter writer = new BlobOutputWriter(
                     CLIENT_ID, "someotheraccount", CONTAINER,
-                    BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES)) {
-                writer.getClient();
+                    BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES, EMPTY_CONNECTION_STRING)) {
+                writer.outputStream();
             }
         });
     }
@@ -171,8 +176,8 @@ public class BlobOutputWriterTest {
         Assertions.assertThrows(WriterException.class, () -> {
             try (BlobOutputWriter writer = new BlobOutputWriter(
                     CLIENT_ID, "someotheraccount", CONTAINER,
-                    BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES)) {
-                writer.getCredentials();
+                    BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES, EMPTY_CONNECTION_STRING)) {
+                writer.outputStream();
             }
         });
     }

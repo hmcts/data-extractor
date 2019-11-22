@@ -184,6 +184,8 @@ dependencies {
 
   compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.26'
 
+  compile 'com.azure:azure-storage-blob:12.0.0'
+
   // needed for app insights
   compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
 

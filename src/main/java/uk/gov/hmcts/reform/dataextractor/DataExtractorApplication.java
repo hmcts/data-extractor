@@ -68,6 +68,7 @@ public class DataExtractorApplication {
         private final String etlContainer;
         private final Output etlFileType;
         private final String etlFilePrefix;
+        private final String connectionString;
 
         ExtractorConfig(String baseDir) {
             if (baseDir != null) {
@@ -97,6 +98,13 @@ public class DataExtractorApplication {
                 this.etlFileType = Output.defaultOutput();
             }
             this.etlFilePrefix = config.getString("etl-file-prefix");
+
+            if (config.hasPath("etl-connection-string-file")) {
+                String etlDbPasswordFile = config.getString("etl-connection-string-file");
+                this.connectionString = readFirstLine(etlDbPasswordFile);
+            } else {
+                this.connectionString = config.getString("etl-connection-string");
+            }
         }
 
         ExtractorConfig() {
@@ -140,7 +148,7 @@ public class DataExtractorApplication {
         try (QueryExecutor executor = new QueryExecutor(
                 config.etlDbUrl, config.etlDbUser, config.etlDbPassword, config.etlSql);
             BlobOutputWriter writer = new BlobOutputWriter(
-                config.etlMsiClientId, config.etlAccount, config.etlContainer, config.etlFilePrefix, config.etlFileType)
+                config.etlMsiClientId, config.etlAccount, config.etlContainer, config.etlFilePrefix, config.etlFileType, config.connectionString)
             ) {
             Extractor extractor = DataExtractorApplication.extractorFactory(config.etlFileType);
             extractor.apply(executor.execute(), writer.outputStream());
