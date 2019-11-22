@@ -20,7 +20,6 @@ import org.testcontainers.shaded.org.apache.commons.io.IOUtils;
 import uk.gov.hmcts.reform.dataextractor.utils.TestUtils;
 
 import java.io.BufferedOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
@@ -77,7 +76,9 @@ public class BlobOutputWriterTest {
     public void whenBlobOutputWriterCreated_thenBufferedOutputAvailable() {
         try (BlobOutputWriter writer = new BlobOutputWriter(
                 CLIENT_ID, ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES, EMPTY_CONNECTION_STRING)) {
-            OutputStream outputStream = writer.outputStream();
+            BlobOutputWriter writerSpy = getSpyWritterWithMockClient(writer);
+
+            OutputStream outputStream = writerSpy.outputStream();
             assertThat(outputStream, instanceOf(BufferedOutputStream.class));
         }
     }
@@ -87,7 +88,10 @@ public class BlobOutputWriterTest {
     public void whenfileUploaded_thenAvailableInBlobStorage(String filePath) throws Exception {
         try (BlobOutputWriter writer = new BlobOutputWriter(
             CLIENT_ID, ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES, EMPTY_CONNECTION_STRING)) {
-            OutputStream outputStream = writer.outputStream();
+
+            BlobOutputWriter writerSpy = getSpyWritterWithMockClient(writer);
+
+            OutputStream outputStream = writerSpy.outputStream();
             assertNotNull(outputStream);
             InputStream inputStream = TestUtils.getStreamFromFile(filePath);
             IOUtils.copy(inputStream, outputStream);
@@ -111,20 +115,32 @@ public class BlobOutputWriterTest {
     }
 
     @Test
-    public void whenContainerMissing_thenFileUploadFails() {
-        Assertions.assertThrows(IOException.class, () -> {
-            try (BlobOutputWriter writer = new BlobOutputWriter(
-                    CLIENT_ID, ACCOUNT, "somenewcontainer",
-                    BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES, EMPTY_CONNECTION_STRING)) {
-                OutputStream outputStream = writer.outputStream();
-                assertNotNull(outputStream);
-                String filePath = "dataA1.json";
-                InputStream inputStream = TestUtils.getStreamFromFile(filePath);
-                IOUtils.copy(inputStream, outputStream);
-                outputStream.flush();
-                outputStream.close();
-            }
-        });
+    public void whenContainerMissing_thenContainerIsCreated() throws Exception {
+        String filePath = "dataA1.json";
+        String containerName = "somenewcontainer";
+        try (BlobOutputWriter writer = new BlobOutputWriter(
+                CLIENT_ID, ACCOUNT, containerName,
+                BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES, EMPTY_CONNECTION_STRING)) {
+
+            BlobOutputWriter writerSpy = spy(writer);
+            ManageIdentityStreamProvider spyManageIdentityStreamProvider =  spy(new ManageIdentityStreamProvider(CLIENT_ID, ACCOUNT));
+            spy(new ManageIdentityStreamProvider(CLIENT_ID, ACCOUNT));
+            when(writerSpy.getOutputStreamProvider()).thenReturn(spyManageIdentityStreamProvider);
+            doReturn(cloudBlobClient).when(spyManageIdentityStreamProvider).getClient();
+
+            OutputStream outputStream = writerSpy.outputStream();
+            assertNotNull(outputStream);
+            InputStream inputStream = TestUtils.getStreamFromFile(filePath);
+            IOUtils.copy(inputStream, outputStream);
+            outputStream.flush();
+            outputStream.close();
+        }
+        CloudBlobContainer container = cloudBlobClient.getContainerReference(containerName);
+        TestUtils.hasBlobThatStartsWith(container, BLOB_PREFIX);
+        CloudBlockBlob blob = TestUtils.downloadFirstBlobThatStartsWith(container, BLOB_PREFIX);
+        assertTrue(blob.exists());
+        assertEquals(TestUtils.getDataFromFile(filePath), blob.downloadText());
+
     }
 
     @Test
@@ -134,10 +150,7 @@ public class BlobOutputWriterTest {
                 CLIENT_ID, ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES, EMPTY_CONNECTION_STRING)) {
 
 //            // stub aad identity client
-            BlobOutputWriter writerSpy = spy(writer);
-            ManageIdentityStreamProvider spyManageIdentityStreamProvider =  spy(new ManageIdentityStreamProvider(CLIENT_ID, ACCOUNT));
-            when(writerSpy  .getOutputStreamProvider()).thenReturn(spyManageIdentityStreamProvider);
-            doReturn(cloudBlobClient).when(spyManageIdentityStreamProvider).getClient();
+            BlobOutputWriter writerSpy = getSpyWritterWithMockClient(writer);
 
             OutputStream outputStream = writerSpy.outputStream();
             assertNotNull(outputStream);
@@ -153,33 +166,23 @@ public class BlobOutputWriterTest {
     public void whenOutputStreamExists_thenSameInstanceIsReturned() throws Exception {
         try (BlobOutputWriter writer = new BlobOutputWriter(
                 CLIENT_ID, ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES, EMPTY_CONNECTION_STRING)) {
-            OutputStream outputStream = writer.outputStream();
+            BlobOutputWriter writerSpy = getSpyWritterWithMockClient(writer);
+
+            OutputStream outputStream = writerSpy.outputStream();
             assertNotNull(outputStream);
-            OutputStream newOutputStream = writer.outputStream();
+            OutputStream newOutputStream = writerSpy.outputStream();
             assertSame(outputStream, newOutputStream);
         }
     }
-
-    @Test
-    public void whenInvalidUriUsed_thenCannotGetClientInstance() throws Exception {
-        Assertions.assertThrows(WriterException.class, () -> {
-            try (BlobOutputWriter writer = new BlobOutputWriter(
-                    CLIENT_ID, "someotheraccount", CONTAINER,
-                    BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES, EMPTY_CONNECTION_STRING)) {
-                writer.outputStream();
-            }
-        });
+    
+    private BlobOutputWriter getSpyWritterWithMockClient(BlobOutputWriter writer) {
+        BlobOutputWriter writerSpy = spy(writer);
+        ManageIdentityStreamProvider spyManageIdentityStreamProvider =  spy(new ManageIdentityStreamProvider(CLIENT_ID, ACCOUNT));
+        spy(new ManageIdentityStreamProvider(CLIENT_ID, ACCOUNT));
+        when(writerSpy.getOutputStreamProvider()).thenReturn(spyManageIdentityStreamProvider);
+        doReturn(cloudBlobClient).when(spyManageIdentityStreamProvider).getClient();
+        return writerSpy;
     }
 
-    @Test
-    public void whenAadNotAvailable_thenCannotGetCredentialsInstance() throws Exception {
-        Assertions.assertThrows(WriterException.class, () -> {
-            try (BlobOutputWriter writer = new BlobOutputWriter(
-                    CLIENT_ID, "someotheraccount", CONTAINER,
-                    BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES, EMPTY_CONNECTION_STRING)) {
-                writer.outputStream();
-            }
-        });
-    }
 
 }
