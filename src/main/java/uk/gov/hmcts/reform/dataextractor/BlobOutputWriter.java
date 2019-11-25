@@ -59,7 +59,7 @@ public class BlobOutputWriter implements AutoCloseable {
                 outputStream.flush();
                 outputStream.close();
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             // Blob storage client has already closed the stream. This exception cannot be
             // re-thrown as otherwise if this is run as a kubernetes job, it will keep being
             // restarted and the same file generated again and again.
