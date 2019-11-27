@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.dataextractor.config.ExtractionData;
 import uk.gov.hmcts.reform.dataextractor.config.Extractions;
@@ -27,7 +28,7 @@ public class DataExtractorApplicationTest {
     @InjectMocks
     private DataExtractorApplication classToTest;
 
-    @Mock
+    @Spy
     private Extractions extractions;
 
     @Mock
@@ -58,7 +59,7 @@ public class DataExtractorApplicationTest {
 
         when(blobOutputFactory.provide(any(ExtractionData.class))).thenReturn(writer);
         when(queryExecutorFactory.provide(QUERY)).thenReturn(queryExecutor);
-        when(extractorFactory.provide(DataExtractorApplication.Output.JSON_LINES)).thenReturn(mock(Extractor.class));
+        when(extractorFactory.provide(testExtractorData.getType())).thenReturn(mock(Extractor.class));
         when(extractions.getCaseTypes()).thenReturn(extractionData);
 
         classToTest.run(null);
@@ -79,6 +80,6 @@ public class DataExtractorApplicationTest {
 
         classToTest.run(null);
 
-        verify(queryExecutorFactory, times(2)).provide(QUERY);
+        verify(queryExecutorFactory, times(2)).provide(testExtractorData.getQuery());
     }
 }
