@@ -86,13 +86,22 @@ jacocoTestReport {
   }
 }
 
+def sonarExclusions = [
+        "**/uk/gov/hmcts/reform/dataextractor/Extractor*.java",
+        "**/uk/gov/hmcts/reform/dataextractor/Query*.java",
+        "**/uk/gov/hmcts/reform/dataextractor/BlobOut*.java",
+        "**/ApiKeyStreamProvider.java",
+        "**/ManageIdentityStreamProvider.java",
+        "**/DataExtractorApplication.java"
+]
+
 project.tasks['sonarqube'].dependsOn test, integration
 sonarqube {
   properties {
     property "sonar.projectName", "data-extractor-job"
     property "sonar.projectKey", "data-extractor-job"
     property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
-    property 'sonar.coverage.exclusions', "**/uk/gov/hmcts/reform/dataextractor/Extractor*.java,**/uk/gov/hmcts/reform/dataextractor/Query*.java,**/uk/gov/hmcts/reform/dataextractor/BlobOut*.java,**/ApiKeyStreamProvider.java,**/ManageIdentityStreamProvider.java,**/DataExtractorApplication.java"
+    property 'sonar.coverage.exclusions', sonarExclusions.join(", ")
   }
 }
 
