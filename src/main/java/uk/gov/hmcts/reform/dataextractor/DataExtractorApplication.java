@@ -81,6 +81,7 @@ public class DataExtractorApplication implements ApplicationRunner {
     }
 
     @Override
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     public void run(ApplicationArguments args) {
 
         for (ExtractionData extractionData : extractions.getCaseTypes()) {
