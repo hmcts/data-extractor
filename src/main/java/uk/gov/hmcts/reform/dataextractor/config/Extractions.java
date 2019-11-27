@@ -13,4 +13,5 @@ import java.util.List;
 public class Extractions {
 
     List<ExtractionData> caseTypes = new ArrayList<>();
+
 }

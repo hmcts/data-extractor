@@ -7,7 +7,6 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import uk.gov.hmcts.reform.dataextractor.config.DbConfig;
 import uk.gov.hmcts.reform.dataextractor.config.ExtractionData;
 import uk.gov.hmcts.reform.dataextractor.config.Extractions;
 
@@ -18,10 +17,13 @@ import java.util.Locale;
 public class DataExtractorApplication implements ApplicationRunner {
 
     @Autowired
-    private BlobOutputWriter writer;
+    private Factory<ExtractionData, BlobOutputWriter> blobOutputFactory;
 
     @Autowired
-    private DbConfig config;
+    private Factory<String,  QueryExecutor> queryExecutorFactory;
+
+    @Autowired
+    private Factory<DataExtractorApplication.Output,  Extractor> extractorFactory;
 
     @Autowired
     private Extractions extractions;
@@ -71,24 +73,13 @@ public class DataExtractorApplication implements ApplicationRunner {
         }
     }
 
-    protected static Extractor extractorFactory(Output outputType) {
-        switch (outputType) {
-            case JSON_LINES: return new ExtractorJsonLines();
-            case JSON: return new ExtractorJson();
-            case CSV: return new ExtractorCsv();
-            default: return extractorFactory(Output.defaultOutput());
-        }
-    }
-
     @Override
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     public void run(ApplicationArguments args) {
-
         for (ExtractionData extractionData : extractions.getCaseTypes()) {
-            try (QueryExecutor executor = new QueryExecutor(
-                config.getUrl(), config.getUser(), config.getPassword(), extractionData.getQuery())
-            ) {
-                Extractor extractor = DataExtractorApplication.extractorFactory(extractionData.getType());
+            try (QueryExecutor executor = queryExecutorFactory.provide(extractionData.getQuery());
+                 BlobOutputWriter writer = blobOutputFactory.provide(extractionData))  {
+                Extractor extractor = extractorFactory.provide(extractionData.getType());
                 extractor.apply(executor.execute(), writer.outputStream());
             } catch (Exception e) {
                 log.error("Error processing case {}", extractionData.getContainer(), e);

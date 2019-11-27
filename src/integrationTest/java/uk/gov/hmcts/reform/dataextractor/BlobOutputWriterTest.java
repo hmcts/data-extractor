@@ -47,6 +47,8 @@ public class BlobOutputWriterTest {
     private static final String BLOB_PREFIX = "testblob";
     private static final String ACCOUNT = "devstoreaccount1";
 
+    private final ManageIdentityStreamProvider miStreamProviderSpy =  spy(new ManageIdentityStreamProvider(CLIENT_ID, ACCOUNT));
+
     @Container
     public static final GenericContainer blobStorageContainer =
         new GenericContainer("arafato/azurite:2.6.5")
@@ -74,8 +76,8 @@ public class BlobOutputWriterTest {
     @Test
     public void whenBlobOutputWriterCreated_thenBufferedOutputAvailable() throws Exception {
         try (BlobOutputWriter writer = new BlobOutputWriter(CONTAINER, BLOB_PREFIX,
-            DataExtractorApplication.Output.JSON_LINES)) {
-            BlobOutputWriter writerSpy = getSpyWritterWithMockClient(writer);
+            DataExtractorApplication.Output.JSON_LINES, miStreamProviderSpy)) {
+            BlobOutputWriter writerSpy = getSpyWriterWithMockClient(writer);
 
             OutputStream outputStream = writerSpy.outputStream();
             assertThat(outputStream, instanceOf(BufferedOutputStream.class));
@@ -86,9 +88,9 @@ public class BlobOutputWriterTest {
     @ValueSource(strings = {"dataA1.json", "dataA1.csv"})
     public void whenfileUploaded_thenAvailableInBlobStorage(String filePath) throws Exception {
         try (BlobOutputWriter writer = new BlobOutputWriter(CONTAINER, BLOB_PREFIX,
-            DataExtractorApplication.Output.JSON_LINES)) {
+            DataExtractorApplication.Output.JSON_LINES, miStreamProviderSpy)) {
 
-            BlobOutputWriter writerSpy = getSpyWritterWithMockClient(writer);
+            BlobOutputWriter writerSpy = getSpyWriterWithMockClient(writer);
 
             OutputStream outputStream = writerSpy.outputStream();
             assertNotNull(outputStream);
@@ -118,7 +120,7 @@ public class BlobOutputWriterTest {
         String filePath = "dataA1.json";
         String containerName = "somenewcontainer";
         try (BlobOutputWriter writer = new BlobOutputWriter(containerName,
-                BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES)) {
+                BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES, miStreamProviderSpy)) {
 
             BlobOutputWriter writerSpy = spy(writer);
             ManageIdentityStreamProvider spyManageIdentityStreamProvider =  spy(new ManageIdentityStreamProvider(CLIENT_ID, ACCOUNT));
@@ -145,9 +147,9 @@ public class BlobOutputWriterTest {
     public void whenAuthorisedClientAvailable_thenBlobStorageCanBeAccessed() throws Exception {
         String filePath = "dataA1.json";
         try (BlobOutputWriter writer = new BlobOutputWriter(CONTAINER, BLOB_PREFIX,
-            DataExtractorApplication.Output.JSON_LINES)) {
+            DataExtractorApplication.Output.JSON_LINES, miStreamProviderSpy)) {
 
-            BlobOutputWriter writerSpy = getSpyWritterWithMockClient(writer);
+            BlobOutputWriter writerSpy = getSpyWriterWithMockClient(writer);
 
             OutputStream outputStream = writerSpy.outputStream();
             assertNotNull(outputStream);
@@ -162,8 +164,8 @@ public class BlobOutputWriterTest {
     @Test
     public void whenOutputStreamExists_thenSameInstanceIsReturned() throws Exception {
         try (BlobOutputWriter writer = new BlobOutputWriter(CONTAINER, BLOB_PREFIX,
-            DataExtractorApplication.Output.JSON_LINES)) {
-            BlobOutputWriter writerSpy = getSpyWritterWithMockClient(writer);
+            DataExtractorApplication.Output.JSON_LINES, miStreamProviderSpy)) {
+            BlobOutputWriter writerSpy = getSpyWriterWithMockClient(writer);
 
             OutputStream outputStream = writerSpy.outputStream();
             assertNotNull(outputStream);
@@ -172,12 +174,10 @@ public class BlobOutputWriterTest {
         }
     }
     
-    private BlobOutputWriter getSpyWritterWithMockClient(BlobOutputWriter writer) throws Exception {
+    private BlobOutputWriter getSpyWriterWithMockClient(BlobOutputWriter writer) throws Exception {
         BlobOutputWriter writerSpy = spy(writer);
-        ManageIdentityStreamProvider spyManageIdentityStreamProvider =  spy(new ManageIdentityStreamProvider(CLIENT_ID, ACCOUNT));
-        spy(new ManageIdentityStreamProvider(CLIENT_ID, ACCOUNT));
-        when(writerSpy.getOutputStreamProvider()).thenReturn(spyManageIdentityStreamProvider);
-        doReturn(cloudBlobClient).when(spyManageIdentityStreamProvider).getClient();
+        when(writerSpy.getOutputStreamProvider()).thenReturn(miStreamProviderSpy);
+        doReturn(cloudBlobClient).when(miStreamProviderSpy).getClient();
         return writerSpy;
     }
 

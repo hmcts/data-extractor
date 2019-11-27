@@ -2,9 +2,6 @@ package uk.gov.hmcts.reform.dataextractor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import java.io.BufferedOutputStream;
 import java.io.OutputStream;
@@ -14,7 +11,6 @@ import java.time.format.DateTimeFormatter;
 
 import static java.time.ZoneOffset.UTC;
 
-@Component
 public class BlobOutputWriter implements AutoCloseable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BlobOutputWriter.class);
@@ -28,18 +24,16 @@ public class BlobOutputWriter implements AutoCloseable {
 
     private final  DataExtractorApplication.Output outputType;
 
-    @Autowired
-    private OutputStreamProvider getOutputStreamProvider;
+    private final OutputStreamProvider getOutputStreamProvider;
 
     private OutputStream outputStream;
 
-    public BlobOutputWriter(@Value("${etl.container}") String containerName,
-                            @Value("${etl.file.prefix}")String filePrefix,
-                            @Value("${etl.file.type}") DataExtractorApplication.Output outputType
-    ) {
+    public BlobOutputWriter(String containerName, String filePrefix, DataExtractorApplication.Output outputType,
+                            OutputStreamProvider outputStreamProvider) {
         this.containerName = containerName;
         this.filePrefix = filePrefix;
         this.outputType = outputType;
+        this.getOutputStreamProvider = outputStreamProvider;
     }
 
     public OutputStream outputStream() {

@@ -1,60 +1,84 @@
 package uk.gov.hmcts.reform.dataextractor;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.dataextractor.config.ExtractionData;
+import uk.gov.hmcts.reform.dataextractor.config.Extractions;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.Arrays;
+import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class DataExtractorApplicationTest {
 
+    private static final String CONTAINER_NAME = "testContainer";
+    private static final String QUERY = "testQuery";
+    private static final String PREFIX = "test";
+
+    @InjectMocks
+    private DataExtractorApplication classToTest;
+
+    @Mock
+    private Extractions extractions;
+
+    @Mock
+    private Factory<ExtractionData, BlobOutputWriter> blobOutputFactory;
+
+    @Mock
+    private Factory<String,  QueryExecutor> queryExecutorFactory;
+
+    @Mock
+    private Factory<DataExtractorApplication.Output,  Extractor> extractorFactory;
+
+    @Mock
+    private BlobOutputWriter writer;
+
+    @Mock
+    private QueryExecutor queryExecutor;
+
     @Test
-    public void whenDefaultOutputRequested_thenJsonLinesReturned() {
-        assertEquals(DataExtractorApplication.Output.JSON_LINES, DataExtractorApplication.Output.defaultOutput());
+    public void givenExtractorList_thenProcessAllCases() {
+        ExtractionData testExtractorData = ExtractionData
+            .builder()
+            .container(CONTAINER_NAME)
+            .prefix(PREFIX)
+            .query(QUERY)
+            .type(DataExtractorApplication.Output.JSON_LINES)
+            .build();
+        List<ExtractionData> extractionData = Arrays.asList(testExtractorData, testExtractorData);
+
+        when(blobOutputFactory.provide(any(ExtractionData.class))).thenReturn(writer);
+        when(queryExecutorFactory.provide(QUERY)).thenReturn(queryExecutor);
+        when(extractorFactory.provide(DataExtractorApplication.Output.JSON_LINES)).thenReturn(mock(Extractor.class));
+        when(extractions.getCaseTypes()).thenReturn(extractionData);
+
+        classToTest.run(null);
+
+        verify(writer, times(2)).outputStream();
     }
 
     @Test
-    public void whenFromIsCsv_thenCsvOutputIsReturned() {
-        assertEquals(DataExtractorApplication.Output.CSV, DataExtractorApplication.Output.from("Csv"));
-    }
+    public void givenErrorProcessingOneExtractor_thenProcessAll() {
+        ExtractionData testExtractorData = ExtractionData
+            .builder()
+            .query(QUERY)
+            .build();
+        List<ExtractionData> extractionData = Arrays.asList(testExtractorData, testExtractorData);
+        when(extractions.getCaseTypes()).thenReturn(extractionData);
+        when(blobOutputFactory.provide(any(ExtractionData.class))).thenThrow(new RuntimeException("Any error"));
+        when(queryExecutorFactory.provide(QUERY)).thenReturn(queryExecutor);
 
-    @Test
-    public void whenFromIsJson_thenJsonOutputIsReturned() {
-        assertEquals(DataExtractorApplication.Output.JSON, DataExtractorApplication.Output.from("jSon"));
-        assertEquals(DataExtractorApplication.Output.JSON, DataExtractorApplication.Output.from("JSON"));
-    }
+        classToTest.run(null);
 
-    @Test
-    public void whenFromIsJsonLines_thenJsonLinesOutputIsReturned() {
-        assertEquals(DataExtractorApplication.Output.JSON_LINES, DataExtractorApplication.Output.from("jSonLiNes"));
-        assertEquals(DataExtractorApplication.Output.JSON_LINES, DataExtractorApplication.Output.from("JSONLINES"));
-    }
-
-    @Test
-    public void whenFromIsNotSpecified_thenJsonLinesOutputIsReturned() {
-        assertEquals(DataExtractorApplication.Output.JSON_LINES, DataExtractorApplication.Output.from(null));
-    }
-
-    @Test
-    public void whenFactoryOutputIsJson_thenExtractorJsonIsReturned() {
-        assertEquals(
-            ExtractorJson.class,
-            DataExtractorApplication.extractorFactory(DataExtractorApplication.Output.JSON).getClass()
-        );
-    }
-
-    @Test
-    public void whenFactoryOutputIsCsv_thenExtractorCsvIsReturned() {
-        assertEquals(
-            ExtractorCsv.class,
-            DataExtractorApplication.extractorFactory(DataExtractorApplication.Output.CSV).getClass()
-        );
-    }
-
-    @Test
-    public void whenFactoryOutputIsJsonLines_thenExtractorJsonLinesIsReturned() {
-        assertEquals(
-            ExtractorJsonLines.class,
-            DataExtractorApplication.extractorFactory(DataExtractorApplication.Output.JSON_LINES).getClass()
-        );
+        verify(queryExecutorFactory, times(2)).provide(QUERY);
     }
 }
