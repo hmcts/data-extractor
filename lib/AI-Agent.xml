@@ -3,7 +3,8 @@
     <AgentLogger>INFO</AgentLogger>
     <Instrumentation>
         <BuiltIn enabled="true">
-            <JDBC enabled="true"/>
+            <Logging enabled="true"/>
+            <JDBC enabled="true" />
         </BuiltIn>
     </Instrumentation>
 </ApplicationInsightsAgent>

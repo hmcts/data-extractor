@@ -1,0 +1,43 @@
+info:
+  app:
+    name: ${spring.application.name}
+
+etl:
+  db:
+    url: "jdbc:postgresql://localhost:5432/ccd_data_store?sslmode=require"
+    user: "dumyUser"
+    password: "cdummyPassword"
+  account: "midatastgsbox"
+  container: "probate"
+  file:
+    type: "jsonlines"
+    prefix: "test01"
+  connection-string: "dummyConnectionString"
+  msi-client-id: "dummyClient"
+
+extraction:
+  caseTypes:
+    - container: "probate"
+      type: "jsonlines"
+      query: "SELECT id, created_date, event_id, summary, description, user_id, case_data_id, \
+             case_type_id, case_type_version, state_id, user_first_name, user_last_name, \
+             event_name, state_name, security_classification  \
+             FROM case_event  \
+             WHERE created_date >= (current_date-1 + time '00:00') \
+             AND created_date < (current_date + time '00:00')  \
+             ORDER BY created_date ASC;"
+    - container: "divorce"
+      type: "jsonlines"
+      query: "SELECT id, created_date, event_id, summary, description, user_id, case_data_id, \
+             case_type_id, case_type_version, state_id, user_first_name, user_last_name, \
+             event_name, state_name, security_classification  \
+             FROM case_event  \
+             WHERE created_date >= (current_date-1 + time '00:00') \
+             AND created_date < (current_date + time '00:00')  \
+             ORDER BY created_date ASC;"
+
+application-insights:
+  default:
+    modules:
+      WebSyntheticRequestTelemetryInitializer:
+        enabled: false

@@ -7,16 +7,21 @@ import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.specialized.BlobOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
 
 import java.io.OutputStream;
 
+@Component
+@ConditionalOnProperty(value = "etl.connection-string")
 public class ApiKeyStreamProvider implements OutputStreamProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApiKeyStreamProvider.class);
 
     private final String connectStr;
 
-    public ApiKeyStreamProvider(String connectStr) {
+    public ApiKeyStreamProvider(@Value("${etl.connection-string}") String connectStr) {
         this.connectStr = connectStr;
     }
 

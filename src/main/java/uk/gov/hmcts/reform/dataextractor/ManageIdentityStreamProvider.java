@@ -10,12 +10,19 @@ import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+@Component
+@Primary
+@ConditionalOnProperty(value = "etl.msi-client-id")
 public class ManageIdentityStreamProvider implements OutputStreamProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ManageIdentityStreamProvider.class);
@@ -25,7 +32,8 @@ public class ManageIdentityStreamProvider implements OutputStreamProvider {
     private final String clientId;
     private final String accountName;
 
-    public ManageIdentityStreamProvider(String clientId, String accountName) {
+    public ManageIdentityStreamProvider(@Value("${etl.msi-client-id}") String clientId,
+                                        @Value("${etl.account}") String accountName) {
         this.clientId = clientId;
         this.accountName = accountName;
     }
@@ -44,20 +52,17 @@ public class ManageIdentityStreamProvider implements OutputStreamProvider {
         }
     }
 
-    protected CloudBlobClient getClient() {
-        URI connectionUri;
-        try {
-            connectionUri = new URI(String.format(CONNECTION_URI_TPL, accountName));
-        } catch (URISyntaxException e) {
-            throw new WriterException(e);
-        }
+    protected CloudBlobClient getClient() throws URISyntaxException {
+        URI connectionUri = new URI(String.format(CONNECTION_URI_TPL, accountName));
+
         StorageCredentials storageCredentials = getCredentials();
         return new CloudBlobClient(connectionUri, storageCredentials);
     }
 
     public OutputStream getOutputStream(String containerName, String fileName, DataExtractorApplication.Output outputType) {
-        CloudBlobClient client = getClient();
         try {
+            CloudBlobClient client = getClient();
+
             CloudBlobContainer container = client.getContainerReference(containerName);
 
             if (!container.exists()) {

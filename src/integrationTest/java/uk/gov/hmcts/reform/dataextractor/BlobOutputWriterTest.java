@@ -46,7 +46,6 @@ public class BlobOutputWriterTest {
     private static final String CONTAINER = "testcontainer";
     private static final String BLOB_PREFIX = "testblob";
     private static final String ACCOUNT = "devstoreaccount1";
-    private static final String EMPTY_CONNECTION_STRING = "";
 
     @Container
     public static final GenericContainer blobStorageContainer =
@@ -73,9 +72,9 @@ public class BlobOutputWriterTest {
     }
 
     @Test
-    public void whenBlobOutputWriterCreated_thenBufferedOutputAvailable() {
-        try (BlobOutputWriter writer = new BlobOutputWriter(
-                CLIENT_ID, ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES, EMPTY_CONNECTION_STRING)) {
+    public void whenBlobOutputWriterCreated_thenBufferedOutputAvailable() throws Exception {
+        try (BlobOutputWriter writer = new BlobOutputWriter(CONTAINER, BLOB_PREFIX,
+            DataExtractorApplication.Output.JSON_LINES)) {
             BlobOutputWriter writerSpy = getSpyWritterWithMockClient(writer);
 
             OutputStream outputStream = writerSpy.outputStream();
@@ -86,8 +85,8 @@ public class BlobOutputWriterTest {
     @ParameterizedTest
     @ValueSource(strings = {"dataA1.json", "dataA1.csv"})
     public void whenfileUploaded_thenAvailableInBlobStorage(String filePath) throws Exception {
-        try (BlobOutputWriter writer = new BlobOutputWriter(
-            CLIENT_ID, ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES, EMPTY_CONNECTION_STRING)) {
+        try (BlobOutputWriter writer = new BlobOutputWriter(CONTAINER, BLOB_PREFIX,
+            DataExtractorApplication.Output.JSON_LINES)) {
 
             BlobOutputWriter writerSpy = getSpyWritterWithMockClient(writer);
 
@@ -118,9 +117,8 @@ public class BlobOutputWriterTest {
     public void whenContainerMissing_thenContainerIsCreated() throws Exception {
         String filePath = "dataA1.json";
         String containerName = "somenewcontainer";
-        try (BlobOutputWriter writer = new BlobOutputWriter(
-                CLIENT_ID, ACCOUNT, containerName,
-                BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES, EMPTY_CONNECTION_STRING)) {
+        try (BlobOutputWriter writer = new BlobOutputWriter(containerName,
+                BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES)) {
 
             BlobOutputWriter writerSpy = spy(writer);
             ManageIdentityStreamProvider spyManageIdentityStreamProvider =  spy(new ManageIdentityStreamProvider(CLIENT_ID, ACCOUNT));
@@ -146,8 +144,8 @@ public class BlobOutputWriterTest {
     @Test
     public void whenAuthorisedClientAvailable_thenBlobStorageCanBeAccessed() throws Exception {
         String filePath = "dataA1.json";
-        try (BlobOutputWriter writer = new BlobOutputWriter(
-                CLIENT_ID, ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES, EMPTY_CONNECTION_STRING)) {
+        try (BlobOutputWriter writer = new BlobOutputWriter(CONTAINER, BLOB_PREFIX,
+            DataExtractorApplication.Output.JSON_LINES)) {
 
             BlobOutputWriter writerSpy = getSpyWritterWithMockClient(writer);
 
@@ -163,8 +161,8 @@ public class BlobOutputWriterTest {
 
     @Test
     public void whenOutputStreamExists_thenSameInstanceIsReturned() throws Exception {
-        try (BlobOutputWriter writer = new BlobOutputWriter(
-                CLIENT_ID, ACCOUNT, CONTAINER, BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES, EMPTY_CONNECTION_STRING)) {
+        try (BlobOutputWriter writer = new BlobOutputWriter(CONTAINER, BLOB_PREFIX,
+            DataExtractorApplication.Output.JSON_LINES)) {
             BlobOutputWriter writerSpy = getSpyWritterWithMockClient(writer);
 
             OutputStream outputStream = writerSpy.outputStream();
@@ -174,7 +172,7 @@ public class BlobOutputWriterTest {
         }
     }
     
-    private BlobOutputWriter getSpyWritterWithMockClient(BlobOutputWriter writer) {
+    private BlobOutputWriter getSpyWritterWithMockClient(BlobOutputWriter writer) throws Exception {
         BlobOutputWriter writerSpy = spy(writer);
         ManageIdentityStreamProvider spyManageIdentityStreamProvider =  spy(new ManageIdentityStreamProvider(CLIENT_ID, ACCOUNT));
         spy(new ManageIdentityStreamProvider(CLIENT_ID, ACCOUNT));
