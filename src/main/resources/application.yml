@@ -13,7 +13,6 @@ etl:
     type: "jsonlines"
     prefix: "test01"
   connection-string: "dummyConnectionString"
-  msi-client-id: "dummyClient"
 
 extraction:
   caseTypes:
