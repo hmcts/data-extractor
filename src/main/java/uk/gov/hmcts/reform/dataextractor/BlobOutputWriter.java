@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.dataextractor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedOutputStream;
 import java.io.OutputStream;
@@ -11,12 +10,11 @@ import java.time.format.DateTimeFormatter;
 
 import static java.time.ZoneOffset.UTC;
 
+@Slf4j
 public class BlobOutputWriter implements AutoCloseable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BlobOutputWriter.class);
-
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
-    private static final int OUTPUT_BUFFER_SIZE = 100_000_000;
+    static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
+    static final int OUTPUT_BUFFER_SIZE = 100_000_000;
 
     private final String containerName;
 
@@ -54,7 +52,7 @@ public class BlobOutputWriter implements AutoCloseable {
             // Blob storage client has already closed the stream. This exception cannot be
             // re-thrown as otherwise if this is run as a kubernetes job, it will keep being
             // restarted and the same file generated again and again.
-            LOGGER.warn("Could not close stream.", e);
+            log.warn("Could not close stream.", e);
         }
     }
 

@@ -8,10 +8,6 @@ etl:
     user: "dumyUser"
     password: "cdummyPassword"
   account: "midatastgsbox"
-  container: "probate"
-  file:
-    type: "jsonlines"
-    prefix: "test01"
   connection-string: "dummyConnectionString"
 
 extraction:
@@ -25,6 +21,7 @@ extraction:
              WHERE created_date >= (current_date-1 + time '00:00') \
              AND created_date < (current_date + time '00:00')  \
              ORDER BY created_date ASC;"
+      prefix: "PROB"
     - container: "divorce"
       type: "jsonlines"
       query: "SELECT id, created_date, event_id, summary, description, user_id, case_data_id, \
@@ -34,6 +31,7 @@ extraction:
              WHERE created_date >= (current_date-1 + time '00:00') \
              AND created_date < (current_date + time '00:00')  \
              ORDER BY created_date ASC;"
+      prefix: "DIV"
 
 application-insights:
   default:
