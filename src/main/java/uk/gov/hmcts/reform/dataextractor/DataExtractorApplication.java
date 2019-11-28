@@ -6,14 +6,13 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import uk.gov.hmcts.reform.dataextractor.config.ExtractionData;
 import uk.gov.hmcts.reform.dataextractor.config.Extractions;
 
 import java.util.Locale;
 
 @Slf4j
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+@SpringBootApplication
 public class DataExtractorApplication implements ApplicationRunner {
 
     @Autowired
