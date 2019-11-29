@@ -54,6 +54,6 @@ public class ApplicationConfigTest {
         Factory<String, QueryExecutor> queryExecutorFactory = classToTest.queryExecutorFactory();
         QueryExecutor result = queryExecutorFactory.provide("sqlQuery");
         QueryExecutor expected = new QueryExecutor(dbConfig.getUrl(), dbConfig.getUser(), dbConfig.getPassword(), "sqlQuery");
-        assertThat(result).isEqualToIgnoringGivenFields(expected);
+        assertThat(result).isEqualToComparingFieldByField(expected);
     }
 }
