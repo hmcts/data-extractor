@@ -89,9 +89,7 @@ def sonarExclusions = [
         "**/uk/gov/hmcts/reform/dataextractor/Extractor*.java",
         "**/uk/gov/hmcts/reform/dataextractor/Query*.java",
         "**/uk/gov/hmcts/reform/dataextractor/BlobOut*.java",
-        "**/ApiKeyStreamProvider.java",
-        "**/ManageIdentityStreamProvider.java",
-        "**/DataExtractorApplication.java"
+        "**/ManageIdentityStreamProvider.java"
 ]
 
 project.tasks['sonarqube'].dependsOn test, integration
