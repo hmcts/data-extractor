@@ -12,7 +12,7 @@ etl:
 
 extraction:
   caseTypes:
-    - container: "probateGor"
+    - container: "probate"
       type: "jsonlines"
       query: "SELECT to_char(current_timestamp, 'YYYYMMDD-HH24MI') AS extraction_date,
               CE.id           AS case_metadata_event_id,
@@ -76,7 +76,7 @@ extraction:
               AND created_date < (current_date + time '00:00')
               ORDER BY CE.created_date ASC;"
       prefix: "DIV"
-    - container: "sscsAsylum"
+    - container: "sscs"
       type: "jsonlines"
       query: "SELECT to_char(current_timestamp, 'YYYYMMDD-HH24MI') AS extraction_date,
               CE.id           AS case_metadata_event_id,
@@ -93,7 +93,7 @@ extraction:
               AND created_date < (current_date + time '00:00')
               ORDER BY CE.created_date ASC;"
       prefix: "SSCS-Asylum"
-    - container: "sscsBenefit"
+    - container: "sscs"
       type: "jsonlines"
       query: "SELECT to_char(current_timestamp, 'YYYYMMDD-HH24MI') AS extraction_date,
               CE.id           AS case_metadata_event_id,
