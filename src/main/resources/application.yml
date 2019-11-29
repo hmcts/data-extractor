@@ -139,3 +139,7 @@ application-insights:
     modules:
       WebSyntheticRequestTelemetryInitializer:
         enabled: false
+
+azure:
+  application-insights:
+    instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:""}
