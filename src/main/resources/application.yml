@@ -2,6 +2,10 @@ info:
   app:
     name: ${spring.application.name}
 
+spring:
+  application:
+    name: mi-data-extractor
+    
 etl:
   db:
     url: "jdbc:postgresql://localhost:5432/ccd_data_store?sslmode=require"
