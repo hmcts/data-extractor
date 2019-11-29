@@ -5,8 +5,7 @@ import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.specialized.BlockBlobClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -14,10 +13,9 @@ import org.springframework.stereotype.Component;
 import java.io.OutputStream;
 
 @Component
+@Slf4j
 @ConditionalOnProperty(value = "etl.connection-string")
 public class ApiKeyStreamProvider implements OutputStreamProvider {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ApiKeyStreamProvider.class);
 
     private final String connectStr;
 
@@ -41,7 +39,7 @@ public class ApiKeyStreamProvider implements OutputStreamProvider {
         container = client.getBlobContainerClient(containerName);
         if (!container.exists()) {
             container.create();
-            LOGGER.info("Created container {}", containerName);
+            log.info("Created container {}", containerName);
         }
         BlobClient blob = container.getBlobClient(fileName);
         BlockBlobClient appendClient = blob.getBlockBlobClient();
