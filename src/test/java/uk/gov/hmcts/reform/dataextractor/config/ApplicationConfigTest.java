@@ -33,13 +33,14 @@ public class ApplicationConfigTest {
         String containerName = "TestContainerName";
         String prefix = "testPrefix";
         DataExtractorApplication.Output outputType = DataExtractorApplication.Output.CSV;
-        BlobOutputWriter result = blobOutput.provide(ExtractionData
+        ExtractionData extractionData = ExtractionData
             .builder()
             .type(outputType)
             .prefix(prefix)
             .container(containerName)
-            .build());
-        BlobOutputWriter expected = new BlobOutputWriter(containerName, prefix, outputType, outputStreamProvider);
+            .build();
+        BlobOutputWriter result = blobOutput.provide(extractionData);
+        BlobOutputWriter expected = new BlobOutputWriter(containerName, extractionData.getFileName(), outputType, outputStreamProvider);
 
         assertThat(result).isEqualToIgnoringGivenFields(expected, "outputStream");
     }

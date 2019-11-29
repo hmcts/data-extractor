@@ -38,7 +38,7 @@ public class ApplicationConfig {
     }
 
     private BlobOutputWriter blobOutputWriter(ExtractionData config) {
-        return new BlobOutputWriter(config.getContainer(), config.getPrefix(), config.getType(), outputStreamProvider);
+        return new BlobOutputWriter(config.getContainer(), config.getFileName(), config.getType(), outputStreamProvider);
     }
 
     private QueryExecutor blobOutputWriter(String sqlQuery) {

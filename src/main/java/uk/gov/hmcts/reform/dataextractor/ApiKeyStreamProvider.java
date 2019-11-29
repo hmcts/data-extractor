@@ -4,7 +4,7 @@ import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
-import com.azure.storage.blob.specialized.BlobOutputStream;
+import com.azure.storage.blob.specialized.BlockBlobClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,15 +44,8 @@ public class ApiKeyStreamProvider implements OutputStreamProvider {
             LOGGER.info("Created container {}", containerName);
         }
         BlobClient blob = container.getBlobClient(fileName);
-
-        BlobOutputStream blobOutputStream;
-        if (!blob.exists()) {
-            blobOutputStream = blob.getBlockBlobClient().getBlobOutputStream();
-
-        } else {
-            blobOutputStream = blob.getAppendBlobClient().getBlobOutputStream();
-        }
-
-        return blobOutputStream;
+        BlockBlobClient appendClient = blob.getBlockBlobClient();
+        return appendClient.getBlobOutputStream();
     }
+
 }

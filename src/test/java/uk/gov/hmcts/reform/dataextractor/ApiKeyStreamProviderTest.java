@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.dataextractor;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
-import com.azure.storage.blob.specialized.AppendBlobClient;
 import com.azure.storage.blob.specialized.BlobOutputStream;
 import com.azure.storage.blob.specialized.BlockBlobClient;
 import org.junit.Before;
@@ -36,16 +35,10 @@ public class ApiKeyStreamProviderTest {
     private BlobClient blobMock;
 
     @Mock
-    private AppendBlobClient appendBlobClientMock;
-
-    @Mock
     private BlockBlobClient blockBlobClientMock;
 
     @Mock
     private BlobOutputStream blockOutputStreamMock;
-
-    @Mock
-    private BlobOutputStream appendOutputStreamMock;
 
     @Before
     public void setup() {
@@ -54,19 +47,10 @@ public class ApiKeyStreamProviderTest {
     }
 
     @Test
-    public void givenExistingBlob_thenReturnAppendBlob() {
-        DataExtractorApplication.Output type = DataExtractorApplication.Output.JSON_LINES;
-
-        mockDependencies(true, true);
-
-        assertThat(classToTest.getOutputStream(CONTAINER_NAME, FILE_NAME, type), is(appendOutputStreamMock));
-    }
-
-    @Test
     public void givenNonExistingBlob_thenReturnBlockBlob() {
         DataExtractorApplication.Output type = DataExtractorApplication.Output.JSON_LINES;
 
-        mockDependencies(true, false);
+        mockDependencies(true);
 
         assertThat(classToTest.getOutputStream(CONTAINER_NAME, FILE_NAME, type), is(blockOutputStreamMock));
     }
@@ -75,7 +59,7 @@ public class ApiKeyStreamProviderTest {
     public void givenNonExistingContainer_thenReturnCreateContainer() {
         DataExtractorApplication.Output type = DataExtractorApplication.Output.JSON_LINES;
 
-        mockDependencies(false, false);
+        mockDependencies(false);
 
         assertThat(classToTest.getOutputStream(CONTAINER_NAME, FILE_NAME, type), is(blockOutputStreamMock));
         verify(blobContainerClientMock, times(1)).create();
@@ -87,15 +71,12 @@ public class ApiKeyStreamProviderTest {
         assertThat(classToTest.getOutputStream(CONTAINER_NAME, FILE_NAME, type), is(blockOutputStreamMock));
     }
 
-    private void mockDependencies(boolean containerExist, boolean blobExist) {
+    private void mockDependencies(boolean containerExist) {
         doReturn(mockClient).when(classToTest).getBlobServiceClient();
         doReturn(blobContainerClientMock).when(mockClient).getBlobContainerClient(CONTAINER_NAME);
         doReturn(containerExist).when(blobContainerClientMock).exists();
         doReturn(blobMock).when(blobContainerClientMock).getBlobClient(FILE_NAME);
-        doReturn(blobExist).when(blobMock).exists();
         doReturn(blockBlobClientMock).when(blobMock).getBlockBlobClient();
         doReturn(blockOutputStreamMock).when(blockBlobClientMock).getBlobOutputStream();
-        doReturn(appendBlobClientMock).when(blobMock).getAppendBlobClient();
-        doReturn(appendOutputStreamMock).when(appendBlobClientMock).getBlobOutputStream();
     }
 }
