@@ -77,6 +77,7 @@ public class DataExtractorApplication implements ApplicationRunner {
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     public void run(ApplicationArguments args) {
         for (ExtractionData extractionData : extractions.getCaseTypes()) {
+            log.info("Processing data for caseType {} with prefix {}", extractionData.getContainer(), extractionData.getPrefix());
             try (
                 QueryExecutor executor = queryExecutorFactory.provide(extractionData.getQuery())) {
                 BlobOutputWriter writer = blobOutputFactory.provide(extractionData);

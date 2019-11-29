@@ -1,0 +1,9 @@
+spring:
+  cloud:
+    propertiesvolume:
+      enabled: true
+      prefixed: true
+      paths: /mnt/secrets/mi
+      aliases:
+        mi.aat-ccdro-user: ETL_DB_USER
+        mi.aat-ccdro-password: ETL_DB_PASSWORD
