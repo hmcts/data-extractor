@@ -1,17 +1,34 @@
 package uk.gov.hmcts.reform.dataextractor;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import uk.gov.hmcts.reform.dataextractor.config.ExtractionData;
+import uk.gov.hmcts.reform.dataextractor.config.Extractions;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.Locale;
 
+@Slf4j
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+public class DataExtractorApplication implements ApplicationRunner {
 
-@SuppressWarnings({"PMD", "checkstyle:hideutilityclassconstructor"})
-public class DataExtractorApplication {
+    @Autowired
+    private Factory<ExtractionData, BlobOutputWriter> blobOutputFactory;
 
-    enum Output {
+    @Autowired
+    private Factory<String,  QueryExecutor> queryExecutorFactory;
+
+    @Autowired
+    private Factory<DataExtractorApplication.Output,  Extractor> extractorFactory;
+
+    @Autowired
+    private Extractions extractions;
+
+    public enum Output {
         CSV("csv", "text/csv"),
         JSON("json", "application/json"),
         JSON_LINES("jsonl", "application/x-ndjson");
@@ -42,13 +59,13 @@ public class DataExtractorApplication {
                 return defaultOutput();
             }
             String normalisedVal = val
-                .toLowerCase()
+                .toLowerCase(Locale.ENGLISH)
                 .replaceAll("[-_\\p{Space}]", "");
-            if (normalisedVal.equals("csv")) {
+            if ("csv".equals(normalisedVal)) {
                 return Output.CSV;
-            } else if (normalisedVal.equals("jsonlines")) {
+            } else if ("jsonlines".equals(normalisedVal)) {
                 return Output.JSON_LINES;
-            } else if (normalisedVal.equals("json")) {
+            } else if ("json".equals(normalisedVal)) {
                 return Output.JSON;
             } else {
                 return defaultOutput();
@@ -56,104 +73,24 @@ public class DataExtractorApplication {
         }
     }
 
-    static class ExtractorConfig {
-        private String baseDir = "/mnt/secrets/";
-
-        private final String etlDbUrl;
-        final String etlDbUser;
-        final String etlDbPassword;
-        private final String etlSql;
-        private final String etlMsiClientId;
-        private final String etlAccount;
-        private final String etlContainer;
-        private final Output etlFileType;
-        private final String etlFilePrefix;
-
-        ExtractorConfig(String baseDir) {
-            if (baseDir != null) {
-                this.baseDir = baseDir;
-            }
-            Config config = ConfigFactory.load();
-            this.etlDbUrl = config.getString("etl-db-url");
-            if (config.hasPath("etl-db-user-file")) {
-                String etlDbUserFile = config.getString("etl-db-user-file");
-                this.etlDbUser = readFirstLine(etlDbUserFile);
-            } else {
-                this.etlDbUser = config.getString("etl-db-user");
-            }
-            if (config.hasPath("etl-db-password-file")) {
-                String etlDbPasswordFile = config.getString("etl-db-password-file");
-                this.etlDbPassword = readFirstLine(etlDbPasswordFile);
-            } else {
-                this.etlDbPassword = config.getString("etl-db-password");
-            }
-            this.etlSql = config.getString("etl-sql");
-            this.etlMsiClientId = config.getString("etl-msi-client-id");
-            this.etlAccount = config.getString("etl-account");
-            this.etlContainer = config.getString("etl-container");
-            if (config.hasPath("etl-file-type")) {
-                this.etlFileType = Output.from(config.getString("etl-file-type"));
-            } else {
-                this.etlFileType = Output.defaultOutput();
-            }
-            this.etlFilePrefix = config.getString("etl-file-prefix");
-        }
-
-        ExtractorConfig() {
-            this(null);
-        }
-
-        private String readFirstLine(String fileName) {
-            try {
-                return Files.readAllLines(Paths.get(baseDir, fileName))
-                    .stream()
-                    .findFirst()
-                    .orElseThrow();
-            } catch (IOException e) {
-                throw new ExtractorException(e);
+    @Override
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
+    public void run(ApplicationArguments args) {
+        for (ExtractionData extractionData : extractions.getCaseTypes()) {
+            log.info("Processing data for caseType {} with prefix {}", extractionData.getContainer(), extractionData.getPrefix());
+            try (
+                QueryExecutor executor = queryExecutorFactory.provide(extractionData.getQuery())) {
+                BlobOutputWriter writer = blobOutputFactory.provide(extractionData);
+                Extractor extractor = extractorFactory.provide(extractionData.getType());
+                extractor.apply(executor.execute(), writer.outputStream());
+            } catch (Exception e) {
+                log.error("Error processing case {}", extractionData.getContainer(), e);
             }
         }
     }
-
-
-    private ExtractorConfig config;
-
-
-    public DataExtractorApplication() {
-        this.config = new ExtractorConfig();
-    }
-
-    DataExtractorApplication(String baseDir) {
-        this.config = new ExtractorConfig(baseDir);
-    }
-
-    protected static Extractor extractorFactory(Output outputType) {
-        switch (outputType) {
-            case JSON_LINES: return new ExtractorJsonLines();
-            case JSON: return new ExtractorJson();
-            case CSV: return new ExtractorCsv();
-            default: return extractorFactory(Output.defaultOutput());
-        }
-    }
-
-    public void run() {
-        try (QueryExecutor executor = new QueryExecutor(
-                config.etlDbUrl, config.etlDbUser, config.etlDbPassword, config.etlSql);
-            BlobOutputWriter writer = new BlobOutputWriter(
-                config.etlMsiClientId, config.etlAccount, config.etlContainer, config.etlFilePrefix, config.etlFileType)
-            ) {
-            Extractor extractor = DataExtractorApplication.extractorFactory(config.etlFileType);
-            extractor.apply(executor.execute(), writer.outputStream());
-        }
-    }
-
-    public ExtractorConfig getConfig() {
-        return config;
-    }
-
 
     public static void main(String[] args) {
-        new DataExtractorApplication().run();
+        SpringApplication.run(DataExtractorApplication.class, args);
     }
 
 }
