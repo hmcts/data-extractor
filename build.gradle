@@ -188,6 +188,7 @@ dependencies {
 
   compile group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.logging
   compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.logging
+  compile 'uk.gov.hmcts.reform:properties-volume-spring-boot-starter:0.0.4'
 
   compile 'com.azure:azure-storage-blob:12.0.0'
 

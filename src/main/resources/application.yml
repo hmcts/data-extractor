@@ -115,7 +115,8 @@ extraction:
               trim(CE.data ->> 'caseCode') AS CE_CASE_CODE
               FROM case_event CE
               WHERE CE.case_type_id = 'Benefit'
-              AND CE.created_date < timestamp '2019-10-28 00:00:00'
+              AND created_date >= (current_date-1 + time '00:00')
+              AND created_date < (current_date + time '00:00')
               ORDER BY CE.created_date ASC;"
       prefix: "SSCS-Benefit"
     - container: "finred"
