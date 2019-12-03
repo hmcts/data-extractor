@@ -18,8 +18,8 @@ archivesBaseName = 'data-extractor'
 mainClassName = 'uk.gov.hmcts.reform.dataextractor.DataExtractorApplication'
 
 
-sourceCompatibility = 11
-targetCompatibility = 11
+sourceCompatibility = "11"
+targetCompatibility = "11"
 
 sourceSets {
   integrationTest {
@@ -75,7 +75,6 @@ task e2e(type: Test, description: 'Runs the integration tests.', group: 'Verific
 task functionalPostDeploy(type: Test) {
   group = 'Functional Tests'
   description = 'Verifies that files from functionPreDeploy step were processed following job creation in AKS'
-  println "===>" + sourceSets.e2e.output.classesDirs.asPath
   setTestClassesDirs(sourceSets.e2e.output.classesDirs)
   setClasspath(sourceSets.e2e.runtimeClasspath)
   useJUnitPlatform()
