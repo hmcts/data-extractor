@@ -4,6 +4,7 @@ spring:
       enabled: true
       prefixed: true
       paths: /mnt/secrets/mi
+      name: mi-vault
       aliases:
-        mi.aat-ccdro-user: ETL_DB_USER
+        mi.aat-ccdro-user: etl.db.user
         mi.aat-ccdro-password: ETL_DB_PASSWORD
