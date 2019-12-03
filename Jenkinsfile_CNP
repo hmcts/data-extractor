@@ -9,8 +9,8 @@ def component = "job"
 
 def secrets = [
   'data-extractor-${env}': [
-    secret('${env}-ccdro-user', 'ETL_DB_USE'),
-    secret('${env}-ccdro-password', 'ETL_DB_PASSWORD'),
+    secret('aat-ccdro-user', 'ETL_DB_USE'),
+    secret('aat-ccdro-password', 'ETL_DB_PASSWORD'),
     secret('connection-string', 'ETL_CONNECTIONSTRING')
   ]
 ]
