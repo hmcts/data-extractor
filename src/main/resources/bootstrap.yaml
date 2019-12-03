@@ -7,5 +7,5 @@ spring:
       name: mi-vault
       aliases:
         data-extractor.aat-ccdro-user: etl.db.user
-        data-extractor.aat-ccdro-password: aat.db.password
+        data-extractor.aat-ccdro-password: etl.db.password
         data-extractor.connection-string: etl.connection-string
