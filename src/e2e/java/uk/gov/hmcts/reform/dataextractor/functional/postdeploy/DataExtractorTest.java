@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.dataextractor.config.DbConfig;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:application_e2e.properties")
 @SpringBootTest
@@ -35,11 +37,16 @@ public class DataExtractorTest {
         try {
             ResultSet resultSet = queryExecutor.execute();
             resultSet.next();
-            resultSet.getInt(1);
+            int rows = resultSet.getInt(1);
+            assertTrue(rows > 0, "Rows numbers " + rows);
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            queryExecutor.close();
+            try {
+                queryExecutor.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }
