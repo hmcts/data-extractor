@@ -1,0 +1,45 @@
+package uk.gov.hmcts.reform.dataextractor.functional.postdeploy;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.dataextractor.QueryExecutor;
+import uk.gov.hmcts.reform.dataextractor.config.DbConfig;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+@ExtendWith(SpringExtension.class)
+@TestPropertySource(locations = "classpath:application_e2e.properties")
+@SpringBootTest
+public class DataExtractorTest {
+
+    @Autowired
+    private DbConfig dbConfig;
+
+    private QueryExecutor queryExecutor;
+
+    @Test
+    public void test() {
+        String sqlQuery = "SELECT count(*) \n"
+            + "FROM case_event CE\n"
+            + "WHERE CE.case_type_id = 'GrantOfRepresentation'\n"
+            + "AND created_date >= (current_date-1 + time '00:00')\n"
+            + "AND created_date < (current_date + time '00:00')\n"
+            + "ORDER BY CE.created_date ASC";
+
+        queryExecutor = new QueryExecutor(dbConfig.getUrl(), dbConfig.getUser(), dbConfig.getPassword(), sqlQuery);
+        try {
+            ResultSet resultSet = queryExecutor.execute();
+            resultSet.next();
+            resultSet.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            queryExecutor.close();
+        }
+    }
+}

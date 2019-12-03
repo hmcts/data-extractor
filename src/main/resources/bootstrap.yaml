@@ -2,9 +2,10 @@ spring:
   cloud:
     propertiesvolume:
       enabled: true
-      prefixed: true
-      paths: /mnt/secrets/mi
+      prefixed: false
+      paths: /mnt/secrets/data-extractor,/mnt/secrets/mi
       name: mi-vault
       aliases:
-        mi.aat-ccdro-user: etl.db.user
-        mi.aat-ccdro-password: ETL_DB_PASSWORD
+        aat-ccdro-user: etl.db.user
+        aat-ccdro-password: etl.db.password
+        connection-string: etl.connection-string

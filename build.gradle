@@ -30,6 +30,14 @@ sourceSets {
     }
     resources.srcDir file('src/integrationTest/resources')
   }
+  e2e {
+    java {
+      compileClasspath += main.output + test.output
+      runtimeClasspath += main.output + test.output
+      srcDir('src/e2e/java')
+    }
+    resources.srcDir file('src/e2e/resources')
+  }
 }
 
 tasks.withType(JavaCompile) {
@@ -52,6 +60,26 @@ task integration(type: Test, description: 'Runs the integration tests.', group: 
   testLogging {
     exceptionFormat = 'full'
   }
+}
+
+task e2e(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
+  testClassesDirs = sourceSets.e2e.output.classesDirs
+  classpath = sourceSets.e2e.runtimeClasspath
+  useJUnitPlatform()
+  mustRunAfter test
+  testLogging {
+    exceptionFormat = 'full'
+  }
+}
+
+task functionalPostDeploy(type: Test) {
+  group = 'Functional Tests'
+  description = 'Verifies that files from functionPreDeploy step were processed following job creation in AKS'
+  println "===>" + sourceSets.e2e.output.classesDirs.asPath
+  setTestClassesDirs(sourceSets.e2e.output.classesDirs)
+  setClasspath(sourceSets.e2e.runtimeClasspath)
+  useJUnitPlatform()
+  include "uk/gov/hmcts/reform/dataextractor/functional/postdeploy/**"
 }
 
 check {
@@ -154,6 +182,19 @@ def versions = [
   springBoot: '2.2.1.RELEASE'
 ]
 
+dependencies {
+  integrationTestCompile(sourceSets.test.output)
+  e2eCompile(sourceSets.test.output)
+}
+
+configurations {
+  integrationTestCompile.extendsFrom(testCompile)
+  integrationTestRuntime.extendsFrom(testRuntime)
+  e2eRuntime.extendsFrom(testRuntime)
+  e2eCompile.extendsFrom(testCompile)
+}
+
+
 configurations.all {
   resolutionStrategy {
     eachDependency { DependencyResolveDetails details ->
@@ -203,7 +244,10 @@ dependencies {
   testRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: versions.junit
   testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '2.25.0'
 
-  testImplementation('org.springframework.boot:spring-boot-starter-test') {
+  testCompileOnly 'org.projectlombok:lombok'
+  testAnnotationProcessor "org.projectlombok:lombok"
+
+  testCompile('org.springframework.boot:spring-boot-starter-test') {
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
 
@@ -213,7 +257,10 @@ dependencies {
 
   integrationTestCompile sourceSets.main.runtimeClasspath
   integrationTestCompile sourceSets.test.runtimeClasspath
-  
+
+  e2eCompile sourceSets.main.runtimeClasspath
+  e2eCompile sourceSets.test.runtimeClasspath
+
 }
 
 mainClassName = 'uk.gov.hmcts.reform.dataextractor.DataExtractorApplication'
