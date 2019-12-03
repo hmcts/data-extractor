@@ -178,7 +178,8 @@ def versions = [
   logging: '5.1.1',
   jackson: '2.10.0',
   commonsBeanUtils: '1.9.4',
-  springBoot: '2.2.1.RELEASE'
+  springBoot: '2.2.1.RELEASE',
+  postgresql: '42.2.5'
 ]
 
 dependencies {
@@ -209,7 +210,7 @@ configurations.all {
 }
 
 dependencies {
-  compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
+  compile group: 'org.postgresql', name: 'postgresql', version: versions.postgresql
 
   compile group: 'com.microsoft.azure', name: 'azure-storage', version: '8.3.0'
   compile group: 'com.microsoft.azure.msi_auth_token_provider', name: 'azure-authentication-msi-token-provider', version: '1.0.0-Beta-1'
@@ -256,7 +257,7 @@ dependencies {
 
   integrationTestCompile sourceSets.main.runtimeClasspath
   integrationTestCompile sourceSets.test.runtimeClasspath
-
+  
   e2eCompile sourceSets.main.runtimeClasspath
   e2eCompile sourceSets.test.runtimeClasspath
 
