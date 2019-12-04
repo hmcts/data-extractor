@@ -12,10 +12,7 @@ import uk.gov.hmcts.reform.dataextractor.Factory;
 import uk.gov.hmcts.reform.dataextractor.OutputStreamProvider;
 import uk.gov.hmcts.reform.dataextractor.QueryExecutor;
 
-import java.sql.Connection;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -23,9 +20,6 @@ public class ApplicationConfigTest {
 
     @Mock
     private OutputStreamProvider outputStreamProvider;
-
-    @Mock
-    private Connection connection;
 
     @Spy
     private DbConfig dbConfig;
@@ -53,18 +47,13 @@ public class ApplicationConfigTest {
 
     @Test
     public void givenBlobOutputFactory_thenCreateQueryExecutor() {
-        Factory<String, QueryExecutor> queryExecutorFactory = classToTest.queryExecutorFactory();
-        QueryExecutor result = queryExecutorFactory.provide("sqlQuery");
-        QueryExecutor expected = new QueryExecutor(connection, "sqlQuery");
-        assertThat(result).isEqualToComparingFieldByField(expected);
-    }
-
-    @Test
-    public void givenDbConnectionError_thenThrowException() {
         dbConfig.setBaseDir("BaseDir");
         dbConfig.setPassword("password");
         dbConfig.setUrl("ulr");
         dbConfig.setUser("user");
-        assertThrows(IllegalStateException.class, () -> connection = classToTest.dbConnection());
+        Factory<String, QueryExecutor> queryExecutorFactory = classToTest.queryExecutorFactory();
+        QueryExecutor result = queryExecutorFactory.provide("sqlQuery");
+        QueryExecutor expected = new QueryExecutor(dbConfig.getUrl(), dbConfig.getUser(), dbConfig.getPassword(), "sqlQuery");
+        assertThat(result).isEqualToComparingFieldByField(expected);
     }
 }

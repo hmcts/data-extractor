@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.dataextractor.DataExtractorApplication;
 import uk.gov.hmcts.reform.dataextractor.QueryExecutor;
 import uk.gov.hmcts.reform.dataextractor.config.DbConfig;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -38,8 +37,6 @@ public class DataExtractorTest {
     @Autowired
     private BlobReader blobReader;
 
-    @Autowired
-    private Connection dbConnection;
     private static final  String SQL_QUERY_BY_CASETYPE = "SELECT count(*) \n"
         + "FROM case_event CE\n"
         + "WHERE CE.case_type_id = '%s'\n"
@@ -60,7 +57,7 @@ public class DataExtractorTest {
     public void checkByCaseType(String container, String caseType, DataExtractorApplication.Output type, String prefix) {
         String sqlQuery = getQueryByCaseType(caseType);
         String fileName = getFileName(prefix, type);
-        QueryExecutor queryExecutor = new QueryExecutor(dbConnection, sqlQuery);
+        QueryExecutor queryExecutor = new QueryExecutor(dbConfig.getUrl(), dbConfig.getUser(), dbConfig.getPassword(), sqlQuery);
         try {
             ResultSet resultSet = queryExecutor.execute();
             resultSet.next();
