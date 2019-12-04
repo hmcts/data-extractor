@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.dataextractor.functional.postdeploy;
 
 import com.azure.storage.blob.BlobClient;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -53,7 +53,7 @@ public class DataExtractorTest {
 
     @ParameterizedTest(name = "#{index} - Testing caseType: {1}")
     @MethodSource("caseTypeInfoProvider")
-    @Ignore // Do not verify DB content
+    @Disabled // Do not verify DB content
     public void checkByCaseType(String container, String caseType, DataExtractorApplication.Output type, String prefix) {
         String sqlQuery = getQueryByCaseType(caseType);
         String fileName = getFileName(prefix, type);
