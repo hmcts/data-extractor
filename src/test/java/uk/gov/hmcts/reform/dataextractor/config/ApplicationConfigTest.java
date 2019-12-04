@@ -60,7 +60,7 @@ public class ApplicationConfigTest {
     }
 
     @Test
-    public void givenDBConnectionError_thenThrowException() {
+    public void givenDbConnectionError_thenThrowException() {
         dbConfig.setBaseDir("BaseDir");
         dbConfig.setPassword("password");
         dbConfig.setUrl("ulr");
