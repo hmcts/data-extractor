@@ -31,8 +31,7 @@ public class DataExtractorTest {
             + "FROM case_event CE\n"
             + "WHERE CE.case_type_id = 'GrantOfRepresentation'\n"
             + "AND created_date >= (current_date-1 + time '00:00')\n"
-            + "AND created_date < (current_date + time '00:00')\n"
-            + "ORDER BY CE.created_date ASC";
+            + "AND created_date < (current_date + time '00:00')";
 
         QueryExecutor queryExecutor = new QueryExecutor(dbConfig.getUrl(), dbConfig.getUser(), dbConfig.getPassword(), sqlQuery);
         try {
