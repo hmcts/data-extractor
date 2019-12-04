@@ -24,22 +24,7 @@ extraction:
               CE.created_date     AS ce_created_date,
               trim(CE.case_type_id)   AS ce_case_type_id,
               CE.case_type_version    AS ce_case_type_version,
-              trim(CE.data ->>'applicationType') AS ce_app_type,
-              trim(CE.data ->>'applicationSubmittedDate') AS ce_app_sub_date,
-              trim(CE.data ->>'registryLocation') AS ce_reg_location,
-              trim(CE.data ->>'willExists') AS ce_will_exists,
-              trim(CE.data ->>'ihtNetValue') AS ce_iht_net_value,
-              trim(CE.data ->>'ihtGrossValue') AS ce_iht_gross_value,
-              trim(CE.data ->>'deceasedDateOfDeath') AS ce_deceased_dod,
-              trim(CE.data ->>'deceasedAnyOtherNames') AS ce_deceased_other_names,
-              trim(CE.data ->>'boCaseStopReasonList') AS ce_case_stop_reason,
-              jsonb_array_length(CE.data ->'boCaseStopReasonList') AS ce_case_stop_reason_cnt,
-              trim(CE.data ->>'caseType') AS ce_gor_case_type,
-              trim(CE.data ->>'paperForm') AS ce_paperform_ind,
-              trim(CE.data ->>'grantIssuedDate') AS ce_grantissued_date,
-              trim(CE.data ->>'recordId') AS ce_leg_record_id,
-              trim(CE.data ->>'latestGrantReissueDate') AS ce_lat_grnt_reiss_date,
-              trim(CE.data ->>'reissueReasonNotation') AS ce_reiss_rea_not
+              CE.data AS ce_data
               FROM case_event CE
               WHERE CE.case_type_id = 'GrantOfRepresentation'
               AND created_date >= (current_date-1 + time '00:00')
@@ -54,26 +39,7 @@ extraction:
               CE.created_date     AS ce_created_date,
               trim(CE.case_type_id)   AS ce_case_type_id,
               CE.case_type_version    AS ce_case_type_version,
-              CASE WHEN trim(CE.data->>'D8DivorceUnit') IS NULL THEN 'OTHER'
-              ELSE trim(CE.data->>'D8DivorceUnit') END AS ce_divorce_unit,
-              trim(CE.data ->>'D8PetitionerContactDetailsConfidential') AS ce_contact_confidential,
-              trim(CE.data ->> 'D8HelpWithFeesNeedHelp') AS ce_need_help_with_fees,
-              trim(CE.data ->> 'D8FinancialOrder') AS ce_financial_order,
-              trim(CE.data ->> 'D8ReasonForDivorce') AS ce_reason_for_divorce,
-              trim(CE.data ->> 'D8DivorceClaimFrom') AS ce_divorce_claim_from,
-              trim(CE.data ->>'D8ReasonForDivorceAdulteryWishToName') as ce_adultery_wish_to_name,
-              trim(CE.data ->>'D8caseReference') AS ce_case_reference,
-              trim(CE.data ->> 'D8legalProcess') AS CE_LEGAL_PROCESS,
-              trim(CE.data ->> 'createdDate') AS CE_CASE_CREATED_DATE,
-              trim(CE.data ->> 'receivedDate') AS CE_CASE_RECEIVED_DATE,
-              trim(CE.data ->> 'IssueDate') AS CE_CASE_ISSUE_DATE,
-              trim(CE.data ->> 'ReceivedAOSfromRespDate') AS CE_AOS_RECEIVED_RESP_DATE,
-              trim(CE.data ->> 'ReceivedAnswerFromRespDate') AS CE_ANSWER_RECEIVED_RESP_DATE,
-              trim(CE.data ->> 'ReceivedAosFromCoRespDate') AS CE_AOS_RECEIVED_CORESP_DATE,
-              trim(CE.data ->> 'ReceivedAnswerFromCoRespDate') AS CE_ANSWER_RECEIVED_CORESP_DATE,
-              trim(CE.data ->> 'DNApplicationSubmittedDate') AS CE_DN_SUBMITTED_DATE,
-              trim(CE.data ->> 'RespDefendsDivorce') AS CE_RESP_DEFENDS,
-              trim(CE.data ->> 'CoRespDefendsDivorce') AS CE_CORESP_DEFENDS
+              CE.data AS ce_data
               FROM case_event CE
               WHERE CE.case_type_id = 'DIVORCE'
               AND created_date >= (current_date-1 + time '00:00')
@@ -88,9 +54,7 @@ extraction:
               CE.created_date     AS ce_created_date,
               trim(CE.case_type_id)   AS ce_case_type_id,
               CE.case_type_version    AS ce_case_type_version,
-              trim(CE.data ->> 'homeOfficeDecisionDate') AS CE_HO_DECISION_DATE,
-              trim(CE.data ->> 'listCaseHearingCentre') AS CE_HEARING_CENTRE,
-              trim(CE.data ->> 'homeOfficeReferenceNumber') AS CE_HO_REF_NO
+              CE.data AS ce_data
               FROM case_event CE
               WHERE CE.case_type_id = 'Asylum'
               AND created_date >= (current_date-1 + time '00:00')
@@ -105,14 +69,7 @@ extraction:
               CE.created_date     AS ce_created_date,
               trim(CE.case_type_id)   AS ce_case_type_id,
               CE.case_type_version    AS ce_case_type_version,
-              trim(CE.data ->> 'caseReference') AS CE_BEN_CASE_REF,
-              trim(CE.data ->> 'caseCreated') AS CE_CASE_CREATED_DATE,
-              trim(CE.data -> 'appeal' ->> 'receivedVia') AS CE_RECEIVED_VIA,
-              trim(CE.data -> 'appeal' ->> 'hearingType') AS CE_HEARING_TYPE,
-              trim(CE.data -> 'appeal' -> 'rep' ->> 'hasRepresentative') AS CE_HAS_REPR,
-              trim(CE.data -> 'regionalProcessingCenter' ->> 'name') AS CE_REGIONAL_CENTRE,
-              trim(CE.data ->> 'outcome') AS CE_CASE_OUTCOME,
-              trim(CE.data ->> 'caseCode') AS CE_CASE_CODE
+              CE.data AS ce_data
               FROM case_event CE
               WHERE CE.case_type_id = 'Benefit'
               AND created_date >= (current_date-1 + time '00:00')
@@ -127,11 +84,7 @@ extraction:
               CE.created_date     AS ce_created_date,
               trim(CE.case_type_id)   AS ce_case_type_id,
               CE.case_type_version    AS ce_case_type_version,
-              trim(CE.data ->> 'issueDate') AS CE_ISSUED_DATE,
-              trim(CE.data ->> 'orderDirectionDate') AS CE_ORDER_DATE,
-              trim(CE.data ->> 'divorceCaseNumber') AS CE_DIVORCE_CASE_NUM,
-              trim(CE.data ->> 'natureOfApplication2') AS CE_ORDER_TYPES,
-              trim(CE.data ->> 'orderDirectionJudge') AS CE_JUDGE_TYPE
+              CE.data AS ce_data
               FROM case_event CE
               WHERE CE.case_type_id = 'FinancialRemedyMVP2'
               AND created_date >= (current_date-1 + time '00:00')
