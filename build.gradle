@@ -18,8 +18,8 @@ archivesBaseName = 'data-extractor'
 mainClassName = 'uk.gov.hmcts.reform.dataextractor.DataExtractorApplication'
 
 
-sourceCompatibility = 11
-targetCompatibility = 11
+sourceCompatibility = "11"
+targetCompatibility = "11"
 
 sourceSets {
   integrationTest {
@@ -29,6 +29,14 @@ sourceSets {
       srcDir file('src/integrationTest/java')
     }
     resources.srcDir file('src/integrationTest/resources')
+  }
+  e2e {
+    java {
+      compileClasspath += main.output + test.output
+      runtimeClasspath += main.output + test.output
+      srcDir('src/e2e/java')
+    }
+    resources.srcDir file('src/e2e/resources')
   }
 }
 
@@ -52,6 +60,25 @@ task integration(type: Test, description: 'Runs the integration tests.', group: 
   testLogging {
     exceptionFormat = 'full'
   }
+}
+
+task e2e(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
+  testClassesDirs = sourceSets.e2e.output.classesDirs
+  classpath = sourceSets.e2e.runtimeClasspath
+  useJUnitPlatform()
+  mustRunAfter test
+  testLogging {
+    exceptionFormat = 'full'
+  }
+}
+
+task functionalPostDeploy(type: Test) {
+  group = 'Functional Tests'
+  description = 'Verifies that files from functionPreDeploy step were processed following job creation in AKS'
+  setTestClassesDirs(sourceSets.e2e.output.classesDirs)
+  setClasspath(sourceSets.e2e.runtimeClasspath)
+  useJUnitPlatform()
+  include "uk/gov/hmcts/reform/dataextractor/functional/postdeploy/**"
 }
 
 check {
@@ -151,8 +178,22 @@ def versions = [
   logging: '5.1.1',
   jackson: '2.10.0',
   commonsBeanUtils: '1.9.4',
-  springBoot: '2.2.1.RELEASE'
+  springBoot: '2.2.1.RELEASE',
+  postgresql: '42.2.5'
 ]
+
+dependencies {
+  integrationTestCompile(sourceSets.test.output)
+  e2eCompile(sourceSets.test.output)
+}
+
+configurations {
+  integrationTestCompile.extendsFrom(testCompile)
+  integrationTestRuntime.extendsFrom(testRuntime)
+  e2eRuntime.extendsFrom(testRuntime)
+  e2eCompile.extendsFrom(testCompile)
+}
+
 
 configurations.all {
   resolutionStrategy {
@@ -169,7 +210,7 @@ configurations.all {
 }
 
 dependencies {
-  compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
+  compile group: 'org.postgresql', name: 'postgresql', version: versions.postgresql
 
   compile group: 'com.microsoft.azure', name: 'azure-storage', version: '8.3.0'
   compile group: 'com.microsoft.azure.msi_auth_token_provider', name: 'azure-authentication-msi-token-provider', version: '1.0.0-Beta-1'
@@ -185,9 +226,12 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-batch'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-json'
-
+  
   compile group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.logging
   compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.logging
+  compile('uk.gov.hmcts.reform:properties-volume-spring-boot-starter:0.0.4') {
+    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
+  }
 
   compile 'com.azure:azure-storage-blob:12.0.0'
 
@@ -200,7 +244,10 @@ dependencies {
   testRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: versions.junit
   testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '2.25.0'
 
-  testImplementation('org.springframework.boot:spring-boot-starter-test') {
+  testCompileOnly 'org.projectlombok:lombok'
+  testAnnotationProcessor "org.projectlombok:lombok"
+
+  testCompile('org.springframework.boot:spring-boot-starter-test') {
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
 
@@ -211,6 +258,9 @@ dependencies {
   integrationTestCompile sourceSets.main.runtimeClasspath
   integrationTestCompile sourceSets.test.runtimeClasspath
   
+  e2eCompile sourceSets.main.runtimeClasspath
+  e2eCompile sourceSets.test.runtimeClasspath
+
 }
 
 mainClassName = 'uk.gov.hmcts.reform.dataextractor.DataExtractorApplication'

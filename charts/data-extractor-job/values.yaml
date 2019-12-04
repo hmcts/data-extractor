@@ -6,6 +6,7 @@ job:
       secrets:
         - aat-ccdro-user
         - aat-ccdro-password
+        - connection-string
   memoryLimits: '2048Mi'
   cpuLimits: '2000m'
   labels:
@@ -15,20 +16,8 @@ job:
     ETL_DB_URL: jdbc:postgresql://ccd-data-store-api-postgres-db-{{ .Values.global.environment }}.postgres.database.azure.com:5432/ccd_data_store
     ETL_DB_USER_FILE: data-extractor/{{ .Values.global.environment }}-ccdro-user
     ETL_DB_PASSWORD_FILE: data-extractor/{{ .Values.global.environment }}-ccdro-password
-    ETL_SQL: >
-      SELECT id, created_date, event_id, summary, description, user_id, case_data_id,
-      case_type_id, case_type_version, state_id, user_first_name, user_last_name,
-      event_name, state_name, security_classification
-      FROM case_event
-      WHERE created_date >= (current_date-1 + time '00:00')
-      AND created_date < (current_date + time '00:00')
-      ORDER BY created_date ASC;
     ETL_ACCOUNT: miphasetwostorage1
-    ETL_CONTAINER: probate
-    ETL_FILE_TYPE: jsonlines
-    ETL_FILE_PREFIX: test01
-    ETL_MSI_CLIENT_ID: d97865b7-49ce-4449-b9d8-6de89375b63f
-
+    APPINSIGHTS_INSTRUMENTATIONKEY: c3043e63-3383-4add-a507-e0adf8588e4a
 global:
   job:
     kind: Job

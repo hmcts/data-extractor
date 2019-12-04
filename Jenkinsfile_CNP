@@ -1,17 +1,49 @@
 #!groovy
 
 @Library("Infrastructure")
+import uk.gov.hmcts.contino.GradleBuilder
 
 def type = "java"
 def product = "data-extractor"
 def component = "job"
 
+def secrets = [
+  'data-extractor-${env}': [
+    secret('aat-ccdro-user', 'ETL_DB_USER'),
+    secret('aat-ccdro-password', 'ETL_DB_PASSWORD'),
+    secret('connection-string', 'ETL_CONNECTIONSTRING')
+  ]
+]
+
+static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
+  [ $class: 'AzureKeyVaultSecret',
+    secretType: 'Secret',
+    name: secretName,
+    version: '',
+    envVariable: envVar
+  ]
+}
+
+GradleBuilder builder = new GradleBuilder(this, product)
+
 withPipeline(type, product, component) {
   env.TESTCONTAINERS_RYUK_DISABLED = 'true'
   enableDockerBuild()
   installCharts()
+  loadVaultSecrets(secrets)
   disableLegacyDeployment()
   enableAksStagingDeployment()
   nonServiceApp()
 
+  after('akschartsinstall') {
+    echo "Checking exported cases"
+    echo "Just waiting a while to ensure that the pod has run the job"
+    sh "sleep 120s"
+    echo "Verifying that functional test data was processed correctly"
+    try {
+      builder.gradle('functionalPostDeploy')
+    } finally {
+      junit '**/test-results/**/*.xml'
+    }
+  }
 }

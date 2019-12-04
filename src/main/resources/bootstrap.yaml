@@ -1,0 +1,11 @@
+spring:
+  cloud:
+    propertiesvolume:
+      enabled: true
+      prefixed: false
+      paths: /mnt/secrets/data-extractor,/mnt/secrets/mi
+      name: mi-vault
+      aliases:
+        aat-ccdro-user: etl.db.user
+        aat-ccdro-password: etl.db.password
+        connection-string: etl.connection-string
