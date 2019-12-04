@@ -22,7 +22,8 @@ public class DataExtractorTest {
     @Autowired
     private DbConfig dbConfig;
 
-    private QueryExecutor queryExecutor;
+    @Autowired
+    private BlobReader blobReader;
 
     @Test
     public void test() {
@@ -33,11 +34,12 @@ public class DataExtractorTest {
             + "AND created_date < (current_date + time '00:00')\n"
             + "ORDER BY CE.created_date ASC";
 
-        queryExecutor = new QueryExecutor(dbConfig.getUrl(), dbConfig.getUser(), dbConfig.getPassword(), sqlQuery);
+        QueryExecutor queryExecutor = new QueryExecutor(dbConfig.getUrl(), dbConfig.getUser(), dbConfig.getPassword(), sqlQuery);
         try {
             ResultSet resultSet = queryExecutor.execute();
             resultSet.next();
             int rows = resultSet.getInt(1);
+            blobReader.readFile("divorce", "DIV-20191129.jsonl");
             assertTrue(rows > 0, "Rows numbers " + rows);
         } catch (SQLException e) {
             e.printStackTrace();
