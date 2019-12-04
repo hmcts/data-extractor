@@ -33,8 +33,11 @@ public class BlobReader {
         BlobServiceClient blobContainer = getBlobServiceClient();
         BlobClient blobClient = blobContainer.getBlobContainerClient(container).getBlobClient(fileName);
         blobClient.download(output);
-        String blobContent = output.toString();
-        System.out.println(blobContent);
-        return blobContent;
+        return output.toString();
+    }
+
+    public BlobClient  getBlobClient(String container, String fileName) {
+        BlobServiceClient blobContainer = getBlobServiceClient();
+        return blobContainer.getBlobContainerClient(container).getBlobClient(fileName);
     }
 }

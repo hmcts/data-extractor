@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.dataextractor.functional.postdeploy;
 
+import com.azure.storage.blob.BlobClient;
+import org.junit.Ignore;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -12,6 +14,7 @@ import uk.gov.hmcts.reform.dataextractor.DataExtractorApplication;
 import uk.gov.hmcts.reform.dataextractor.QueryExecutor;
 import uk.gov.hmcts.reform.dataextractor.config.DbConfig;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -35,6 +38,8 @@ public class DataExtractorTest {
     @Autowired
     private BlobReader blobReader;
 
+    @Autowired
+    private Connection dbConnection;
     private static final  String SQL_QUERY_BY_CASETYPE = "SELECT count(*) \n"
         + "FROM case_event CE\n"
         + "WHERE CE.case_type_id = '%s'\n"
@@ -51,10 +56,11 @@ public class DataExtractorTest {
 
     @ParameterizedTest(name = "#{index} - Testing caseType: {1}")
     @MethodSource("caseTypeInfoProvider")
+    @Ignore // Do not verify DB content
     public void checkByCaseType(String container, String caseType, DataExtractorApplication.Output type, String prefix) {
         String sqlQuery = getQueryByCaseType(caseType);
         String fileName = getFileName(prefix, type);
-        QueryExecutor queryExecutor = new QueryExecutor(dbConfig.getUrl(), dbConfig.getUser(), dbConfig.getPassword(), sqlQuery);
+        QueryExecutor queryExecutor = new QueryExecutor(dbConnection, sqlQuery);
         try {
             ResultSet resultSet = queryExecutor.execute();
             resultSet.next();
@@ -70,6 +76,16 @@ public class DataExtractorTest {
                 e.printStackTrace();
             }
         }
+    }
+
+    @ParameterizedTest(name = "#{index} - Testing caseType: {1}")
+    @MethodSource("caseTypeInfoProvider")
+    public void checkBlobAreCreated(String container, String caseType, DataExtractorApplication.Output type, String prefix) {
+        String fileName = getFileName(prefix, type);
+
+        BlobClient blobClient = blobReader.getBlobClient(container, fileName);
+        assertTrue(blobClient.exists(), "Blob missing");
+        assertTrue(blobClient.getProperties().getBlobSize() > 0, "Blob empty");
     }
 
     public String getFileName(String prefix, DataExtractorApplication.Output extension) {

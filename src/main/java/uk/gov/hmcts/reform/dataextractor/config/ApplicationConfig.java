@@ -13,6 +13,10 @@ import uk.gov.hmcts.reform.dataextractor.Factory;
 import uk.gov.hmcts.reform.dataextractor.OutputStreamProvider;
 import uk.gov.hmcts.reform.dataextractor.QueryExecutor;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
 @Configuration
 public class ApplicationConfig {
 
@@ -21,6 +25,9 @@ public class ApplicationConfig {
 
     @Autowired
     private DbConfig dbConfig;
+
+    @Autowired
+    public Connection dbConnection;
 
     @Bean
     public Factory<ExtractionData, BlobOutputWriter> blobOutputFactory() {
@@ -37,12 +44,24 @@ public class ApplicationConfig {
         return this::extractor;
     }
 
+    @Bean(destroyMethod = "close")
+    public Connection dbConnection() {
+        Connection connection = null;
+        try {
+            connection = DriverManager.getConnection(dbConfig.getUrl(), dbConfig.getUser(), dbConfig.getPassword());
+            connection.setAutoCommit(false);
+        } catch (SQLException e) {
+            throw new IllegalStateException("Cannot create database connection", e);
+        }
+        return  connection;
+    }
+
     private BlobOutputWriter blobOutputWriter(ExtractionData config) {
         return new BlobOutputWriter(config.getContainer(), config.getFileName(), config.getType(), outputStreamProvider);
     }
 
     private QueryExecutor blobOutputWriter(String sqlQuery) {
-        return new QueryExecutor(dbConfig.getUrl(), dbConfig.getUser(), dbConfig.getPassword(), sqlQuery);
+        return new QueryExecutor(dbConnection, sqlQuery);
     }
 
     private Extractor extractor(DataExtractorApplication.Output outputType) {
