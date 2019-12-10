@@ -46,7 +46,7 @@ public class DataExtractorTest {
 
     static Stream<Arguments> caseTypeInfoProvider() {
         return Stream.of(
-            arguments("probate", "GrantOfRepresentation", DataExtractorApplication.Output.JSON_LINES, "PROB-GOR"),
+            arguments("grantofrepresentation", "GrantOfRepresentation", DataExtractorApplication.Output.JSON_LINES, "PROB-GOR"),
             arguments("divorce", "divorce", DataExtractorApplication.Output.JSON_LINES, "DIV")
         );
     }
