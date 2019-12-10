@@ -33,9 +33,9 @@ extraction:
       type: "jsonlines"
       prefix: "PROB-SS"
     - container: "divorce"
-        caseType: "DIVORCE"
-        type: "jsonlines"
-        prefix: "DIV"
+      caseType: "DIVORCE"
+      type: "jsonlines"
+      prefix: "DIV"
 application-insights:
   default:
     modules:
