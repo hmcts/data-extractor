@@ -46,7 +46,7 @@ public class DataExtractorTest {
 
     static Stream<Arguments> caseTypeInfoProvider() {
         return Stream.of(
-            arguments("grantofrepresentation", "GrantOfRepresentation", DataExtractorApplication.Output.JSON_LINES, "PROB-GOR"),
+            arguments("grantofrepresentation", "GrantOfRepresentation", DataExtractorApplication.Output.JSON_LINES, "CCD-PROB-GOR"),
             arguments("divorce", "divorce", DataExtractorApplication.Output.JSON_LINES, "DIV")
         );
     }
@@ -86,7 +86,7 @@ public class DataExtractorTest {
     }
 
     public String getFileName(String prefix, DataExtractorApplication.Output extension) {
-        return String.format("%s-%s.%s", prefix, DATE_TIME_FORMATTER.format(LocalDateTime.now(ZoneId.from(UTC))),
+        return String.format("%s-%s.%s", prefix, DATE_TIME_FORMATTER.format(LocalDateTime.now(ZoneId.from(UTC)).minusDays(1)),
             extension.getExtension());
     }
 
