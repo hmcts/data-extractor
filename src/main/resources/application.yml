@@ -16,82 +16,26 @@ etl:
 
 extraction:
   caseTypes:
-    - container: "probate"
+    - container: "grantofrepresentation"
+      caseType: "GrantOfRepresentation"
       type: "jsonlines"
-      query: "SELECT to_char(current_timestamp, 'YYYYMMDD-HH24MI') AS extraction_date,
-              CE.id           AS case_metadata_event_id,
-              CE.case_data_id     AS ce_case_data_id,
-              CE.created_date     AS ce_created_date,
-              trim(CE.case_type_id)   AS ce_case_type_id,
-              CE.case_type_version    AS ce_case_type_version,
-              CE.data AS ce_data
-              FROM case_event CE
-              WHERE CE.case_type_id = 'GrantOfRepresentation'
-              AND created_date >= (current_date-1 + time '00:00')
-              AND created_date < (current_date + time '00:00')
-              ORDER BY CE.created_date ASC"
-      prefix: "PROB-GOR"
+      prefix: "CCD-PROB-GOR"
+    - container: "caveat"
+      caseType: "Caveat"
+      type: "jsonlines"
+      prefix: "CCD-PROB-CAVEAT"
+    - container: "willlodgement"
+      caseType: "WillLodgement"
+      type: "jsonlines"
+      prefix: "CCD-PROB-WL"
+    - container: "standingsearch"
+      caseType: "StandingSearch"
+      type: "jsonlines"
+      prefix: "CCD-PROB-SS"
     - container: "divorce"
+      caseType: "DIVORCE"
       type: "jsonlines"
-      query: "SELECT to_char(current_timestamp, 'YYYYMMDD-HH24MI') AS extraction_date,
-              CE.id           AS case_metadata_event_id,
-              CE.case_data_id     AS ce_case_data_id,
-              CE.created_date     AS ce_created_date,
-              trim(CE.case_type_id)   AS ce_case_type_id,
-              CE.case_type_version    AS ce_case_type_version,
-              CE.data AS ce_data
-              FROM case_event CE
-              WHERE CE.case_type_id = 'DIVORCE'
-              AND created_date >= (current_date-1 + time '00:00')
-              AND created_date < (current_date + time '00:00')
-              ORDER BY CE.created_date ASC;"
-      prefix: "DIV"
-    - container: "sscs"
-      type: "jsonlines"
-      query: "SELECT to_char(current_timestamp, 'YYYYMMDD-HH24MI') AS extraction_date,
-              CE.id           AS case_metadata_event_id,
-              CE.case_data_id     AS ce_case_data_id,
-              CE.created_date     AS ce_created_date,
-              trim(CE.case_type_id)   AS ce_case_type_id,
-              CE.case_type_version    AS ce_case_type_version,
-              CE.data AS ce_data
-              FROM case_event CE
-              WHERE CE.case_type_id = 'Asylum'
-              AND created_date >= (current_date-1 + time '00:00')
-              AND created_date < (current_date + time '00:00')
-              ORDER BY CE.created_date ASC;"
-      prefix: "SSCS-Asylum"
-    - container: "sscs"
-      type: "jsonlines"
-      query: "SELECT to_char(current_timestamp, 'YYYYMMDD-HH24MI') AS extraction_date,
-              CE.id           AS case_metadata_event_id,
-              CE.case_data_id     AS ce_case_data_id,
-              CE.created_date     AS ce_created_date,
-              trim(CE.case_type_id)   AS ce_case_type_id,
-              CE.case_type_version    AS ce_case_type_version,
-              CE.data AS ce_data
-              FROM case_event CE
-              WHERE CE.case_type_id = 'Benefit'
-              AND created_date >= (current_date-1 + time '00:00')
-              AND created_date < (current_date + time '00:00')
-              ORDER BY CE.created_date ASC;"
-      prefix: "SSCS-Benefit"
-    - container: "finred"
-      type: "jsonlines"
-      query: "SELECT to_char(current_timestamp, 'YYYYMMDD-HH24MI') AS extraction_date,
-              CE.id           AS case_metadata_event_id,
-              CE.case_data_id     AS ce_case_data_id,
-              CE.created_date     AS ce_created_date,
-              trim(CE.case_type_id)   AS ce_case_type_id,
-              CE.case_type_version    AS ce_case_type_version,
-              CE.data AS ce_data
-              FROM case_event CE
-              WHERE CE.case_type_id = 'FinancialRemedyMVP2'
-              AND created_date >= (current_date-1 + time '00:00')
-              AND created_date < (current_date + time '00:00')
-              ORDER BY CE.created_date ASC;"
-      prefix: "FINRED"
-
+      prefix: "CCD-DIV"
 application-insights:
   default:
     modules:
