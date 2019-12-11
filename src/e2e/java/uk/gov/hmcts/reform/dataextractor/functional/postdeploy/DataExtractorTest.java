@@ -47,7 +47,7 @@ public class DataExtractorTest {
     static Stream<Arguments> caseTypeInfoProvider() {
         return Stream.of(
             arguments("grantofrepresentation", "GrantOfRepresentation", DataExtractorApplication.Output.JSON_LINES, "CCD-PROB-GOR"),
-            arguments("divorce", "divorce", DataExtractorApplication.Output.JSON_LINES, "DIV")
+            arguments("divorce", "divorce", DataExtractorApplication.Output.JSON_LINES, "CCD-DIV")
         );
     }
 
