@@ -18,8 +18,6 @@ import static java.time.ZoneOffset.UTC;
 @Builder
 public class ExtractionData {
     static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
-    static final DateTimeFormatter POSTGRES_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
 
     private String container;
     private DataExtractorApplication.Output type;
