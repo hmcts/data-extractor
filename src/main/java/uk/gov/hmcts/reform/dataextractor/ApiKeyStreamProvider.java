@@ -25,7 +25,6 @@ public class ApiKeyStreamProvider implements OutputStreamProvider {
 
     protected BlobServiceClient getBlobServiceClient() {
         try {
-            log.info("Connection string: {}", connectStr);
             return new BlobServiceClientBuilder().connectionString(connectStr).buildClient();
         } catch (IllegalArgumentException e) {
             throw new WriterException(e);
