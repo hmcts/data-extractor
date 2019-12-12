@@ -58,7 +58,7 @@ jobs:
 
     dependsOn: BuildAndTestApplication
 
-    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+    condition: succeeded()
     pool:
       vmImage: 'Ubuntu-16.04'
     steps:
@@ -70,32 +70,4 @@ jobs:
           jobName: mi-data-extractor
           namespace: mi
 
-  - job: BuildAndPushImageRelease
 
-    dependsOn: BuildAndTestApplication
-    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
-    pool:
-      vmImage: 'Ubuntu-16.04'
-
-    steps:
-      - template: pipeline-steps/templates/docker-build-release.yaml@mi-core
-        parameters:
-          azureContainerRegistry: $(azure.container.registry)
-          azureSubscriptionEndpoint: $(azure.subscription.endpoint)
-          applicationName: $(application.name)
-
-
-  - job: BuildAndPushImageManual
-
-    dependsOn: BuildAndTestApplication
-    condition: and(succeeded(), eq(variables['Build.Reason'], 'Manual'))
-    pool:
-      vmImage: 'Ubuntu-16.04'
-
-    steps:
-      - template: pipeline-steps/templates/docker-build-manual.yaml@mi-core
-        parameters:
-          azureContainerRegistry: $(azure.container.registry)
-          azureSubscriptionEndpoint: $(azure.subscription.endpoint)
-          manualBranchPrefix: $(manual.branch.prefix)
-          applicationName: $(application.name)
