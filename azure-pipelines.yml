@@ -1,0 +1,101 @@
+# Java
+# Package your Java project.
+# Add steps that install, analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+name: '$(SourceBranchName)-$(Build.SourceVersion) Build-$(Build.BuildId)'
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+      - pipeline-test
+  tags:
+    include:
+      - v*
+
+pr:
+  autoCancel: true
+  branches:
+    include:
+      - master
+      - feature/*
+
+variables:
+  application.name: 'mi-data-extractor'
+  azure.subscription.endpoint: 'DTS-SHAREDSERVICES-SBOX'
+  azure.aks.resourcegroup: 'ss_sbox_kubernetes_resource_group'
+  azure.aks.cluster: 'ss_aks_sbox'
+  manual.branch.prefix: 'master'
+
+resources:
+  repositories:
+    - repository: mi-core
+      type: github
+      name: hmcts/mi-core-lib
+      endpoint: hmcts
+
+jobs:
+  - job: BuildAndTestApplication
+
+    pool:
+      vmImage: 'Ubuntu-16.04'
+
+    variables:
+      aptDependencies: 'qtbase5-dev'
+
+    steps:
+      - template: pipeline-steps/templates/build-application.yaml@mi-core
+      - template: pipeline-steps/templates/publish-tests.yaml@mi-core
+      - template: pipeline-steps/templates/docker-build.yaml@mi-core
+        parameters:
+          azureContainerRegistry: $(azure.container.registry)
+          azureSubscriptionEndpoint: $(azure.subscription.endpoint)
+          applicationName: $(application.name)
+
+  - job: DeployOnTest
+
+    dependsOn: BuildAndTestApplication
+
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+    pool:
+      vmImage: 'Ubuntu-16.04'
+    steps:
+      - template: pipeline-steps/templates/kubernetes-wait-for-job.yaml@mi-core
+        parameters:
+          azureSubscriptionEndpoint: $(azure.subscription.endpoint)
+          aksResourceGroup: $(azure.aks.resourcegroup)
+          aksCluster: $(azure.aks.cluster)
+          jobName: mi-data-extractor
+          namespace: mi
+
+  - job: BuildAndPushImageRelease
+
+    dependsOn: BuildAndTestApplication
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+    pool:
+      vmImage: 'Ubuntu-16.04'
+
+    steps:
+      - template: pipeline-steps/templates/docker-build-release.yaml@mi-core
+        parameters:
+          azureContainerRegistry: $(azure.container.registry)
+          azureSubscriptionEndpoint: $(azure.subscription.endpoint)
+          applicationName: $(application.name)
+
+
+  - job: BuildAndPushImageManual
+
+    dependsOn: BuildAndTestApplication
+    condition: and(succeeded(), eq(variables['Build.Reason'], 'Manual'))
+    pool:
+      vmImage: 'Ubuntu-16.04'
+
+    steps:
+      - template: pipeline-steps/templates/docker-build-manual.yaml@mi-core
+        parameters:
+          azureContainerRegistry: $(azure.container.registry)
+          azureSubscriptionEndpoint: $(azure.subscription.endpoint)
+          manualBranchPrefix: $(manual.branch.prefix)
+          applicationName: $(application.name)
