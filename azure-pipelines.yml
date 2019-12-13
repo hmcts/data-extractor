@@ -65,7 +65,7 @@ jobs:
     steps:
       - template: ./pipeline-steps/helm-install-chart-job.yaml
         parameters:
-          azureContainerRegistry: $(azure.container.registry)
+          azureContainerRegistry: 'ssprivatesbox'
           azureSubscriptionEndpoint: $(azure.subscription.endpoint)
           applicationName: $(application.name)
           aksResourceGroup: $(azure.aks.resourcegroup)
