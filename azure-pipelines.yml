@@ -71,6 +71,7 @@ jobs:
           aksResourceGroup: $(azure.aks.resourcegroup)
           aksCluster: $(azure.aks.cluster)
           jobName: $(application.name)-test
+          projectName: $(application.name)-job
           namespace: mi
       - template: pipeline-steps/templates/kubernetes-wait-for-job.yaml@mi-core
         parameters:
