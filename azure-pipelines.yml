@@ -23,7 +23,7 @@ pr:
       - feature/*
 
 variables:
-  application.name: 'data-extractor'
+  application.name: 'data-extractor-job'
   azure.subscription.endpoint: 'DTS-SHAREDSERVICES-SBOX'
   azure.aks.resourcegroup: 'ss_sbox_kubernetes_resource_group'
   azure.aks.cluster: 'ss_aks_sbox'
@@ -70,10 +70,10 @@ jobs:
         parameters:
           azureContainerRegistry: $(azure.container.registry)
           azureSubscriptionEndpoint: $(azure.subscription.endpoint)
-          applicationName: $(application.name)-job
+          applicationName: $(application.name)
           aksResourceGroup: $(azure.aks.resourcegroup)
           aksCluster: $(azure.aks.cluster)
-          jobName: $(application.name)-test
+          jobName: $(application.name)
           namespace: mi
           chartEnv: $(chart.env)
       - template: pipeline-steps/templates/kubernetes-wait-for-job.yaml@mi-core
