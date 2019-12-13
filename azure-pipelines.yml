@@ -67,7 +67,7 @@ jobs:
     steps:
       - template: pipeline-steps/templates/helm-install-chart.yaml@mi-core
         parameters:
-          azureContainerRegistry: 'ssprivatesbox'
+          azureContainerRegistry: $(azure.container.registry)
           azureSubscriptionEndpoint: $(azure.subscription.endpoint)
           applicationName: $(application.name)-job
           aksResourceGroup: $(azure.aks.resourcegroup)
