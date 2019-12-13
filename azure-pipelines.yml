@@ -81,8 +81,8 @@ jobs:
           azureSubscriptionEndpoint: $(azure.subscription.endpoint)
           aksResourceGroup: $(azure.aks.resourcegroup)
           aksCluster: $(azure.aks.cluster)
-          jobName: $(application.name)-test
+          jobName: $(application.name)
           namespace: $(product)
-          projectName: $(application.name)-job
+          projectName: $(application.name)
 
 
