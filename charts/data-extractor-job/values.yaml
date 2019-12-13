@@ -1,7 +1,7 @@
 job:
   image: ${IMAGE_NAME}
   keyVaults:
-    "data-extractor":
+    "mi-vault":
       resourceGroup: mi-{{ .Values.global.environment }}-rg
       secrets:
         - aat-ccdro-user
