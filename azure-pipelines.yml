@@ -23,7 +23,7 @@ pr:
       - feature/*
 
 variables:
-  application.name: 'mi-data-extractor'
+  application.name: 'data-extractor'
   azure.subscription.endpoint: 'DTS-SHAREDSERVICES-SBOX'
   azure.aks.resourcegroup: 'ss_sbox_kubernetes_resource_group'
   azure.aks.cluster: 'ss_aks_sbox'
