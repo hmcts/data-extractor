@@ -1,0 +1,37 @@
+# Note: getDockerTag must be setup in another pipeline-step that runs before this one.
+
+parameters:
+  helmVersion: '3.0.0'
+  azureContainerRegistry: ''
+  azureSubscriptionEndpoint: ''
+  applicationName: ''
+  aksResourceGroup: ''
+  aksCluster: ''
+  jobName: ''
+  namespace: ''
+
+steps:
+  - task: HelmInstaller@1
+    displayName: 'Install Helm ${{ parameters.helmVersion }}'
+    inputs:
+      helmVersionToInstall: ${{ parameters.helmVersion }}
+  - task: AzureCLI@1
+    displayName: "AKS Authenticate"
+    inputs:
+      azureSubscription: ${{ parameters.azureSubscriptionEndpoint }}
+      scriptLocation: "inlineScript"
+      inlineScript: az aks get-credentials --admin --resource-group ${{ parameters.aksResourceGroup }} --name ${{ parameters.aksCluster }}
+  - script: |
+      envsubst < charts/mi-integration-service/values.preview.template.yaml > charts/mi-integration-service/values.preview.yaml
+    displayName: 'Replace Image Name In Chart Values'
+    env:
+      IMAGE_NAME: '${{ parameters.azureContainerRegistry }}/${{ parameters.applicationName }}:$(getDockerTag.DOCKER_TAG)'
+  - task: AzureCLI@1
+    displayName: "Helm Install Job Chart"
+    inputs:
+      azureSubscription: ${{ parameters.azureSubscriptionEndpoint }}
+      scriptLocation: "inlineScript"
+      inlineScript: |
+        az acr helm repo add --name ${{ parameters.azureContainerRegistry }}
+        helm dependency update charts/mi-integration-service
+        helm install ${{ parameters.jobName }} charts/mi-integration-service --namespace ${{ parameters.namespace }} -f charts/mi-integration-service/values.yaml -f charts/mi-integration-service/values.preview.yaml

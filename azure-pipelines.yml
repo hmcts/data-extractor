@@ -28,7 +28,8 @@ variables:
   azure.aks.resourcegroup: 'ss_sbox_kubernetes_resource_group'
   azure.aks.cluster: 'ss_aks_sbox'
   manual.branch.prefix: 'master'
-
+  product: 'mi
+  '
 resources:
   repositories:
     - repository: mi-core
@@ -62,12 +63,21 @@ jobs:
     pool:
       vmImage: 'Ubuntu-16.04'
     steps:
+      - template: ./pipeline-steps/helm-install-chart-job.yaml
+        parameters:
+          azureContainerRegistry: $(azure.container.registry)
+          azureSubscriptionEndpoint: $(azure.subscription.endpoint)
+          applicationName: $(application.name)
+          aksResourceGroup: $(azure.aks.resourcegroup)
+          aksCluster: $(azure.aks.cluster)
+          jobName: $(application.name)-test
+          namespace: mi
       - template: pipeline-steps/templates/kubernetes-wait-for-job.yaml@mi-core
         parameters:
           azureSubscriptionEndpoint: $(azure.subscription.endpoint)
           aksResourceGroup: $(azure.aks.resourcegroup)
           aksCluster: $(azure.aks.cluster)
-          jobName: mi-data-extractor
-          namespace: mi
+          jobName: $(mi-data-extractor-test)-test
+          namespace: $(product)
 
 
