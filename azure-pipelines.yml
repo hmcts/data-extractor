@@ -28,8 +28,8 @@ variables:
   azure.aks.resourcegroup: 'ss_sbox_kubernetes_resource_group'
   azure.aks.cluster: 'ss_aks_sbox'
   manual.branch.prefix: 'master'
-  product: 'mi
-  '
+  product: 'mi'
+
 resources:
   repositories:
     - repository: mi-core
@@ -77,7 +77,8 @@ jobs:
           azureSubscriptionEndpoint: $(azure.subscription.endpoint)
           aksResourceGroup: $(azure.aks.resourcegroup)
           aksCluster: $(azure.aks.cluster)
-          jobName: $(mi-data-extractor-test)-test
+          jobName: $(application.name)-test
           namespace: $(product)
+          projectName: $(application.name)-job
 
 

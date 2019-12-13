@@ -8,6 +8,7 @@ parameters:
   aksResourceGroup: ''
   aksCluster: ''
   jobName: ''
+  projectName: ''
   namespace: ''
 
 steps:
@@ -22,7 +23,7 @@ steps:
       scriptLocation: "inlineScript"
       inlineScript: az aks get-credentials --admin --resource-group ${{ parameters.aksResourceGroup }} --name ${{ parameters.aksCluster }}
   - script: |
-      envsubst < charts/mi-integration-service/values.preview.template.yaml > charts/mi-integration-service/values.preview.yaml
+      envsubst < charts/${{ parameters.projectName }}/values.preview.template.yaml > charts/data-extractor-job/values.preview.yaml
     displayName: 'Replace Image Name In Chart Values'
     env:
       IMAGE_NAME: '${{ parameters.azureContainerRegistry }}/${{ parameters.applicationName }}:$(getDockerTag.DOCKER_TAG)'
@@ -33,5 +34,5 @@ steps:
       scriptLocation: "inlineScript"
       inlineScript: |
         az acr helm repo add --name ${{ parameters.azureContainerRegistry }}
-        helm dependency update charts/mi-integration-service
-        helm install ${{ parameters.jobName }} charts/mi-integration-service --namespace ${{ parameters.namespace }} -f charts/mi-integration-service/values.yaml -f charts/mi-integration-service/values.preview.yaml
+        helm dependency update charts/${{ parameters.projectName }}
+        helm install ${{ parameters.jobName }} charts/${{ parameters.projectName }} --namespace ${{ parameters.namespace }} -f charts/${{ parameters.projectName }}/values.yaml -f charts/${{ parameters.projectName }}/values.preview.yaml
