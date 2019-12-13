@@ -29,6 +29,7 @@ variables:
   azure.aks.cluster: 'ss_aks_sbox'
   manual.branch.prefix: 'master'
   product: 'mi'
+  chart.env: 'preview'
 
 resources:
   repositories:
@@ -74,6 +75,7 @@ jobs:
           aksCluster: $(azure.aks.cluster)
           jobName: $(application.name)-test
           namespace: mi
+          chartEnv: $(chart.env)
       - template: pipeline-steps/templates/kubernetes-wait-for-job.yaml@mi-core
         parameters:
           azureSubscriptionEndpoint: $(azure.subscription.endpoint)
