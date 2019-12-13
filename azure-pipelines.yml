@@ -62,6 +62,9 @@ jobs:
     condition: succeeded()
     pool:
       vmImage: 'Ubuntu-16.04'
+    variables:
+      getDockerTag:
+        DOCKER_TAG: $[ dependencies.BuildAndTestApplication.outputs['getDockerTag.DOCKER_TAG'] ]
     steps:
       - template: ./pipeline-steps/helm-install-chart-job.yaml
         parameters:
