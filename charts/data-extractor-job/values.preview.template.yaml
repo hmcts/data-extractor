@@ -1,8 +1,6 @@
 job:
   image: ${IMAGE_NAME}
 
-environment:
-  SPRING_APPLICATION_JSON:{ "extraction": { "caseTypes": [{ "container": "test", "caseType": "GrantOfRepresentation", "type": "jsonlines", "prefix": "CCD-PROB-GOR" }] } }
 global:
   job:
     kind: Job
