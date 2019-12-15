@@ -1,9 +1,11 @@
 job:
   image: ${IMAGE_NAME}
 
+environment:
+  SPRING_APPLICATION_JSON:{ "extraction": { "caseTypes": [{ "container": "test", "caseType": "GrantOfRepresentation", "type": "jsonlines", "prefix": "CCD-PROB-GOR" }] } }
 global:
   job:
     kind: Job
   subscriptionId: "1c4f0704-a29e-403d-b719-b90c34ef14c9"
   tenantId: "531ff96d-0ae9-462a-8d2d-bec7c0b42082"
-  environment: aat
+  environment: sbox
