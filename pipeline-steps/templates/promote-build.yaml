@@ -23,4 +23,7 @@ steps:
           sourceRegistry=/subscriptions/${{ parameters.azureProdSubscription }}/resourceGroups/${{ parameters.azureProdResourceGroup }}/providers/Microsoft.ContainerRegistry/registries/${{ parameters.azureContainerRegistry }}
           sourceImage=${{ parameters.azureContainerRegistry }}/:'${{ parameters.applicationName }}:$(getDockerTag.DOCKER_TAG)'
           targetImage=${{ parameters.azureDestinyContainerRegistry }}/${{ parameters.applicationName }}:$(getDockerProdTag.DOCKER_PROD_TAG)
-          az acr import -n  ${{ parameters.azureDestinyContainerRegistry }} --source $sourceImage -t $targetImage -r $sourceRegistry
+          echo $sourceRegistry
+          echo$ $targetImage
+          echo $sourceRegistry
+          az acr import -n  ssprivatetest --source $sourceImage -t $targetImage -r $sourceRegistry
