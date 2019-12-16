@@ -61,7 +61,7 @@ jobs:
 
   - job: DeployOnTest
     dependsOn: BuildAndTestApplication
-    condition:  and(succeeded(), $(System.PullRequest))
+    condition:  and(succeeded(), eq($(System.PullRequest), True))
     pool:
       vmImage: 'Ubuntu-16.04'
     variables:
