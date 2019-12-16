@@ -61,7 +61,7 @@ jobs:
 
   - job: DeployOnTest
     dependsOn: BuildAndTestApplication
-    condition:  and(succeeded(), variables['Build.PullRequestId'])
+    condition:  and(succeeded(), variables['system.pullRequest'])
     pool:
       vmImage: 'Ubuntu-16.04'
     variables:
