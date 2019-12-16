@@ -49,7 +49,7 @@ jobs:
 
     variables:
       aptDependencies: 'qtbase5-dev'
-
+      System.Debug: true
     steps:
       - template: pipeline-steps/templates/build-application.yaml@mi-core
       - template: pipeline-steps/templates/publish-tests.yaml@mi-core
@@ -61,7 +61,7 @@ jobs:
 
   - job: DeployOnTest
     dependsOn: BuildAndTestApplication
-    condition:  and(succeeded(), variables['System.PullRequest'])
+    condition:  and(succeeded(), variables['System.pullRequest'])
     pool:
       vmImage: 'Ubuntu-16.04'
     variables:
