@@ -118,7 +118,7 @@ jobs:
 
   - job: PromoteProd
     dependsOn: DeployOnTest
-    condition: and(succeeded())
+#    condition: succeeded()
     pool:
       vmImage: 'Ubuntu-16.04'
     variables:
