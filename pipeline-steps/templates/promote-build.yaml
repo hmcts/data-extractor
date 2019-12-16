@@ -5,7 +5,7 @@ parameters:
   azureDestinyContainerRegistry: ''
   azureProdSubscription: ''
   azureProdResourceGroup: ''
-
+  azureOriginSubscription: ''
 steps:
     - bash: |
         repo_sha=$(git rev-parse --verify HEAD)
@@ -25,7 +25,7 @@ steps:
         azureSubscription: ${{ parameters.azureProdSubscription }}
         scriptLocation: "inlineScript"
         inlineScript: |
-          sourceRegistry=/subscriptions/${{ parameters.azureSubscriptionEndpoint }}/resourceGroups/${{ parameters.azureProdResourceGroup }}/providers/Microsoft.ContainerRegistry/registries/${{ parameters.azureContainerRegistry }}
+          sourceRegistry=/subscriptions/${{ parameters.azureOriginSubscription }}/resourceGroups/${{ parameters.azureProdResourceGroup }}/providers/Microsoft.ContainerRegistry/registries/${{ parameters.azureContainerRegistry }}
           sourceImage=${{ parameters.azureContainerRegistry }}/:${{ parameters.applicationName }}:$(getDockerTag.DOCKER_TAG)
           targetImage=${{ parameters.azureDestinyContainerRegistry }}/${{ parameters.applicationName }}:$(getDockerProdTag.DOCKER_PROD_TAG)
           az acr import -n  ssprivatetest --source $sourceImage -t $targetImage -r $sourceRegistry

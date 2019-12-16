@@ -130,5 +130,6 @@ jobs:
           azureSubscriptionEndpoint: $(azure.subscription.endpoint)
           applicationName: $(application.name)
           azureDestinyContainerRegistry: 'ssprivatetest.azurecr.io'
+          azureOriginSubscription: 'a8140a9e-f1b0-481f-a4de-09e2ee23f7ab'
           azureProdSubscription: 'DTS-SHAREDSERVICES-TEST'
           azureProdResourceGroup: 'genesis_resource_group'
