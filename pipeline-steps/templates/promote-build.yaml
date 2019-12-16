@@ -15,12 +15,12 @@ steps:
       name: 'getDockerProdTag'
 
     - task: AzureCLI@1
-        displayName: "Acr promote"
-        inputs:
-          azureSubscription: ${{ parameters.azureProdSubscription }}
-          scriptLocation: "inlineScript"
-          inlineScript: |
-            sourceRegistry=/subscriptions/${{ parameters.azureProdSubscription }}/resourceGroups/${{ parameters.azureProdResourceGroup }}/providers/Microsoft.ContainerRegistry/registries/${{ parameters.azureContainerRegistry }}
-            sourceImage=${{ parameters.azureContainerRegistry }}/:'${{ parameters.applicationName }}:$(getDockerTag.DOCKER_TAG)'
-            targetImage=${{ parameters.azureDestinyContainerRegistry }}/${{ parameters.applicationName }}:$(getDockerProdTag.DOCKER_PROD_TAG)
-            az acr import -n  ${{ parameters.azureDestinyContainerRegistry }} --source $sourceImage -t $targetImage -r $sourceRegistry
+      displayName: "Acr promote"
+      inputs:
+        azureSubscription: ${{ parameters.azureProdSubscription }}
+        scriptLocation: "inlineScript"
+        inlineScript: |
+          sourceRegistry=/subscriptions/${{ parameters.azureProdSubscription }}/resourceGroups/${{ parameters.azureProdResourceGroup }}/providers/Microsoft.ContainerRegistry/registries/${{ parameters.azureContainerRegistry }}
+          sourceImage=${{ parameters.azureContainerRegistry }}/:'${{ parameters.applicationName }}:$(getDockerTag.DOCKER_TAG)'
+          targetImage=${{ parameters.azureDestinyContainerRegistry }}/${{ parameters.applicationName }}:$(getDockerProdTag.DOCKER_PROD_TAG)
+          az acr import -n  ${{ parameters.azureDestinyContainerRegistry }} --source $sourceImage -t $targetImage -r $sourceRegistry
