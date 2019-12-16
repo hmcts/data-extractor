@@ -27,6 +27,9 @@ variables:
   azure.subscription.endpoint: 'DTS-SHAREDSERVICES-SBOX'
   azure.aks.resourcegroup: 'ss_sbox_kubernetes_resource_group'
   azure.aks.cluster: 'ss_aks_sbox'
+  azure.stg.subscription.endpoint: 'DTS-SHAREDSERVICES-STG'
+  azure.stg.aks.resourcegroup: 'ss_stg_kubernetes_resource_group'
+  azure.stg.aks.cluster: 'ss_aks_stg'
   manual.branch.prefix: 'master'
   product: 'mi'
   chart.env: 'preview'
@@ -57,10 +60,8 @@ jobs:
           applicationName: $(application.name)
 
   - job: DeployOnTest
-
     dependsOn: BuildAndTestApplication
-
-    condition: succeeded()
+    condition:  and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
     pool:
       vmImage: 'Ubuntu-16.04'
     variables:
@@ -85,4 +86,49 @@ jobs:
           namespace: $(product)
           projectName: $(application.name)
 
+  - job: DeployOnStg
 
+    dependsOn: BuildAndTestApplication
+
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+
+    pool:
+      vmImage: 'Ubuntu-16.04'
+    variables:
+      getDockerTag.DOCKER_TAG: $[ dependencies.BuildAndTestApplication.outputs['getDockerTag.DOCKER_TAG'] ]
+    steps:
+      - template: pipeline-steps/templates/helm-install-chart.yaml@mi-core
+        parameters:
+          azureContainerRegistry: $(azure.container.registry)
+          azureSubscriptionEndpoint: $(azure.subscription.endpoint)
+          applicationName: $(application.name)
+          aksResourceGroup: $(azure.stg.aks.resourcegroup)
+          aksCluster: $(azure.stg.aks.cluster)
+          jobName: $(application.name)
+          namespace: mi
+          chartEnv: $(chart.env)
+      - template: pipeline-steps/templates/kubernetes-wait-for-job.yaml@mi-core
+        parameters:
+          azureSubscriptionEndpoint: $(azure.subscription.endpoint)
+          aksResourceGroup: $(azure.stg.aks.resourcegroup)
+          aksCluster: $(azure.stg.aks.cluster)
+          jobName: $(application.name)
+          namespace: $(product)
+          projectName: $(application.name)
+
+  - job: PromoteProd
+    dependsOn: DeployOnTest
+    condition: and(succeeded())
+    pool:
+      vmImage: 'Ubuntu-16.04'
+    variables:
+      getDockerTag.DOCKER_TAG: $[ dependencies.BuildAndTestApplication.outputs['getDockerTag.DOCKER_TAG'] ]
+    steps:
+      - template: ./pipeline-steps/templates/promote-build.yaml
+        parameters:
+          azureContainerRegistry: $(azure.container.registry)
+          azureSubscriptionEndpoint: $(azure.subscription.endpoint)
+          applicationName: $(application.name)
+          azureDestinyContainerRegistry: 'ssprivatetest.azurecr.io'
+          azureProdSubscription: '3eec5bde-7feb-4566-bfb6-805df6e10b90'
+          azureProdResourceGroup: 'genesis_resource_group'
