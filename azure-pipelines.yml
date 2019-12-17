@@ -10,7 +10,7 @@ trigger:
   branches:
     include:
       - master
-      - pipeline-test
+
   tags:
     include:
       - v*
@@ -24,15 +24,17 @@ pr:
 
 variables:
   application.name: 'data-extractor-job'
-  azure.subscription.endpoint: 'DTS-SHAREDSERVICES-SBOX'
-  azure.aks.resourcegroup: 'ss_sbox_kubernetes_resource_group'
-  azure.aks.cluster: 'ss_aks_sbox'
-  azure.stg.subscription.endpoint: 'DTS-SHAREDSERVICES-STG'
-  azure.stg.aks.resourcegroup: 'ss_stg_kubernetes_resource_group'
-  azure.stg.aks.cluster: 'ss_aks_stg'
+  azure.subscription.endpoint: 'DTS-SHAREDSERVICES-$(env.upper)'
+#  azure.subscription: 'a8140a9e-f1b0-481f-a4de-09e2ee23f7ab'
+  azure.aks.resourcegroup: 'ss_$(env)_kubernetes_resource_group'
+  azure.aks.cluster: 'ss_aks_$(env)'
+  azure.prom.subscription.endpoint: 'DTS-SHAREDSERVICES-$(env.prom.upper)'
+  azure.prom.aks.resourcegroup: 'ss_$(env.prom)_kubernetes_resource_group'
+  azure.prom.aks.cluster: 'ss_aks_$(env.prom)'
   manual.branch.prefix: 'master'
   product: 'mi'
   chart.env: 'preview'
+  azure.prom.acr: 'ssprivate$(env.prom)'
 
 resources:
   repositories:
@@ -43,8 +45,6 @@ resources:
 
 jobs:
   - job: BuildAndTestApplication
-    dependsOn: PromoteProd
-    condition:  and(succeeded(), variables['System.PullRequest.PullRequestId'])
     pool:
       vmImage: 'Ubuntu-16.04'
 
@@ -105,7 +105,7 @@ jobs:
           aksResourceGroup: $(azure.stg.aks.resourcegroup)
           aksCluster: $(azure.stg.aks.cluster)
           jobName: $(application.name)
-          namespace: mi
+          namespace: $(product)
           chartEnv: $(chart.env)
       - template: pipeline-steps/templates/kubernetes-wait-for-job.yaml@mi-core
         parameters:
@@ -117,7 +117,10 @@ jobs:
           projectName: $(application.name)
 
   - job: PromoteProd
-    condition: always()
+    dependsOn: BuildAndTestApplication
+#    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    condition: succeeded()
+
     pool:
       vmImage: 'Ubuntu-16.04'
     variables:
@@ -127,10 +130,7 @@ jobs:
       - template: ./pipeline-steps/templates/promote-build.yaml
         parameters:
           azureContainerRegistry: $(azure.container.registry)
-          azureSubscriptionEndpoint: $(azure.subscription.endpoint)
           applicationName: $(application.name)
-          azureDestinyContainerRegistry: 'ssprivatetest.azurecr.io'
-          azureOriginSubscription: 'a8140a9e-f1b0-481f-a4de-09e2ee23f7ab'
-          azureProdSubscription: 'DTS-SHAREDSERVICES-TEST'
-          azureProdResourceGroup: 'genesis_resource_group'
-          originAcr: 'ssprivatesbox'
+          azureDestinyContainerRegistry: $(azure.prom.acr)
+          azureProdSubscription: $(azure.prom.subscription.endpoint)
+          originAcr: $(azure.prom.acr)

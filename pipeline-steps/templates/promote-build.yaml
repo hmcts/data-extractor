@@ -1,11 +1,7 @@
 parameters:
   azureContainerRegistry: ''
-  azureSubscriptionEndpoint: ''
   applicationName: ''
-  azureDestinyContainerRegistry: ''
   azureProdSubscription: ''
-  azureProdResourceGroup: ''
-  azureOriginSubscription: ''
   originAcr: ''
 
 steps:
@@ -27,7 +23,6 @@ steps:
         azureSubscription: ${{ parameters.azureProdSubscription }}
         scriptLocation: "inlineScript"
         inlineScript: |
-          sourceRegistry=/subscriptions/${{ parameters.azureOriginSubscription }}/resourceGroups/${{ parameters.azureProdResourceGroup }}/providers/Microsoft.ContainerRegistry/registries/${{ parameters.originAcr }}
-          sourceImage=${{ parameters.azureContainerRegistry }}/${{ parameters.applicationName }}:merge-169ad39
-          targetImage=${{ parameters.applicationName }}:test-169ad39
+          sourceImage=${{ parameters.azureContainerRegistry }}/${{ parameters.applicationName }}:$(getDockerTag.DOCKER_TAG)
+          targetImage=${{ parameters.applicationName }}:$(getDockerProdTag.DOCKER_PROD_TAG)
           az acr import -n  ssprivatetest --source $sourceImage --image $targetImage --username  $(sp.user) --password $(sp.password)
