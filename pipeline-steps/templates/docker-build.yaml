@@ -5,7 +5,7 @@ parameters:
 
 
 steps:
-  - template: ../tasks/dockerTag.yaml
+  - template: ./tasks/dockerTag.yaml
 
 #  - bash: |
 #      repo_sha=$(git rev-parse --verify HEAD)
