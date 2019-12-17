@@ -10,7 +10,7 @@ stages:
       variables:
         env: ${{ parameters.env }}
       steps:
-        - template: ./tasks/docker-tag.yaml
+        - template: ./templates//tasks/docker-tag.yaml
         - template: ./templates/tasks/echo-variables.yaml
           parameters:
             azureContainerRegistry: $(azure.aks.cluster)
