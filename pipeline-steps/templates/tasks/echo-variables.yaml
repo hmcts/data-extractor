@@ -1,0 +1,16 @@
+parameters:
+  helmVersion: '3.0.0'
+  azureContainerRegistry: ''
+  azureSubscriptionEndpoint: ''
+  applicationName: ''
+  aksCluster: 'ss_aks_$(env)'
+
+steps:
+
+  - bash: |
+      echo "AKS cluster is  : ${{ parameters.aksCluster }}"
+      echo "azureContainerRegistry  is  : ${{ parameters.azureContainerRegistry }}"
+
+    displayName: 'Echo variables'
+
+

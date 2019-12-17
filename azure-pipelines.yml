@@ -23,9 +23,9 @@ pr:
       - feature/*
 
 variables:
+#  group: pipeline-env-variables
   application.name: 'data-extractor-job'
   azure.subscription.endpoint: 'DTS-SHAREDSERVICES-$(env.upper)'
-#  azure.subscription: 'a8140a9e-f1b0-481f-a4de-09e2ee23f7ab'
   azure.aks.resourcegroup: 'ss_$(env)_kubernetes_resource_group'
   azure.aks.cluster: 'ss_aks_$(env)'
   azure.prom.subscription.endpoint: 'DTS-SHAREDSERVICES-$(env.prom.upper)'
@@ -44,10 +44,21 @@ resources:
       endpoint: hmcts
 
 jobs:
+  - job: EchoVariables  ${env}
+    pool:
+      vmImage: 'Ubuntu-16.04'
+    variables:
+      env: 'sbox'
+    steps:
+      - template: ./pipeline-steps/templates/tasks/echo-variables.yaml
+        parameters:
+          azureContainerRegistry: 'ssprivate$(env)'
+
   - job: BuildAndTestApplication
     pool:
       vmImage: 'Ubuntu-16.04'
-
+    dependsOn: EchoVariables
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     variables:
       aptDependencies: 'qtbase5-dev'
     steps:
@@ -59,7 +70,7 @@ jobs:
           azureSubscriptionEndpoint: $(azure.subscription.endpoint)
           applicationName: $(application.name)
 
-  - job: DeployOnTest
+  - job: Deploy on ${env}
     dependsOn: BuildAndTestApplication
     condition:  and(succeeded(), variables['System.PullRequest.PullRequestId'])
     pool:
@@ -117,9 +128,9 @@ jobs:
           projectName: $(application.name)
 
   - job: PromoteProd
-    dependsOn: BuildAndTestApplication
-#    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-    condition: succeeded()
+    dependsOn: Deploy
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+#    condition: succeeded()
 
     pool:
       vmImage: 'Ubuntu-16.04'
