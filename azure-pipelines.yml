@@ -43,7 +43,8 @@ resources:
 
 jobs:
   - job: BuildAndTestApplication
-
+    dependsOn: PromoteProd
+    condition:  and(succeeded(), variables['System.PullRequest.PullRequestId'])
     pool:
       vmImage: 'Ubuntu-16.04'
 
@@ -116,7 +117,6 @@ jobs:
           projectName: $(application.name)
 
   - job: PromoteProd
-    dependsOn: DeployOnTest
     condition: always()
     pool:
       vmImage: 'Ubuntu-16.04'
