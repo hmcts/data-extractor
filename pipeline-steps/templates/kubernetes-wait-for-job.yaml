@@ -5,6 +5,7 @@ parameters:
   namespace: ''
 
 steps:
+  - template: ./tasks/docker-tag.yaml
   - task: AzureCLI@1
     displayName: "AKS Authenticate"
     inputs:
@@ -13,7 +14,7 @@ steps:
       inlineScript: az aks get-credentials --admin --overwrite-existing --resource-group ${{ parameters.aksResourceGroup }} --name ${{ parameters.aksCluster }}
   - bash: |
       timeout=300
-      job=${{ parameters.jobName }}-$(getDockerTagLowerCase.DOCKER_SHA)-job
+      job=${{ parameters.jobName }}-$(imageSha)-job
       until [[ $SECONDS -gt $timeout ]] \
         || [[ $(kubectl get jobs $job --namespace ${{ parameters.namespace }} \
             -o jsonpath='{.status.conditions[?(@.type=="Failed")].status}') == 'True' ]] \
