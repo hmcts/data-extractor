@@ -1,0 +1,30 @@
+parameters:
+  azureSubscriptionEndpoint: ''
+  aksResourceGroup: ''
+  aksCluster: ''
+  namespace: ''
+
+steps:
+  - task: AzureCLI@1
+    displayName: "AKS Authenticate"
+    inputs:
+      azureSubscription: ${{ parameters.azureSubscriptionEndpoint }}
+      scriptLocation: "inlineScript"
+      inlineScript: az aks get-credentials --admin --overwrite-existing --resource-group ${{ parameters.aksResourceGroup }} --name ${{ parameters.aksCluster }}
+  - bash: |
+      timeout=300
+      job=${{ parameters.jobName }}-$(getDockerTagLowerCase.DOCKER_SHA)-job
+      until [[ $SECONDS -gt $timeout ]] \
+        || [[ $(kubectl get jobs $job --namespace ${{ parameters.namespace }} \
+            -o jsonpath='{.status.conditions[?(@.type=="Failed")].status}') == 'True' ]] \
+        || [[ $(kubectl get jobs $job --namespace ${{ parameters.namespace }} \
+            -o jsonpath='{.status.conditions[?(@.type=="Complete")].status}') == 'True' ]];
+      do
+        echo "Waiting for job $job completion"
+        sleep 5
+      done
+      if [[ $SECONDS -gt $timeout ]]; then
+        echo "Timed out waiting job $job completion"
+        exit 1
+      fi
+    displayName: 'Wait for job completion'

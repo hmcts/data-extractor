@@ -10,7 +10,7 @@ steps:
   - bash: |
       echo "AKS cluster is  : ${{ parameters.aksCluster }}"
       echo "azureContainerRegistry  is  : ${{ parameters.azureContainerRegistry }}"
-
+      echo "Image tag is: $(imageTag)"
     displayName: 'Echo variables'
 
 
