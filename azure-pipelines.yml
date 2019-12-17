@@ -128,7 +128,7 @@ jobs:
           projectName: $(application.name)
 
   - job: PromoteProd
-    dependsOn: Deploy
+    dependsOn: DeployOnTest
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
 #    condition: succeeded()
 
