@@ -1,0 +1,51 @@
+parameters:
+  helmVersion: '3.0.0'
+  azureContainerRegistry: ''
+  azureSubscriptionEndpoint: ''
+  applicationName: ''
+  aksResourceGroup: ''
+  aksCluster: ''
+  jobName: ''
+  namespace: ''
+  chartEnv: ''
+
+steps:
+  - powershell: |
+      $sourceBranch = "$(Build.SourceBranchName)"
+      $formattedSourceBranch = $sourceBranch.ToLower()
+      $repo_sha="$(git rev-parse --verify HEAD)"
+      $docker_image_tag_sha=$repo_sha.SubString(0, 7)
+      Write-Host "##vso[task.setvariable variable=DOCKER_TAG;isOutput=true]$formattedSourceBranch-$docker_image_tag_sha"
+      Write-Host "##vso[task.setvariable variable=DOCKER_SHA;isOutput=true]$docker_image_tag_sha"
+    displayName: 'Get Docker Tag In Lower Case'
+    name: 'getDockerTagLowerCase'
+  - powershell: |
+      $azureContainerRegistry = "${{ parameters.azureContainerRegistry }}"
+      $azureContainerRegistryName = $azureContainerRegistry.Substring(0, $azureContainerRegistry.IndexOf("."))
+      Write-Host "##vso[task.setvariable variable=ACR_NAME;isOutput=true]$azureContainerRegistryName"
+    displayName: 'Get Azure Container Registry Name'
+    name: 'getAzureContainerRegistryName'
+  - task: HelmInstaller@1
+    displayName: 'Install Helm ${{ parameters.helmVersion }}'
+    inputs:
+      helmVersionToInstall: ${{ parameters.helmVersion }}
+  - task: AzureCLI@1
+    displayName: "AKS Authenticate"
+    inputs:
+      azureSubscription: ${{ parameters.azureSubscriptionEndpoint }}
+      scriptLocation: "inlineScript"
+      inlineScript: az aks get-credentials --admin --resource-group ${{ parameters.aksResourceGroup }} --name ${{ parameters.aksCluster }}
+  - script: |
+      envsubst < charts/${{ parameters.applicationName }}/values.${{ parameters.chartEnv }}.template.yaml > charts/${{ parameters.applicationName }}/values.${{ parameters.chartEnv }}.yaml
+    displayName: 'Replace Image Name In Chart Values'
+    env:
+      IMAGE_NAME: '${{ parameters.azureContainerRegistry }}/${{ parameters.applicationName }}:$(getDockerTagLowerCase.DOCKER_TAG)'
+  - task: AzureCLI@1
+    displayName: "Helm Install Job Chart"
+    inputs:
+      azureSubscription: ${{ parameters.azureSubscriptionEndpoint }}
+      scriptLocation: "inlineScript"
+      inlineScript: |
+        az acr helm repo add --name $(getAzureContainerRegistryName.ACR_NAME)
+        helm dependency update charts/${{ parameters.applicationName }}
+        helm install ${{ parameters.jobName }}-$(getDockerTagLowerCase.DOCKER_SHA) charts/${{ parameters.applicationName }} --namespace ${{ parameters.namespace }} -f charts/${{ parameters.applicationName }}/values.yaml -f charts/${{ parameters.applicationName }}/values.${{ parameters.chartEnv }}.yaml

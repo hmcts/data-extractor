@@ -67,7 +67,7 @@ jobs:
     pool:
       vmImage: 'Ubuntu-16.04'
     dependsOn: EchoVariablesSBox
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+#    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     variables:
       aptDependencies: 'qtbase5-dev'
       env: 'sbox'
@@ -75,14 +75,14 @@ jobs:
       - template: pipeline-steps/templates/build-application.yaml@mi-core
       - template: pipeline-steps/templates/publish-tests.yaml@mi-core
       - template: ./pipeline-steps/templates/tasks/publish-artifact.yaml
-      - template: pipeline-steps/templates/docker-build.yaml@mi-core
+      - template: ./pipeline-steps/templates/docker-build.yaml
         parameters:
           azureContainerRegistry: $(azure.container.registry)
           azureSubscriptionEndpoint: $(azure.subscription.endpoint)
           applicationName: $(application.name)
 
   - job: DeployOnTest
-    dependsOn: BuildAndTestApplication
+    dependsOn: DeployOnStg
     condition:  and(succeeded(), variables['System.PullRequest.PullRequestId'])
     pool:
       vmImage: 'Ubuntu-16.04'
