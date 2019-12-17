@@ -1,3 +1,6 @@
+parameters:
+  env: 'sbox'
+
 stages:
 - stage: BuildAndDeploy
   jobs:
@@ -5,17 +8,17 @@ stages:
       pool:
         vmImage: 'Ubuntu-16.04'
       variables:
-        env: 'sbox'
+        env: ${{ parameters.env }}
       steps:
         - template: ./templates/tasks/echo-variables.yaml
           parameters:
             azureContainerRegistry: $(azure.aks.cluster)
-
+            aksCluster: 'Overriden aksCluster'
     - job: EchoVariablesTest
       pool:
         vmImage: 'Ubuntu-16.04'
       variables:
-        env: 'sbox'
+        env: ${{ parameters.env }}
       steps:
         - template: ./templates/tasks/docker-tag.yaml
 
@@ -23,7 +26,7 @@ stages:
       pool:
         vmImage: 'Ubuntu-16.04'
       dependsOn: EchoVariablesSBox
-  #    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
       variables:
         aptDependencies: 'qtbase5-dev'
         env: 'sbox'

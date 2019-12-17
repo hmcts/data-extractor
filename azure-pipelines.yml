@@ -46,3 +46,5 @@ resources:
 
 stages:
   - template: ./pipeline-steps/build-deploy-stage.yaml 
+    parameters:
+      env: 'sbox'
