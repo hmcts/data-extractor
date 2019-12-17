@@ -1,0 +1,10 @@
+parameters:
+  applicationName: $(application.name)
+
+
+steps:
+  - task: PublishPipelineArtifact@2
+    condition: succeeded()
+    inputs:
+      path: '$(System.DefaultWorkingDirectory)/build/libs/'
+      artifact: ${{ parameters.applicationName }}
