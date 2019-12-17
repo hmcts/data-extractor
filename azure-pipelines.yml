@@ -52,7 +52,7 @@ jobs:
     steps:
       - template: ./pipeline-steps/templates/tasks/echo-variables.yaml
         parameters:
-          azureContainerRegistry: $(azure.prom.acr)
+          azureContainerRegistry: $(azure.aks.cluster)
 
   - job: BuildAndTestApplication
     pool:
