@@ -38,7 +38,7 @@ stages:
             applicationName: $(application.name)
 
     - job: DeployBuild
-      dependsOn: DeployOnStg
+      dependsOn: BuildAndTestApplication
       condition:  and(succeeded(), variables['System.PullRequest.PullRequestId'])
       pool:
         vmImage: 'Ubuntu-16.04'
@@ -95,7 +95,7 @@ stages:
             projectName: $(application.name)
 
     - job: PromoteBuild
-      dependsOn: DeployOnTest
+      dependsOn: DeployBuild
       condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   #    condition: succeeded()
       pool:
