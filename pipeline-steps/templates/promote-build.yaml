@@ -6,6 +6,7 @@ parameters:
   azureProdSubscription: ''
   azureProdResourceGroup: ''
   azureOriginSubscription: ''
+  originAcr: ''
 
 steps:
     - bash: |
@@ -26,7 +27,7 @@ steps:
         azureSubscription: ${{ parameters.azureProdSubscription }}
         scriptLocation: "inlineScript"
         inlineScript: |
-          sourceRegistry=/subscriptions/${{ parameters.azureOriginSubscription }}/resourceGroups/${{ parameters.azureProdResourceGroup }}/providers/Microsoft.ContainerRegistry/registries/ssprivatesbox
+          sourceRegistry=/subscriptions/${{ parameters.azureOriginSubscription }}/resourceGroups/${{ parameters.azureProdResourceGroup }}/providers/Microsoft.ContainerRegistry/registries/${{ originAcr }}
           sourceImage=${{ parameters.azureContainerRegistry }}/:${{ parameters.applicationName }}::prod-169ad39
           targetImage=${{ parameters.azureDestinyContainerRegistry }}/${{ parameters.applicationName }}:merge-169ad39
           az acr import -n  ssprivatetest --source $sourceImage -t $targetImage -r $sourceRegistry --username  $(sp.user) --password $(sp.password)
