@@ -49,7 +49,7 @@ stages:
       variables:
         env: ${{ parameters.env }}
       steps:
-        - template: ./templates/helm-install-chart.yaml
+        - template: ./templates/helm-install-chart-job.yaml
           parameters:
             azureContainerRegistry: $(azure.container.registry)
             azureSubscriptionEndpoint: $(azure.subscription.endpoint)
