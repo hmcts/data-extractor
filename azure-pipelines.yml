@@ -52,7 +52,7 @@ jobs:
     steps:
       - template: ./pipeline-steps/templates/tasks/echo-variables.yaml
         parameters:
-          azureContainerRegistry: 'ssprivate$(env)'
+          azureContainerRegistry: $(azure.prom.acr)
 
   - job: BuildAndTestApplication
     pool:
