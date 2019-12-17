@@ -30,4 +30,4 @@ steps:
           sourceRegistry=/subscriptions/${{ parameters.azureOriginSubscription }}/resourceGroups/${{ parameters.azureProdResourceGroup }}/providers/Microsoft.ContainerRegistry/registries/ssprivatesbox
           sourceImage=${{ parameters.azureContainerRegistry }}/:${{ parameters.applicationName }}:$(getDockerTag.DOCKER_TAG)
           targetImage=${{ parameters.azureDestinyContainerRegistry }}/${{ parameters.applicationName }}:$(getDockerProdTag.DOCKER_PROD_TAG)
-          az acr import -n  ssprivatetest --source $sourceImage -t $targetImage -r $sourceRegistry --username  $env:SP_USER –-password $env:SSPRIVATESBOX
+          az acr import -n  ssprivatetest --source $sourceImage -t $targetImage -r $sourceRegistry --username  $(sp.user) –-password $(ssprivatesbox)
