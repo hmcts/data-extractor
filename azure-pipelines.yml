@@ -44,7 +44,7 @@ resources:
       endpoint: hmcts
 
 jobs:
-  - job: EchoVariables  $(env)
+  - job: EchoVariables
     pool:
       vmImage: 'Ubuntu-16.04'
     variables:
@@ -70,7 +70,7 @@ jobs:
           azureSubscriptionEndpoint: $(azure.subscription.endpoint)
           applicationName: $(application.name)
 
-  - job: Deploy on ${env}
+  - job: DeployOnTest
     dependsOn: BuildAndTestApplication
     condition:  and(succeeded(), variables['System.PullRequest.PullRequestId'])
     pool:
