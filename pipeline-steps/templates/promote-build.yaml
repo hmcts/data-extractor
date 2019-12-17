@@ -6,8 +6,7 @@ parameters:
   azureProdSubscription: ''
   azureProdResourceGroup: ''
   azureOriginSubscription: ''
-  user: ''
-  password: '
+
 steps:
     - bash: |
         repo_sha=$(git rev-parse --verify HEAD)
