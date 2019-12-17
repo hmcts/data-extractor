@@ -1,113 +1,114 @@
-stage:
-  jobs:
-    - job: EchoVariablesSBox
-      pool:
-        vmImage: 'Ubuntu-16.04'
-      variables:
-        env: 'sbox'
-      steps:
-        - template: ./pipeline-steps/templates/tasks/echo-variables.yaml
-          parameters:
-            azureContainerRegistry: $(azure.aks.cluster)
+stages:
+  stage: BuildAndDeploy
+    jobs:
+      - job: EchoVariablesSBox
+        pool:
+          vmImage: 'Ubuntu-16.04'
+        variables:
+          env: 'sbox'
+        steps:
+          - template: ./pipeline-steps/templates/tasks/echo-variables.yaml
+            parameters:
+              azureContainerRegistry: $(azure.aks.cluster)
 
-    - job: EchoVariablesTest
-      pool:
-        vmImage: 'Ubuntu-16.04'
-      variables:
-        env: 'sbox'
-      steps:
-        - template: ./pipeline-steps/templates/tasks/docker-tag.yaml
+      - job: EchoVariablesTest
+        pool:
+          vmImage: 'Ubuntu-16.04'
+        variables:
+          env: 'sbox'
+        steps:
+          - template: ./pipeline-steps/templates/tasks/docker-tag.yaml
 
-    - job: BuildAndTestApplication
-      pool:
-        vmImage: 'Ubuntu-16.04'
-      dependsOn: EchoVariablesSBox
-  #    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-      variables:
-        aptDependencies: 'qtbase5-dev'
-        env: 'sbox'
-      steps:
-        - template: ./pipeline-steps/templates/tasks/build-assemble.yaml
-        - template: pipeline-steps/templates/publish-tests.yaml@mi-core
-        - template: ./pipeline-steps/templates/tasks/publish-artifact.yaml
-        - template: ./pipeline-steps/templates/docker-build.yaml
-          parameters:
-            azureContainerRegistry: $(azure.container.registry)
-            azureSubscriptionEndpoint: $(azure.subscription.endpoint)
-            applicationName: $(application.name)
+      - job: BuildAndTestApplication
+        pool:
+          vmImage: 'Ubuntu-16.04'
+        dependsOn: EchoVariablesSBox
+    #    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+        variables:
+          aptDependencies: 'qtbase5-dev'
+          env: 'sbox'
+        steps:
+          - template: ./pipeline-steps/templates/tasks/build-assemble.yaml
+          - template: pipeline-steps/templates/publish-tests.yaml@mi-core
+          - template: ./pipeline-steps/templates/tasks/publish-artifact.yaml
+          - template: ./pipeline-steps/templates/docker-build.yaml
+            parameters:
+              azureContainerRegistry: $(azure.container.registry)
+              azureSubscriptionEndpoint: $(azure.subscription.endpoint)
+              applicationName: $(application.name)
 
-    - job: DeployBuild
-      dependsOn: DeployOnStg
-      condition:  and(succeeded(), variables['System.PullRequest.PullRequestId'])
-      pool:
-        vmImage: 'Ubuntu-16.04'
-      variables:
-        getDockerTag.DOCKER_TAG: $[ dependencies.BuildAndTestApplication.outputs['getDockerTag.DOCKER_TAG'] ]
-      steps:
-        - template: pipeline-steps/templates/helm-install-chart.yaml@mi-core
-          parameters:
-            azureContainerRegistry: $(azure.container.registry)
-            azureSubscriptionEndpoint: $(azure.subscription.endpoint)
-            applicationName: $(application.name)
-            aksResourceGroup: $(azure.aks.resourcegroup)
-            aksCluster: $(azure.aks.cluster)
-            jobName: $(application.name)
-            namespace: mi
-            chartEnv: $(chart.env)
-        - template: pipeline-steps/templates/kubernetes-wait-for-job.yaml@mi-core
-          parameters:
-            azureSubscriptionEndpoint: $(azure.subscription.endpoint)
-            aksResourceGroup: $(azure.aks.resourcegroup)
-            aksCluster: $(azure.aks.cluster)
-            jobName: $(application.name)
-            namespace: $(product)
-            projectName: $(application.name)
+      - job: DeployBuild
+        dependsOn: DeployOnStg
+        condition:  and(succeeded(), variables['System.PullRequest.PullRequestId'])
+        pool:
+          vmImage: 'Ubuntu-16.04'
+        variables:
+          getDockerTag.DOCKER_TAG: $[ dependencies.BuildAndTestApplication.outputs['getDockerTag.DOCKER_TAG'] ]
+        steps:
+          - template: pipeline-steps/templates/helm-install-chart.yaml@mi-core
+            parameters:
+              azureContainerRegistry: $(azure.container.registry)
+              azureSubscriptionEndpoint: $(azure.subscription.endpoint)
+              applicationName: $(application.name)
+              aksResourceGroup: $(azure.aks.resourcegroup)
+              aksCluster: $(azure.aks.cluster)
+              jobName: $(application.name)
+              namespace: mi
+              chartEnv: $(chart.env)
+          - template: pipeline-steps/templates/kubernetes-wait-for-job.yaml@mi-core
+            parameters:
+              azureSubscriptionEndpoint: $(azure.subscription.endpoint)
+              aksResourceGroup: $(azure.aks.resourcegroup)
+              aksCluster: $(azure.aks.cluster)
+              jobName: $(application.name)
+              namespace: $(product)
+              projectName: $(application.name)
 
-    - job: DeployOnStg
+      - job: DeployOnStg
 
-      dependsOn: BuildAndTestApplication
+        dependsOn: BuildAndTestApplication
 
-      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
 
-      pool:
-        vmImage: 'Ubuntu-16.04'
-      variables:
-        getDockerTag.DOCKER_TAG: $[ dependencies.BuildAndTestApplication.outputs['getDockerTag.DOCKER_TAG'] ]
-      steps:
-        - template: pipeline-steps/templates/helm-install-chart.yaml@mi-core
-          parameters:
-            azureContainerRegistry: $(azure.container.registry)
-            azureSubscriptionEndpoint: $(azure.subscription.endpoint)
-            applicationName: $(application.name)
-            aksResourceGroup: $(azure.stg.aks.resourcegroup)
-            aksCluster: $(azure.stg.aks.cluster)
-            jobName: $(application.name)
-            namespace: $(product)
-            chartEnv: $(chart.env)
-        - template: pipeline-steps/templates/kubernetes-wait-for-job.yaml@mi-core
-          parameters:
-            azureSubscriptionEndpoint: $(azure.subscription.endpoint)
-            aksResourceGroup: $(azure.stg.aks.resourcegroup)
-            aksCluster: $(azure.stg.aks.cluster)
-            jobName: $(application.name)
-            namespace: $(product)
-            projectName: $(application.name)
+        pool:
+          vmImage: 'Ubuntu-16.04'
+        variables:
+          getDockerTag.DOCKER_TAG: $[ dependencies.BuildAndTestApplication.outputs['getDockerTag.DOCKER_TAG'] ]
+        steps:
+          - template: pipeline-steps/templates/helm-install-chart.yaml@mi-core
+            parameters:
+              azureContainerRegistry: $(azure.container.registry)
+              azureSubscriptionEndpoint: $(azure.subscription.endpoint)
+              applicationName: $(application.name)
+              aksResourceGroup: $(azure.stg.aks.resourcegroup)
+              aksCluster: $(azure.stg.aks.cluster)
+              jobName: $(application.name)
+              namespace: $(product)
+              chartEnv: $(chart.env)
+          - template: pipeline-steps/templates/kubernetes-wait-for-job.yaml@mi-core
+            parameters:
+              azureSubscriptionEndpoint: $(azure.subscription.endpoint)
+              aksResourceGroup: $(azure.stg.aks.resourcegroup)
+              aksCluster: $(azure.stg.aks.cluster)
+              jobName: $(application.name)
+              namespace: $(product)
+              projectName: $(application.name)
 
-    - job: PromoteBuild
-      dependsOn: DeployOnTest
-      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  #    condition: succeeded()
-      pool:
-        vmImage: 'Ubuntu-16.04'
-      variables:
-        getDockerTag.DOCKER_TAG: $[ dependencies.BuildAndTestApplication.outputs['getDockerTag.DOCKER_TAG'] ]
-        System.Debug: true
-        env: 'stg'
-      steps:
-        - template: ./pipeline-steps/templates/promote-build.yaml
-          parameters:
-            azureContainerRegistry: $(azure.container.registry)
-            applicationName: $(application.name)
-            azureDestinyContainerRegistry: $(azure.prom.acr)
-            azureProdSubscription: $(azure.prom.subscription.endpoint)
-            originAcr: $(azure.prom.acr)
+      - job: PromoteBuild
+        dependsOn: DeployOnTest
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    #    condition: succeeded()
+        pool:
+          vmImage: 'Ubuntu-16.04'
+        variables:
+          getDockerTag.DOCKER_TAG: $[ dependencies.BuildAndTestApplication.outputs['getDockerTag.DOCKER_TAG'] ]
+          System.Debug: true
+          env: 'stg'
+        steps:
+          - template: ./pipeline-steps/templates/promote-build.yaml
+            parameters:
+              azureContainerRegistry: $(azure.container.registry)
+              applicationName: $(application.name)
+              azureDestinyContainerRegistry: $(azure.prom.acr)
+              azureProdSubscription: $(azure.prom.subscription.endpoint)
+              originAcr: $(azure.prom.acr)
