@@ -68,7 +68,7 @@ jobs:
   - job: BuildAndTestApplication
     pool:
       vmImage: 'Ubuntu-16.04'
-    dependsOn: EchoVariables
+    dependsOn: EchoVariablesSBox
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     variables:
       aptDependencies: 'qtbase5-dev'
