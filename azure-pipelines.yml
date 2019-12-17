@@ -25,6 +25,7 @@ pr:
 variables:
 #  group: pipeline-env-variables
   application.name: 'data-extractor-job'
+  azure.container.registry: 'ssprivate$(env).azurecr.io'
   azure.subscription.endpoint: 'DTS-SHAREDSERVICES-$(env.upper)'
   azure.aks.resourcegroup: 'ss_$(env)_kubernetes_resource_group'
   azure.aks.cluster: 'ss_aks_$(env)'
@@ -44,11 +45,21 @@ resources:
       endpoint: hmcts
 
 jobs:
-  - job: EchoVariables
+  - job: EchoVariablesSBox
     pool:
       vmImage: 'Ubuntu-16.04'
     variables:
       env: 'sbox'
+    steps:
+      - template: ./pipeline-steps/templates/tasks/echo-variables.yaml
+        parameters:
+          azureContainerRegistry: $(azure.aks.cluster)
+
+  - job: EchoVariablesTest
+    pool:
+      vmImage: 'Ubuntu-16.04'
+    variables:
+      env: 'test'
     steps:
       - template: ./pipeline-steps/templates/tasks/echo-variables.yaml
         parameters:
