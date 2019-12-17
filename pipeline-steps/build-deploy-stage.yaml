@@ -1,6 +1,14 @@
 parameters:
   env: 'test'
-
+  product: $(product)
+  application.name: ''
+  chart.env: 'preview'
+  azure.container.registry: $(azure.container.registry)
+  azure.aks.cluster: $(azure.aks.cluster)
+  azure.subscription.endpoint: $(azure.subscription.endpoint)
+  azure.aks.resourcegroup: $(azure.aks.resourcegroup)
+  azure.prom.acr: $(azure.prom.acr)
+  azure.prom.subscription.endpoint: $(azure.prom.subscription.endpoint)
 stages:
 - stage: BuildAndDeploy
   jobs:
@@ -13,7 +21,7 @@ stages:
         - template: ./templates//tasks/docker-tag.yaml
         - template: ./templates/tasks/echo-variables.yaml
           parameters:
-            azureContainerRegistry: $(azure.aks.cluster)
+            azureContainerRegistry: ${{ parameters.azure.aks.cluster }}
             aksCluster: 'Overriden aksCluster'
     - job: EchoVariablesTest
       pool:
@@ -37,13 +45,13 @@ stages:
         - template: ./templates/tasks/publish-artifact.yaml
         - template: ./templates/docker-build.yaml
           parameters:
-            azureContainerRegistry: $(azure.container.registry)
-            azureSubscriptionEndpoint: $(azure.subscription.endpoint)
-            applicationName: $(application.name)
+            azureContainerRegistry: ${{ parameters.azure.container.registry }}
+            azureSubscriptionEndpoint: ${{ parameters.azure.subscription.endpoint }}
+            applicationName: ${{ parameters.application.name }}
 
     - job: DeployBuild
       dependsOn: BuildAndTestApplication
-      condition:  and(succeeded(), variables['System.PullRequest.PullRequestId'])
+      condition: succeeded()
       pool:
         vmImage: 'Ubuntu-16.04'
       variables:
@@ -51,40 +59,34 @@ stages:
       steps:
         - template: ./templates/helm-install-chart-job.yaml
           parameters:
-            azureContainerRegistry: $(azure.container.registry)
-            azureSubscriptionEndpoint: $(azure.subscription.endpoint)
-            applicationName: $(application.name)
-            aksResourceGroup: $(azure.aks.resourcegroup)
-            aksCluster: $(azure.aks.cluster)
-            jobName: $(application.name)
-            namespace: $(product)
-            chartEnv: $(chart.env)
+            azureContainerRegistry: ${{ parameters.azure.container.registry }}
+            azureSubscriptionEndpoint: ${{ parameters.azure.subscription.endpoint }}
+            applicationName: ${{ parameters.application.name }}
+            aksResourceGroup: ${{ parameters.azure.aks.resourcegroup }}
+            aksCluster: ${{ parameters.azure.aks.cluster }}
+            jobName: ${{ parameters.application.name }}
+            namespace: ${{ parameters.product }}
+            chartEnv: ${{ parameters.chart.env }}
         - template: ./templates/kubernetes-wait-for-job.yaml
           parameters:
-            azureSubscriptionEndpoint: $(azure.subscription.endpoint)
-            aksResourceGroup: $(azure.aks.resourcegroup)
-            aksCluster: $(azure.aks.cluster)
-            jobName: $(application.name)
-            namespace: $(product)
-            projectName: $(application.name)
-
-
+            azureSubscriptionEndpoint: ${{ parameters.azure.subscription.endpoint }}
+            aksResourceGroup: ${{ parameters.azure.aks.resourcegroup }}
+            aksCluster: ${{ parameters.azure.aks.cluster }}
+            jobName: ${{ parameters.application.name }}
+            namespace: ${{ parameters.product }}
+            projectName: ${{ parameters.application.name }}
 
     - job: PromoteBuild
       dependsOn: DeployBuild
       condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  #    condition: succeeded()
       pool:
         vmImage: 'Ubuntu-16.04'
       variables:
-        getDockerTag.DOCKER_TAG: $[ dependencies.BuildAndTestApplication.outputs['getDockerTag.DOCKER_TAG'] ]
-        System.Debug: true
-        env: 'stg'
+        env: ${{ parameters.env }}
       steps:
         - template: ./templates/promote-build.yaml
           parameters:
-            azureContainerRegistry: $(azure.container.registry)
-            applicationName: $(application.name)
-            azureDestinyContainerRegistry: $(azure.prom.acr)
-            azureProdSubscription: $(azure.prom.subscription.endpoint)
-            originAcr: $(azure.prom.acr)
+            azureContainerRegistry: ${{ parameters.azure.container.registry }}
+            applicationName: ${{ parameters.application.name }}
+            azureDestinyContainerRegistry: ${{ parameters.azure.prom.acr }}
+            azureProdSubscription: ${{ parameters.azure.prom.subscription.endpoint }}
