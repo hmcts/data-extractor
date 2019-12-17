@@ -7,7 +7,7 @@ stages:
       variables:
         env: 'sbox'
       steps:
-        - template: ./pipeline-steps/templates/tasks/echo-variables.yaml
+        - template: ./templates/tasks/echo-variables.yaml
           parameters:
             azureContainerRegistry: $(azure.aks.cluster)
 
@@ -17,7 +17,7 @@ stages:
       variables:
         env: 'sbox'
       steps:
-        - template: ./pipeline-steps/templates/tasks/docker-tag.yaml
+        - template: ./templates/tasks/docker-tag.yaml
 
     - job: BuildAndTestApplication
       pool:
@@ -28,10 +28,10 @@ stages:
         aptDependencies: 'qtbase5-dev'
         env: 'sbox'
       steps:
-        - template: ./pipeline-steps/templates/tasks/build-assemble.yaml
+        - template: ./templates/tasks/build-assemble.yaml
         - template: pipeline-steps/templates/publish-tests.yaml@mi-core
-        - template: ./pipeline-steps/templates/tasks/publish-artifact.yaml
-        - template: ./pipeline-steps/templates/docker-build.yaml
+        - template: ./templates/tasks/publish-artifact.yaml
+        - template: ./templates/docker-build.yaml
           parameters:
             azureContainerRegistry: $(azure.container.registry)
             azureSubscriptionEndpoint: $(azure.subscription.endpoint)
@@ -105,7 +105,7 @@ stages:
         System.Debug: true
         env: 'stg'
       steps:
-        - template: ./pipeline-steps/templates/promote-build.yaml
+        - template: ./templates/promote-build.yaml
           parameters:
             azureContainerRegistry: $(azure.container.registry)
             applicationName: $(application.name)
