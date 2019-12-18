@@ -41,6 +41,7 @@ variables:
   azure.prom.aks.cluster: 'ss_aks_$(env.prom)'
   manual.branch.prefix: 'master'
   product: 'mi'
+  vault: 'mi-vault-(env)'
   chart.env: 'preview'
   azure.prom.acr: 'ssprivate$(env.prom)'
   
@@ -57,6 +58,7 @@ stages:
       env: $(environment)
       applicationName: $(application.name)
       product: $(product)
+      azureVault: $(vault)
       azureSecreKeys: 'aat-ccdro-user,aat-ccdro-password,data-extractor-connection-string'
       azureKeyMapping: 
       - key: ETL_DB_USER
