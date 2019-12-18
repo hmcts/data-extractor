@@ -37,7 +37,7 @@ stages:
       pool:
         vmImage: 'Ubuntu-16.04'
       dependsOn: EchoVariablesSBox
-      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+      # condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
       variables:
         aptDependencies: 'qtbase5-dev'
         env: ${{ parameters.env }}
