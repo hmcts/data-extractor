@@ -82,7 +82,18 @@ stages:
       dependsOn: EchoVariablesSBox
       condition: succeeded()
       steps:
+        - task: AzureKeyVault@1
+          displayName: 'Get secrets from Keyvault'
+          inputs:
+            azureSubscription: ${{ parameters.azureSubscriptionEndpoint }}
+            keyVaultName: 'mi-vaul-sbox'
+            secretsFilter: 'aat-ccdro-user,aat-ccdro-password,data-extractor-connection-string'
         - template: ./templates/tasks/integration-test.yaml
+          env:
+            ETL_DB_URL: 'jdbc:postgresql://ccd-data-store-api-postgres-db.aat.postgres.database.azure.com:5432/ccd_data_store'
+            etl.db.user: $(aat-ccdro-password) 
+            etl.db.password: $(data-extractor-connection-string)'
+
         - template: pipeline-steps/templates/publish-tests.yaml@mi-core
 
     - job: PromoteBuild
