@@ -84,7 +84,7 @@ stages:
             script: echo $(ETL_DB_USER)
           env:
             ${{ each pair in parameters.azureKeyMapping }}: # Each job
-              ${{ pair.key }}: $(${{ pair.value }})
+              ETL_DB_USER: ${{ pair.key }} 
         - task: Gradle@2
           env:
             ETL_DB_URL: 'jdbc:postgresql://ccd-data-store-api-postgres-db.aat.postgres.database.azure.com:5432/ccd_data_store'
