@@ -54,5 +54,5 @@ stages:
   - template: ./pipeline-steps/build-deploy-stage.yaml
     parameters:
       env: $(environment)
-      application.name: $(application.name)
+      applicationName: $(application.name)
       product: $(product)

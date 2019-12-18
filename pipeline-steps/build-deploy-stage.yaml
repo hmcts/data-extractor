@@ -1,6 +1,6 @@
 parameters:
   env: 'test'
-  application.name: ''
+  applicationName: ''
   chart.env: 'preview'
   product: ''
   # azure.container.registry: $(azure.container.registry)
@@ -23,7 +23,7 @@ stages:
         - template: ./templates/tasks/echo-variables.yaml
           parameters:
             azureContainerRegistry: ${{ parameters.product }}
-            applicationName: ${{ parameters.application.name }}
+            applicationName: ${{ parameters.applicationName }}
     - job: EchoVariablesTest
       pool:
         vmImage: 'Ubuntu-16.04'
@@ -37,7 +37,7 @@ stages:
       pool:
         vmImage: 'Ubuntu-16.04'
       dependsOn: EchoVariablesSBox
-      # condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
       variables:
         aptDependencies: 'qtbase5-dev'
         env: ${{ parameters.env }}
