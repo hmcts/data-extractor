@@ -79,7 +79,7 @@ stages:
             projectName: ${{ parameters.applicationName }}
     
     - job: IntegrationTest
-      dependsOn: EchoVariablesSBox
+      dependsOn: DeployBuild
       condition: succeeded()
       steps:
         - task: AzureKeyVault@1
@@ -105,9 +105,11 @@ stages:
             testResultsFiles: '**/TEST-*.xml'
             options: '--info --rerun-tasks'
             tasks: 'functional'
+        - template: pipeline-steps/templates/publish-tests.yaml@mi-core
+
 
     - job: PromoteBuild
-      dependsOn: DeployBuild
+      dependsOn: IntegrationTest
       condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
       # condition: succeeded()
 
