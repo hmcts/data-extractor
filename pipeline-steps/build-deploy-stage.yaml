@@ -42,7 +42,7 @@ stages:
         aptDependencies: 'qtbase5-dev'
         env: ${{ parameters.env }}
       steps:
-        - template: ./templates/tasks/build-assemble.yaml
+        - template: pipeline-steps/templates/build-application.yaml@mi-core
         - template: pipeline-steps/templates/publish-tests.yaml@mi-core
         - template: ./templates/tasks/publish-artifact.yaml
         - template: ./templates/docker-build.yaml
