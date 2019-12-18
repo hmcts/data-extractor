@@ -4,11 +4,11 @@ parameters:
   chart.env: 'preview'
   product: ''
   azureContainerRegistry: $(azure.container.registry)
-  azure.aks.cluster: $(azure.aks.cluster)
-  azure.subscription.endpoint: "$(azure.subscription.endpoint)"
-  azure.aks.resourcegroup: $(azure.aks.resourcegroup)
-  azure.prom.acr: $(azure.prom.acr)
-  azure.prom.subscription.endpoint: $(azure.prom.subscription.endpoint)
+  azureAksCluster: $(azure.aks.cluster)
+  azureSubscriptionEndpoint: $(azure.subscription.endpoint)
+  azureAksResourcegroup: $(azure.aks.resourcegroup)
+  azurePromAcr: $(azure.prom.acr)
+  azurePromSubscriptionEndpoint: $(azure.prom.subscription.endpoint)
 
 stages:
 - stage: BuildAndDeploy
@@ -37,7 +37,7 @@ stages:
       pool:
         vmImage: 'Ubuntu-16.04'
       dependsOn: EchoVariablesSBox
-      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+      # condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
       variables:
         aptDependencies: 'qtbase5-dev'
         env: ${{ parameters.env }}
@@ -47,8 +47,8 @@ stages:
         - template: ./templates/tasks/publish-artifact.yaml
         - template: ./templates/docker-build.yaml
           parameters:
-            azureContainerRegistry: $(azure.container.registry)
-            azureSubscriptionEndpoint: $(azure.subscription.endpoint)
+            azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
+            azureSubscriptionEndpoint:  ${{ parameters.azureSubscriptionEndpoint }}
             applicationName:  ${{ parameters.application.name }}
 
     - job: DeployBuild
@@ -61,19 +61,19 @@ stages:
       steps:
         - template: ./templates/helm-install-chart-job.yaml
           parameters:
-            azureContainerRegistry: $(azure.container.registry)
-            azureSubscriptionEndpoint: $(azure.subscription.endpoint)
+            azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
+            azureSubscriptionEndpoint:  ${{ parameters.azureSubscriptionEndpoint }}
             applicationName:  ${{ parameters.application.name }}
-            aksResourceGroup: $(azure.aks.resourcegroup)
-            aksCluster: $(azure.aks.cluster)
+            aksResourceGroup:  ${{ parameters.azureAksResourcegroup }}
+            aksCluster:  ${{ parameters.azureAksCluster }}
             jobName:  ${{ parameters.application.name }}
             namespace: ${{ parameters.product }}
             chartEnv: ${{ parameters.chart.env }}
         - template: ./templates/kubernetes-wait-for-job.yaml
           parameters:
-            azureSubscriptionEndpoint: $(azure.subscription.endpoint)
-            aksResourceGroup: $(azure.aks.resourcegroup)
-            aksCluster: $(azure.aks.cluster)
+            azureSubscriptionEndpoint:  ${{ parameters.azureSubscriptionEndpoint }}
+            aksResourceGroup:  ${{ parameters.azureAksResourcegroup }}
+            aksCluster:  ${{ parameters.azureAksCluster }}
             jobName:  ${{ parameters.application.name }}
             namespace:  ${{ parameters.product }}
             projectName: ${{ parameters.application.name }}
@@ -88,7 +88,7 @@ stages:
       steps:
         - template: ./templates/promote-build.yaml
           parameters:
-            azureContainerRegistry: $(azure.container.registry)
+            azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
             applicationName: ${{ parameters.application.name }}
-            azureDestinyContainerRegistry: $(azure.prom.acr)
+            azureDestinyContainerRegistry:  ${{ parameters.azurePromAcr }}
             azureProdSubscription: $(azure.prom.subscription.endpoint)
