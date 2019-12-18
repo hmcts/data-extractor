@@ -10,21 +10,14 @@ parameters:
   azurePromAcr: $(azure.prom.acr)
   azurePromSubscriptionEndpoint: $(azure.prom.subscription.endpoint)
   azureKeyMapping: {}
+  azureSecreKeys: '*' # coma separated azure keys
+  azureVault: ''
+
 stages:
 - stage: BuildAndDeploy
   jobs:
-    - job: EchoVariablesSBox
-      pool:
-        vmImage: 'Ubuntu-16.04'
-      variables:
-        env: ${{ parameters.env }}
-      steps:
-        - template: ./templates/tasks/echo-variables.yaml
-          parameters:
-            variable: ${{ parameters.azurePromAcr }}
-
     - job: BuildAndTestApplication
-      condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+      # condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
 
       pool:
         vmImage: 'Ubuntu-16.04'
@@ -69,32 +62,18 @@ stages:
             projectName: ${{ parameters.applicationName }}
     
     - job: IntegrationTest
-      dependsOn: EchoVariablesSBox
+      dependsOn: DeployBuild
       condition: succeeded()
       steps:
         - task: AzureKeyVault@1
           displayName: 'Get secrets from Keyvault'
           inputs:
             azureSubscription: ${{ parameters.azureSubscriptionEndpoint }}
-            keyVaultName: 'mi-vault-sbox'
-            secretsFilter: 'aat-ccdro-user,aat-ccdro-password,data-extractor-connection-string'
-        - task: Bash@3
-          inputs:
-            targetType: 'inline'
-            script: |
-             echo "$ETL_DB_USER"
-             echo "other is $OTHER"
-          env:
-            OTHER: "fine"
-            ${{ each pair in parameters.azureKeyMapping }}: # Each job
-              ${{ pair.key }}: ${{ pair.value }}
+            keyVaultName: ${{ parameters.azureVault }}
+            secretsFilter: ${{ parameters.azureSecreKeys }}
         - task: Gradle@2
           env:
-            ETL_DB_URL: 'jdbc:postgresql://ccd-data-store-api-postgres-db.aat.postgres.database.azure.com:5432/ccd_data_store'
-            # ETL_DB_USER: $(aat-ccdro-user) 
-            # ETL_DB_PASSWORD: $(aat-ccdro-password)
-            # ETL_CONNECTIONSTRING: $(data-extractor-connection-string)
-            ${{ each pair in parameters.azureKeyMapping }}: # Each job
+            ${{ each pair in parameters.azureKeyMapping }}:
               ${{ pair.key }}: $(${{ pair.value }})
           inputs:
             workingDirectory: ''
@@ -103,16 +82,17 @@ stages:
             javaHomeOption: 'JDKVersion'
             jdkVersionOption: '1.11'
             jdkArchitectureOption: 'x64'
-            publishJUnitResults: false
+            publishJUnitResults: true
             testResultsFiles: '**/TEST-*.xml'
             options: '--info --rerun-tasks'
             tasks: 'functional'
-        - template: ./templates/tasks/echo-variables.yaml
         - template: pipeline-steps/templates/publish-tests.yaml@mi-core
 
     - job: PromoteBuild
       dependsOn: IntegrationTest
-      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+      # condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+      condition: succeeded()
+
       pool:
         vmImage: 'Ubuntu-16.04'
       variables:

@@ -51,13 +51,13 @@ resources:
       name: hmcts/mi-core-lib
       endpoint: hmcts
 
-
 stages:
   - template: ./pipeline-steps/build-deploy-stage.yaml
     parameters:
       env: $(environment)
       applicationName: $(application.name)
       product: $(product)
+      azureSecreKeys: 'aat-ccdro-user,aat-ccdro-password,data-extractor-connection-string'
       azureKeyMapping: 
       - key: ETL_DB_USER
         value: 'aat-ccdro-user'
