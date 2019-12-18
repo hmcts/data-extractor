@@ -23,6 +23,7 @@ stages:
         - template: ./templates/tasks/echo-variables.yaml
           parameters:
             azureContainerRegistry: ${{ parameters.azure.subscription.endpoint }}
+            applicationName: $(azure.aks.resourcegroup)
     - job: EchoVariablesTest
       pool:
         vmImage: 'Ubuntu-16.04'

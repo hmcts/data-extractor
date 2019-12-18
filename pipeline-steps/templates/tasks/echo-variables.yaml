@@ -11,6 +11,7 @@ steps:
       echo "AKS cluster is  : ${{ parameters.aksCluster }}"
       echo "azureContainerRegistry  is  : ${{ parameters.azureContainerRegistry }}"
       echo "Image tag is: $(imageTag)"
+      echo "application name is : ${{ parameters.applicationName }}"
     displayName: 'Echo variables'
 
 
