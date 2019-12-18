@@ -48,7 +48,9 @@ resources:
 stages:
   - template: ./pipeline-steps/build-deploy-stage.yaml 
     parameters:
-    - ${{ if eq(variables['Build.Reason'], 'PullRequest') }}:
-      env: 'sbox'
-    - ${{ if ne(variables['Build.Reason'], 'PullRequest') }}:
-      env: 'test'
+        env: 'sbox'
+    condition: eq(variables['Build.Reason'], 'PullRequest')
+  - template: ./pipeline-steps/build-deploy-stage.yaml 
+    parameters:
+        env: 'test'
+    condition: ne(variables['Build.Reason'], 'PullRequest')
