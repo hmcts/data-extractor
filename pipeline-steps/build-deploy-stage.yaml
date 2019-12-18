@@ -83,6 +83,7 @@ stages:
       condition: succeeded()
       steps:
         - template: ./templates/tasks/integration-test.yaml
+        - template: pipeline-steps/templates/publish-tests.yaml@mi-core
 
     - job: PromoteBuild
       dependsOn: DeployBuild
