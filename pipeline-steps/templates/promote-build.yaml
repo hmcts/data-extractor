@@ -2,6 +2,7 @@ parameters:
   azureContainerRegistry: ''
   applicationName: ''
   azureProdSubscription: ''
+  azureDestinyContainerRegistry: ''
 
 steps:
   - template: ./tasks/docker-tag.yaml
@@ -25,4 +26,4 @@ steps:
       inlineScript: |
         sourceImage=${{ parameters.azureContainerRegistry }}/${{ parameters.applicationName }}:$(imageTag)
         targetImage=${{ parameters.applicationName }}:$(imageTag)
-        az acr import -n  ssprivatetest --source $sourceImage --image $targetImage --username  $(sp.user) --password $(sp.password)
+        az acr import -n  ${{ parameters.azureDestinyContainerRegistry }} --source $sourceImage --image $targetImage --username  $(sp.user) --password $(sp.password)
