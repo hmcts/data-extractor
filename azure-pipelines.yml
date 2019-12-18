@@ -40,7 +40,7 @@ variables:
   product: 'mi'
   chart.env: 'preview'
   azure.prom.acr: 'ssprivate$(env.prom)'
-
+  System.Debug: TRUE
 resources:
   repositories:
     - repository: mi-core

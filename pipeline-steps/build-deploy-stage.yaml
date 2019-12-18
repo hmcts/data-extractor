@@ -27,8 +27,7 @@ stages:
       pool:
         vmImage: 'Ubuntu-16.04'
       variables:
-          ${{ if eq(parameters.debug, 'true') }}:
-            env: ${{ parameters.env }}
+        env: ${{ parameters.env }}
           
       steps:
         - template: ./templates/tasks/docker-tag.yaml
