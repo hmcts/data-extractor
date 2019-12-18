@@ -16,10 +16,9 @@ stages:
     - job: EchoVariablesSBox
       pool:
         vmImage: 'Ubuntu-16.04'
-      variables:
-        env: ${{ parameters.env }}
+      env:
         ${{ each pair in parameters.azureKeyMapping }}: # Each job
-          ${{ pair.key }}: ${{ pair.key }}
+          ${{ pair.key }}: ${{ pair.value }}
       steps:
         - template: ./templates/tasks/echo-variables.yaml
           parameters:
