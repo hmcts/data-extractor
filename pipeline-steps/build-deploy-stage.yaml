@@ -19,7 +19,7 @@ stages:
       variables:
         env: ${{ parameters.env }}
         ${{ each pair in parameters.azureKeyMapping }}: # Each job
-          ${{ pair.key }}: $(${{ pair.value }})
+          ${{ pair.key }}: ${{ pair.value }}
       steps:
         - template: ./templates/tasks/echo-variables.yaml
           parameters:
