@@ -23,7 +23,7 @@ stages:
         - template: ./templates/tasks/echo-variables.yaml
           parameters:
             azureContainerRegistry: ${{ parameters.product }}
-            applicationName: $(parameters.application.name)
+            applicationName: ${{ parameters.application.name }}
     - job: EchoVariablesTest
       pool:
         vmImage: 'Ubuntu-16.04'
