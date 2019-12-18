@@ -3,12 +3,12 @@ parameters:
   applicationName: ''
   chart.env: 'preview'
   product: ''
-  # azure.container.registry: $(azure.container.registry)
-  # azure.aks.cluster: $(azure.aks.cluster)
-  # azure.subscription.endpoint: "$(azure.subscription.endpoint)"
-  # azure.aks.resourcegroup: $(azure.aks.resourcegroup)
-  # azure.prom.acr: $(azure.prom.acr)
-  # azure.prom.subscription.endpoint: $(azure.prom.subscription.endpoint)
+  azureContainerRegistry: $(azure.container.registry)
+  azure.aks.cluster: $(azure.aks.cluster)
+  azure.subscription.endpoint: "$(azure.subscription.endpoint)"
+  azure.aks.resourcegroup: $(azure.aks.resourcegroup)
+  azure.prom.acr: $(azure.prom.acr)
+  azure.prom.subscription.endpoint: $(azure.prom.subscription.endpoint)
 
 stages:
 - stage: BuildAndDeploy
@@ -22,7 +22,7 @@ stages:
         - template: ./templates//tasks/docker-tag.yaml
         - template: ./templates/tasks/echo-variables.yaml
           parameters:
-            azureContainerRegistry: ${{ parameters.product }}
+            azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
             applicationName: ${{ parameters.applicationName }}
     - job: EchoVariablesTest
       pool:
