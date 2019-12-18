@@ -5,7 +5,7 @@ parameters:
   chart.env: 'preview'
   azure.container.registry: $(azure.container.registry)
   azure.aks.cluster: $(azure.aks.cluster)
-  azure.subscription.endpoint: $(azure.subscription.endpoint)
+  azure.subscription.endpoint: '$(azure.subscription.endpoint)''
   azure.aks.resourcegroup: $(azure.aks.resourcegroup)
   azure.prom.acr: $(azure.prom.acr)
   azure.prom.subscription.endpoint: $(azure.prom.subscription.endpoint)
