@@ -18,12 +18,10 @@ stages:
         vmImage: 'Ubuntu-16.04'
       variables:
         env: ${{ parameters.env }}
-
+        ${{ each pair in parameters.azureKeyMapping }}: # Each job
+          ${{ pair.key }}: ${{ pair.value }}
       steps:
         - template: ./templates/tasks/echo-variables.yaml
-          env:
-            ${{ each pair in parameters.azureKeyMapping }}: # Each job
-              ${{ pair.key }}: ${{ pair.value }}
           parameters:
             variable: ${{ parameters.azurePromAcr }}
 
