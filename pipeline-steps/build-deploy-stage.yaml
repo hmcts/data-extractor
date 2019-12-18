@@ -49,7 +49,7 @@ stages:
           parameters:
             azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
             azureSubscriptionEndpoint:  ${{ parameters.azureSubscriptionEndpoint }}
-            applicationName:  ${{ parameters.application.name }}
+            applicationName:  ${{ parameters.applicationName }}
 
     - job: DeployBuild
       dependsOn: BuildAndTestApplication
@@ -63,10 +63,10 @@ stages:
           parameters:
             azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
             azureSubscriptionEndpoint:  ${{ parameters.azureSubscriptionEndpoint }}
-            applicationName:  ${{ parameters.application.name }}
+            applicationName:  ${{ parameters.applicationName }}
             aksResourceGroup:  ${{ parameters.azureAksResourcegroup }}
             aksCluster:  ${{ parameters.azureAksCluster }}
-            jobName:  ${{ parameters.application.name }}
+            jobName:  ${{ parameters.applicationName }}
             namespace: ${{ parameters.product }}
             chartEnv: ${{ parameters.chart.env }}
         - template: ./templates/kubernetes-wait-for-job.yaml
@@ -74,13 +74,15 @@ stages:
             azureSubscriptionEndpoint:  ${{ parameters.azureSubscriptionEndpoint }}
             aksResourceGroup:  ${{ parameters.azureAksResourcegroup }}
             aksCluster:  ${{ parameters.azureAksCluster }}
-            jobName:  ${{ parameters.application.name }}
+            jobName:  ${{ parameters.applicationName }}
             namespace:  ${{ parameters.product }}
-            projectName: ${{ parameters.application.name }}
+            projectName: ${{ parameters.applicationName }}
 
     - job: PromoteBuild
       dependsOn: DeployBuild
-      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+      # condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+      condition: succeeded()
+
       pool:
         vmImage: 'Ubuntu-16.04'
       variables:
@@ -89,6 +91,6 @@ stages:
         - template: ./templates/promote-build.yaml
           parameters:
             azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
-            applicationName: ${{ parameters.application.name }}
+            applicationName: ${{ parameters.applicationName }}
             azureDestinyContainerRegistry:  ${{ parameters.azurePromAcr }}
             azureProdSubscription: $(azure.prom.subscription.endpoint)
