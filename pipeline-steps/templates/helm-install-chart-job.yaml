@@ -8,6 +8,7 @@ parameters:
   jobName: ''
   namespace: ''
   chartEnv: ''
+  helmRepo: 'hmctspublic'
 
 steps:
   - template: ./tasks/docker-tag.yaml
@@ -38,6 +39,6 @@ steps:
       azureSubscription: ${{ parameters.azureSubscriptionEndpoint }}
       scriptLocation: "inlineScript"
       inlineScript: |
-        az acr helm repo add --name $(getAzureContainerRegistryName.ACR_NAME)
+        az acr helm repo add --name ${{ parameters.helmRepo }}
         helm dependency update charts/${{ parameters.applicationName }}
         helm install ${{ parameters.jobName }}-$(imageSha) charts/${{ parameters.applicationName }} --namespace ${{ parameters.namespace }} -f charts/${{ parameters.applicationName }}/values.yaml -f charts/${{ parameters.applicationName }}/values.${{ parameters.chartEnv }}.yaml
