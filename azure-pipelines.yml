@@ -59,7 +59,9 @@ stages:
       applicationName: $(application.name)
       product: $(product)
       azureKeyMapping: 
-        - ETL_DB_USER: 'aat-ccdro-user'
-        # - ETL_DB_PASSWORD: 'aat-ccdro-password' 
-        # - ETL_CONNECTIONSTRING: 'data-extractor-connection-string'
-      
+      - key: ETL_DB_USER
+        value: 'aat-ccdro-user'
+      - key: ETL_DB_PASSWORD
+        value: 'aat-ccdro-password'
+      - key: ETL_CONNECTIONSTRING
+        value: 'data-extractor-connection-string'
