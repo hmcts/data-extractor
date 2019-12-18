@@ -1,7 +1,7 @@
 parameters:
   env: 'test'
   applicationName: ''
-  chart.env: 'preview'
+  chartEnv: 'preview'
   product: ''
   azureContainerRegistry: $(azure.container.registry)
   azureAksCluster: $(azure.aks.cluster)
@@ -68,7 +68,7 @@ stages:
             aksCluster:  ${{ parameters.azureAksCluster }}
             jobName:  ${{ parameters.applicationName }}
             namespace: ${{ parameters.product }}
-            chartEnv: ${{ parameters.chart.env }}
+            chartEnv: ${{ parameters.chartEnv }}
         - template: ./templates/kubernetes-wait-for-job.yaml
           parameters:
             azureSubscriptionEndpoint:  ${{ parameters.azureSubscriptionEndpoint }}
