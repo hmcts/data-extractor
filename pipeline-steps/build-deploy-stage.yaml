@@ -62,7 +62,7 @@ stages:
         - template: ./templates/helm-install-chart-job.yaml
           parameters:
             azureContainerRegistry: $(azure.container.registry)
-            azureSubscriptionEndpoint: $(azure.subscription.endpoint
+            azureSubscriptionEndpoint: $(azure.subscription.endpoint)
             applicationName:  ${{ parameters.application.name }}
             aksResourceGroup: $(azure.aks.resourcegroup)
             aksCluster: $(azure.aks.cluster)
