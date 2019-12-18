@@ -2,7 +2,7 @@ parameters:
   env: 'test'
   application.name: ''
   chart.env: 'preview'
-  product: $(product)
+  product: ''
   # azure.container.registry: $(azure.container.registry)
   # azure.aks.cluster: $(azure.aks.cluster)
   # azure.subscription.endpoint: "$(azure.subscription.endpoint)"
@@ -22,8 +22,8 @@ stages:
         - template: ./templates//tasks/docker-tag.yaml
         - template: ./templates/tasks/echo-variables.yaml
           parameters:
-            azureContainerRegistry: ${{ parameters.azure.subscription.endpoint }}
-            applicationName: $(azure.subscription.endpoint)
+            azureContainerRegistry: ${{ parameters.product }}
+            applicationName: $(parameters.application.name)
     - job: EchoVariablesTest
       pool:
         vmImage: 'Ubuntu-16.04'
@@ -67,7 +67,7 @@ stages:
             aksResourceGroup: $(azure.aks.resourcegroup)
             aksCluster: $(azure.aks.cluster)
             jobName:  ${{ parameters.application.name }}
-            namespace: $(product)
+            namespace: ${{ parameters.product }}
             chartEnv: ${{ parameters.chart.env }}
         - template: ./templates/kubernetes-wait-for-job.yaml
           parameters:
@@ -75,7 +75,7 @@ stages:
             aksResourceGroup: $(azure.aks.resourcegroup)
             aksCluster: $(azure.aks.cluster)
             jobName:  ${{ parameters.application.name }}
-            namespace: $(product)
+            namespace:  ${{ parameters.product }}
             projectName: ${{ parameters.application.name }}
 
     - job: PromoteBuild
