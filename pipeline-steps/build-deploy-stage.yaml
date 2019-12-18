@@ -64,6 +64,8 @@ stages:
     - job: IntegrationTest
       dependsOn: DeployBuild
       condition: succeeded()
+      variables:
+        env: ${{ parameters.env }}
       steps:
         - task: AzureKeyVault@1
           displayName: 'Get secrets from Keyvault'
