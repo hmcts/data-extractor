@@ -28,10 +28,10 @@ variables:
     environment: 'test'
     env.upper: 'TEST'
   ${{ if ne( variables['Build.Reason'], 'PullRequest') }}: 
-    environment: 'stg'
-    env.upper: 'STG'
-  env.prom: 'prod'
-  env.prom.upper: 'PROD'
+    environment: 'test' #Uset test and promoting to stg until prod is ready
+    env.upper: 'TEST'
+  env.prom: 'stg'
+  env.prom.upper: 'STG'
   application.name: 'data-extractor-job'
   azure.container.registry: 'ssprivate$(env).azurecr.io'
   azure.subscription.endpoint: 'DTS-SHAREDSERVICES-$(env.upper)'
