@@ -91,9 +91,9 @@ stages:
         - task: Gradle@2
           env:
             ETL_DB_URL: 'jdbc:postgresql://ccd-data-store-api-postgres-db.aat.postgres.database.azure.com:5432/ccd_data_store'
-            etl.db.user: $(aat-ccdro-user) 
-            etl.db.password: $(aat-ccdro-password)
-            etl.connection-string: $(data-extractor-connection-string)
+            ETL_DB_USER: $(aat-ccdro-user) 
+            ETL_DB_PASSWORD: $(aat-ccdro-password)
+            ETL_CONNECTIONSTRING: $(data-extractor-connection-string)
           inputs:
             workingDirectory: ''
             gradleWrapperFile: 'gradlew'
