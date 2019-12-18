@@ -11,15 +11,6 @@ parameters:
 
 steps:
   - template: ./tasks/docker-tag.yaml
-  # - powershell: |
-  #     $sourceBranch = "$(Build.SourceBranchName)"
-  #     $formattedSourceBranch = $sourceBranch.ToLower()
-  #     $repo_sha="$(git rev-parse --verify HEAD)"
-  #     $docker_image_tag_sha=$repo_sha.SubString(0, 7)
-  #     Write-Host "##vso[task.setvariable variable=DOCKER_TAG;isOutput=true]$formattedSourceBranch-$docker_image_tag_sha"
-  #     Write-Host "##vso[task.setvariable variable=DOCKER_SHA;isOutput=true]$docker_image_tag_sha"
-  #   displayName: 'Get Docker Tag In Lower Case'
-  #   name: 'getDockerTagLowerCase'
   - powershell: |
       $azureContainerRegistry = "${{ parameters.azureContainerRegistry }}"
       $azureContainerRegistryName = $azureContainerRegistry.Substring(0, $azureContainerRegistry.IndexOf("."))

@@ -37,7 +37,7 @@ stages:
       pool:
         vmImage: 'Ubuntu-16.04'
       dependsOn: EchoVariablesSBox
-      # condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
       variables:
         aptDependencies: 'qtbase5-dev'
         env: ${{ parameters.env }}
@@ -77,10 +77,16 @@ stages:
             jobName:  ${{ parameters.applicationName }}
             namespace:  ${{ parameters.product }}
             projectName: ${{ parameters.applicationName }}
+    
+    - job: IntegrationTest
+      dependsOn: EchoVariablesSBox
+      condition: succeeded()
+      steps:
+        - template: ./templates/tasks/integration-test.yaml
 
     - job: PromoteBuild
       dependsOn: DeployBuild
-      # condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
       condition: succeeded()
 
       pool:
