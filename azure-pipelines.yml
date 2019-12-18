@@ -44,7 +44,11 @@ resources:
       name: hmcts/mi-core-lib
       endpoint: hmcts
 
+
 stages:
   - template: ./pipeline-steps/build-deploy-stage.yaml 
     parameters:
+    - ${{ if eq(variables['Build.Reason'], 'PullRequest') }}:
       env: 'sbox'
+    - ${{ if ne(variables['Build.Reason'], 'PullRequest') }}:
+      env: 'test'
