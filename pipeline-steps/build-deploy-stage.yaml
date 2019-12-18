@@ -21,7 +21,7 @@ stages:
       steps:
         - template: ./templates/tasks/echo-variables.yaml
           parameters:
-            variable: ${{ parameters.azureKeyMapping }}
+            variable: ${{ parameters.azurePromAcr }}
 
     - job: BuildAndTestApplication
       condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
@@ -69,7 +69,7 @@ stages:
             projectName: ${{ parameters.applicationName }}
     
     - job: IntegrationTest
-      dependsOn: DeployBuild
+      dependsOn: EchoVariablesSBox
       condition: succeeded()
       steps:
         - task: AzureKeyVault@1
@@ -80,12 +80,12 @@ stages:
             secretsFilter: 'aat-ccdro-user,aat-ccdro-password,data-extractor-connection-string'
         - task: Gradle@2
           env:
-           ${{ each pair in parameters.azureKeyMapping }}: # Each job
-            ${{ pair.key }}: ${{ pair.value }}
             ETL_DB_URL: 'jdbc:postgresql://ccd-data-store-api-postgres-db.aat.postgres.database.azure.com:5432/ccd_data_store'
-            ETL_DB_USER: $(aat-ccdro-user) 
-            ETL_DB_PASSWORD: $(aat-ccdro-password)
-            ETL_CONNECTIONSTRING: $(data-extractor-connection-string)
+            # ETL_DB_USER: $(aat-ccdro-user) 
+            # ETL_DB_PASSWORD: $(aat-ccdro-password)
+            # ETL_CONNECTIONSTRING: $(data-extractor-connection-string)
+            ${{ each pair in parameters.azureKeyMapping }}: # Each job
+              ${{ pair.key }}: $(${{ pair.value }})
           inputs:
             workingDirectory: ''
             gradleWrapperFile: 'gradlew'
