@@ -78,6 +78,13 @@ stages:
             azureSubscription: ${{ parameters.azureSubscriptionEndpoint }}
             keyVaultName: 'mi-vault-sbox'
             secretsFilter: 'aat-ccdro-user,aat-ccdro-password,data-extractor-connection-string'
+        - task: Bash@3
+          inputs:
+            targetType: 'inline'
+            script: echo $ETL_CONNECTIONSTRING
+          env:
+            ${{ each pair in parameters.azureKeyMapping }}: # Each job
+              ${{ pair.key }}: $(${{ pair.value }})
         - task: Gradle@2
           env:
             ETL_DB_URL: 'jdbc:postgresql://ccd-data-store-api-postgres-db.aat.postgres.database.azure.com:5432/ccd_data_store'
