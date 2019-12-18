@@ -53,7 +53,7 @@ resources:
       endpoint: hmcts
 
 stages:
-  - template: ./pipeline-steps/build-deploy-stage.yaml
+  - template: pipeline-steps//templates/build-deploy-stage.yaml@mi-core
     parameters:
       env: $(environment)
       applicationName: $(application.name)
