@@ -46,11 +46,4 @@ resources:
 
 
 stages:
-  - template: ./pipeline-steps/build-deploy-stage.yaml 
-    parameters:
-        env: 'sbox'
-    condition: eq(variables['Build.Reason'], 'PullRequest')
-  - template: ./pipeline-steps/build-deploy-stage.yaml 
-    parameters:
-        env: 'test'
-    condition: ne(variables['Build.Reason'], 'PullRequest')
+  - template: ./pipeline-steps/build-deploy-stage.yaml

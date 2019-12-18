@@ -1,5 +1,4 @@
 parameters:
-  env: 'test'
   product: $(product)
   application.name: ''
   chart.env: 'preview'
@@ -9,6 +8,10 @@ parameters:
   azure.aks.resourcegroup: $(azure.aks.resourcegroup)
   azure.prom.acr: $(azure.prom.acr)
   azure.prom.subscription.endpoint: $(azure.prom.subscription.endpoint)
+  ${{ if eq(variables['Build.Reason'], 'PullRequest') }}:
+    env: 'sbox'
+  ${{ if ne(variables['Build.Reason'], 'PullRequest') }}:
+    env: 'test'
 stages:
 - stage: BuildAndDeploy
   jobs:
@@ -27,7 +30,9 @@ stages:
       pool:
         vmImage: 'Ubuntu-16.04'
       variables:
-        env: ${{ parameters.env }}
+          ${{ if eq(parameters.debug, 'true') }}:
+            env: ${{ parameters.env }}
+          
       steps:
         - template: ./templates/tasks/docker-tag.yaml
 
