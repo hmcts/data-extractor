@@ -88,16 +88,23 @@ stages:
             azureSubscription: ${{ parameters.azureSubscriptionEndpoint }}
             keyVaultName: 'mi-vault-sbox'
             secretsFilter: 'aat-ccdro-user,aat-ccdro-password,data-extractor-connection-string'
-        - bash: |
-            echo "Secret set"
-          displayName: 'Set secrets'
+        - task: Gradle@2
           env:
             ETL_DB_URL: 'jdbc:postgresql://ccd-data-store-api-postgres-db.aat.postgres.database.azure.com:5432/ccd_data_store'
-            etl.db.user: $(aat-ccdro-password) 
-            etl.db.password: $(data-extractor-connection-string)'
-
-        - template: ./templates/tasks/integration-test.yaml          
-        - template: pipeline-steps/templates/publish-tests.yaml@mi-core
+            etl.db.user: $(aat-ccdro-user) 
+            etl.db.password: $(aat-ccdro-password)
+            etl.connection-string: $(data-extractor-connection-string)
+          inputs:
+            workingDirectory: ''
+            gradleWrapperFile: 'gradlew'
+            gradleOptions: '-Xmx3072m'
+            javaHomeOption: 'JDKVersion'
+            jdkVersionOption: '1.11'
+            jdkArchitectureOption: 'x64'
+            publishJUnitResults: false
+            testResultsFiles: '**/TEST-*.xml'
+            options: '--info --rerun-tasks'
+            tasks: 'functional'
 
     - job: PromoteBuild
       dependsOn: DeployBuild
