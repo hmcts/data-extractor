@@ -82,12 +82,12 @@ stages:
           inputs:
             targetType: 'inline'
             script: |
-             echo "$SOME"
+             echo "$ETL_DB_USER"
              echo "other is $OTHER"
           env:
             OTHER: "fine"
             ${{ each pair in parameters.azureKeyMapping }}: # Each job
-              SOME: ${{ pair.key }} 
+              ${{ pair.key }}: ${{ pair.value }}
         - task: Gradle@2
           env:
             ETL_DB_URL: 'jdbc:postgresql://ccd-data-store-api-postgres-db.aat.postgres.database.azure.com:5432/ccd_data_store'
