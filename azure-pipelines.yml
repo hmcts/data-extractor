@@ -31,7 +31,7 @@ variables:
     environment: 'stg'
     env.upper: 'STG'
   env.prom: 'prod'
-  nv.prom.upper: 'PROD'
+  env.prom.upper: 'PROD'
   application.name: 'data-extractor-job'
   azure.container.registry: 'ssprivate$(env).azurecr.io'
   azure.subscription.endpoint: 'DTS-SHAREDSERVICES-$(env.upper)'
