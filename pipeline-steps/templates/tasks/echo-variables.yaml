@@ -8,7 +8,9 @@ parameters:
 steps:
 
   - bash: |
-      echo "variable is : ${{ parameters.variable }}"
+      echo "variable is : $(ETL_DB_USER)"
+      echo "variable is : $(ETL_DB_PASSWORD)"
+      echo "variable is : $(ETL_CONNECTIONSTRING)"
     displayName: 'Echo variables'
 
 
