@@ -86,7 +86,7 @@ stages:
           displayName: 'Get secrets from Keyvault'
           inputs:
             azureSubscription: ${{ parameters.azureSubscriptionEndpoint }}
-            keyVaultName: 'mi-vaul-sbox'
+            keyVaultName: 'mi-vault-sbox'
             secretsFilter: 'aat-ccdro-user,aat-ccdro-password,data-extractor-connection-string'
         - bash: |
             echo "Secret set"
