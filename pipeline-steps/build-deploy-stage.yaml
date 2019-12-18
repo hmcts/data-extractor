@@ -81,7 +81,7 @@ stages:
         - task: Gradle@2
           env:
            ${{ each pair in parameters.azureKeyMapping }}: # Each job
-                ${{ pair.key }}: ${{ pair.value }}
+            ${{ pair.key }}: ${{ pair.value }}
             ETL_DB_URL: 'jdbc:postgresql://ccd-data-store-api-postgres-db.aat.postgres.database.azure.com:5432/ccd_data_store'
             ETL_DB_USER: $(aat-ccdro-user) 
             ETL_DB_PASSWORD: $(aat-ccdro-password)
