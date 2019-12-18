@@ -41,7 +41,7 @@ variables:
   azure.prom.aks.cluster: 'ss_aks_$(env.prom)'
   manual.branch.prefix: 'master'
   product: 'mi'
-  vault: 'mi-vault-(env)'
+  vault: 'mi-vault-$(env)'
   chart.env: 'preview'
   azure.prom.acr: 'ssprivate$(env.prom)'
   
