@@ -18,8 +18,8 @@ stages:
         vmImage: 'Ubuntu-16.04'
       variables:
         env: ${{ parameters.env }}
-        ${{ each pair in parameters.azureKeyMapping }}: # Each job
-          ${{ pair.key }}: ${{ pair.value }}
+        # ${{ each pair in parameters.azureKeyMapping }}: # Each job
+        #   ${{ pair.key }}: ${{ pair.value }}
       steps:
         - template: ./templates/tasks/echo-variables.yaml
           parameters:
@@ -99,6 +99,7 @@ stages:
             testResultsFiles: '**/TEST-*.xml'
             options: '--info --rerun-tasks'
             tasks: 'functional'
+        - template: ./templates/tasks/echo-variables.yaml
         - template: pipeline-steps/templates/publish-tests.yaml@mi-core
 
     - job: PromoteBuild
