@@ -24,7 +24,14 @@ pr:
 
 variables:
 #  group: pipeline-env-variables
-
+  ${{ if eq( variables['Build.Reason'], 'PullRequest') }}: 
+    environment: 'test'
+    env.upper: 'TEST'
+  ${{ if ne( variables['Build.Reason'], 'PullRequest') }}: 
+    environment: 'stg'
+    env.upper: 'STG'
+  env.prom: 'prod'
+  nv.prom.upper: 'PROD'
   application.name: 'data-extractor-job'
   azure.container.registry: 'ssprivate$(env).azurecr.io'
   azure.subscription.endpoint: 'DTS-SHAREDSERVICES-$(env.upper)'
@@ -38,10 +45,7 @@ variables:
   chart.env: 'preview'
   azure.prom.acr: 'ssprivate$(env.prom)'
   System.Debug: TRUE
-  ${{ if eq( variables['Build.Reason'], 'PullRequest') }}: 
-    environment: 'sbox'
-  ${{ if ne( variables['Build.Reason'], 'PullRequest') }}: 
-    environment: 'test'
+
 resources:
   repositories:
     - repository: mi-core
