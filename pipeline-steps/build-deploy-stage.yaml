@@ -81,8 +81,11 @@ stages:
         - task: Bash@3
           inputs:
             targetType: 'inline'
-            script: echo "$SOME"
+            script: |
+             echo "$SOME"
+             echo "other is $OTHER"
           env:
+            OTHER: "fine"
             ${{ each pair in parameters.azureKeyMapping }}: # Each job
               SOME: ${{ pair.key }} 
         - task: Gradle@2
