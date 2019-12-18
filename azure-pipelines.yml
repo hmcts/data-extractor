@@ -36,6 +36,10 @@ variables:
   product: 'mi'
   chart.env: 'preview'
   azure.prom.acr: 'ssprivate$(env.prom)'
+  ${{ if eq( variables['Build.Reason'], 'PullRequest') }}: 
+    env: 'sbox'
+  ${{ if ne( variables['Build.Reason'], 'PullRequest') }}: 
+    env: 'test'
 
 resources:
   repositories:
@@ -47,3 +51,5 @@ resources:
 
 stages:
   - template: ./pipeline-steps/build-deploy-stage.yaml
+    parameters:
+      env: $(env)
