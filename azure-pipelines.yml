@@ -20,7 +20,6 @@ pr:
   branches:
     include:
       - master
-      - feature/*
 
 variables:
 #  group: pipeline-env-variables
@@ -44,8 +43,7 @@ variables:
   product: 'mi'
   chart.env: 'preview'
   azure.prom.acr: 'ssprivate$(env.prom)'
-  System.Debug: TRUE
-
+  
 resources:
   repositories:
     - repository: mi-core
@@ -60,3 +58,7 @@ stages:
       env: $(environment)
       applicationName: $(application.name)
       product: $(product)
+      azureKeyMapping: 
+        - pair: 'value'
+        - pari2: 'Value2' 
+      

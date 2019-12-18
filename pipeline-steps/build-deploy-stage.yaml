@@ -9,11 +9,23 @@ parameters:
   azureAksResourcegroup: $(azure.aks.resourcegroup)
   azurePromAcr: $(azure.prom.acr)
   azurePromSubscriptionEndpoint: $(azure.prom.subscription.endpoint)
-
+  azureKeyMapping: {}
 stages:
 - stage: BuildAndDeploy
   jobs:
+  - job: EchoVariablesSBox
+    pool:
+      vmImage: 'Ubuntu-16.04'
+    variables:
+      env: ${{ parameters.env }}
+    steps:
+      - template: ./templates/tasks/echo-variables.yaml
+        parameters:
+          variable: ${{ parameters.azureKeyMapping }}
+
     - job: BuildAndTestApplication
+      condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+
       pool:
         vmImage: 'Ubuntu-16.04'
       variables:
@@ -68,6 +80,8 @@ stages:
             secretsFilter: 'aat-ccdro-user,aat-ccdro-password,data-extractor-connection-string'
         - task: Gradle@2
           env:
+          - ${{ each pair in parameters.azureKeyMapping }}: # Each job
+                ${{ pair.key }}: ${{ pair.value }}
             ETL_DB_URL: 'jdbc:postgresql://ccd-data-store-api-postgres-db.aat.postgres.database.azure.com:5432/ccd_data_store'
             ETL_DB_USER: $(aat-ccdro-user) 
             ETL_DB_PASSWORD: $(aat-ccdro-password)
