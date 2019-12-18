@@ -13,15 +13,15 @@ parameters:
 stages:
 - stage: BuildAndDeploy
   jobs:
-  - job: EchoVariablesSBox
-    pool:
-      vmImage: 'Ubuntu-16.04'
-    variables:
-      env: ${{ parameters.env }}
-    steps:
-      - template: ./templates/tasks/echo-variables.yaml
-        parameters:
-          variable: ${{ parameters.azureKeyMapping }}
+    - job: EchoVariablesSBox
+      pool:
+        vmImage: 'Ubuntu-16.04'
+      variables:
+        env: ${{ parameters.env }}
+      steps:
+        - template: ./templates/tasks/echo-variables.yaml
+          parameters:
+            variable: ${{ parameters.azureKeyMapping }}
 
     - job: BuildAndTestApplication
       condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
