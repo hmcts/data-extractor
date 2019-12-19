@@ -1,0 +1,69 @@
+# Java
+# Package your Java project.
+# Add steps that install, analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+name: '$(SourceBranchName)-$(Build.SourceVersion) Build-$(Build.BuildId)'
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+
+  tags:
+    include:
+      - v*
+
+pr:
+  autoCancel: true
+  branches:
+    include:
+      - master
+
+variables:
+#  group: pipeline-env-variables
+  ${{ if eq( variables['Build.Reason'], 'PullRequest') }}: 
+    environment: 'sbox'
+    env.upper: 'SBOX'
+  ${{ if ne( variables['Build.Reason'], 'PullRequest') }}: 
+    environment: 'test' #Uset test and promoting to stg until prod is ready
+    env.upper: 'TEST'
+  env.prom: 'stg'
+  env.prom.upper: 'STG'
+  application.name: 'data-extractor-job'
+  azure.container.registry: 'ssprivate$(env).azurecr.io'
+  azure.subscription.endpoint: 'DTS-SHAREDSERVICES-$(env.upper)'
+  azure.aks.resourcegroup: 'ss_$(env)_kubernetes_resource_group'
+  azure.aks.cluster: 'ss_aks_$(env)'
+  azure.prom.subscription.endpoint: 'DTS-SHAREDSERVICES-$(env.prom.upper)'
+  azure.prom.aks.resourcegroup: 'ss_$(env.prom)_kubernetes_resource_group'
+  azure.prom.aks.cluster: 'ss_aks_$(env.prom)'
+  manual.branch.prefix: 'master'
+  product: 'mi'
+  vault: 'mi-vault-$(env)'
+  chart.env: 'preview'
+  azure.prom.acr: 'ssprivate$(env.prom)'
+  
+resources:
+  repositories:
+    - repository: mi-core
+      type: github
+      name: hmcts/mi-core-lib
+      endpoint: hmcts
+
+stages:
+  - template: pipeline-steps//templates/build-deploy-stage.yaml@mi-core
+    parameters:
+      env: $(environment)
+      applicationName: $(application.name)
+      product: $(product)
+      azureVault: $(vault)
+      azureSecreKeys: 'aat-ccdro-user,aat-ccdro-password,data-extractor-connection-string'
+      azureKeyMapping: 
+      - key: ETL_DB_USER
+        value: 'aat-ccdro-user'
+      - key: ETL_DB_PASSWORD
+        value: 'aat-ccdro-password'
+      - key: ETL_CONNECTIONSTRING
+        value: 'data-extractor-connection-string'

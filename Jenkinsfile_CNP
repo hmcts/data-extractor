@@ -29,21 +29,7 @@ GradleBuilder builder = new GradleBuilder(this, product)
 withPipeline(type, product, component) {
   env.TESTCONTAINERS_RYUK_DISABLED = 'true'
   enableDockerBuild()
-  installCharts()
   loadVaultSecrets(secrets)
   disableLegacyDeployment()
-  enableAksStagingDeployment()
   nonServiceApp()
-
-  after('akschartsinstall') {
-    echo "Checking exported cases"
-    echo "Just waiting a while to ensure that the pod has run the job"
-    sh "sleep 120s"
-    echo "Verifying that functional test data was processed correctly"
-    try {
-      builder.gradle('functionalPostDeploy')
-    } finally {
-      junit '**/test-results/**/*.xml'
-    }
-  }
 }

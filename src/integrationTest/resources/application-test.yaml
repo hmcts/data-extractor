@@ -1,0 +1,14 @@
+etl:
+  db:
+    url: ${DB_URL:"jdbc:postgresql://localhost:32878/test?loggerLevel=OFF"}
+    user: "test"
+    password: "test"
+
+extraction:
+  caseTypes:
+    - container: "jsonlines"
+      caseType: "jsonlines"
+      type: "jsonlines"
+      prefix: "JLines"
+      query: "SELECT ID, NAME FROM parent WHERE ID = 1"
+
