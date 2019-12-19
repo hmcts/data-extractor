@@ -6,18 +6,6 @@ parameters:
 
 steps:
   - template: ./tasks/docker-tag.yaml
-  - bash: |
-      repo_sha=$(git rev-parse --verify HEAD)
-      docker_image_tag_sha=${repo_sha:0:7}
-      echo "##vso[task.setvariable variable=DOCKER_TAG;isOutput=true]merge-${docker_image_tag_sha}"
-    displayName: 'Get Docker Tag'
-    name: 'getDockerTag'
-  - bash: |
-      repo_sha=$(git rev-parse --verify HEAD)
-      docker_image_tag_sha=${repo_sha:0:7}
-      echo "##vso[task.setvariable variable=DOCKER_PROD_TAG;isOutput=true]prod-${docker_image_tag_sha}"
-    displayName: 'Get Docker Tag'
-    name: 'getDockerProdTag'
   - task: AzureCLI@1
     displayName: "Acr promote"
     inputs:
