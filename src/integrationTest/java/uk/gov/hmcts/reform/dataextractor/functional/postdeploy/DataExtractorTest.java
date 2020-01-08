@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.dataextractor.functional.postdeploy;
 
 import com.azure.storage.blob.BlobClient;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -28,6 +29,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:application_e2e.properties")
 @SpringBootTest
+@Slf4j
 public class DataExtractorTest {
     static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 
@@ -58,19 +60,19 @@ public class DataExtractorTest {
         String sqlQuery = getQueryByCaseType(caseType);
         String fileName = getFileName(prefix, type);
         QueryExecutor queryExecutor = new QueryExecutor(dbConfig.getUrl(), dbConfig.getUser(), dbConfig.getPassword(), sqlQuery);
-        try {
-            ResultSet resultSet = queryExecutor.execute();
-            resultSet.next();
-            int rows = resultSet.getInt(1);
-            String blobContent = blobReader.readFile(container, fileName);
-            assertTrue(rows > 0, "Rows numbers " + rows);
+        try (ResultSet resultSet = queryExecutor.execute()) {
+            if (resultSet.next()) {
+                int rows = resultSet.getInt(1);
+                blobReader.readFile(container, fileName);
+                assertTrue(rows > 0, "Rows numbers " + rows);
+            }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Error executing query", e);
         } finally {
             try {
                 queryExecutor.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Error closing connection", e);
             }
         }
     }
