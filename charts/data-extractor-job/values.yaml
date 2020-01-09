@@ -11,6 +11,7 @@ job:
   cpuLimits: '2000m'
   kind: Job
   ttlSecondsAfterFinished: 30
+  activeDeadlineSeconds: 600
   labels:
     app.kubernetes.io/instance : data-extractor-job-001
     app.kubernetes.io/name: data-extractor-job
