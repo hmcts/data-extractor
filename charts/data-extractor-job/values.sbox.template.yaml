@@ -1,0 +1,8 @@
+job:
+  image: ${IMAGE_NAME}
+  environment:
+    APPINSIGHTS_INSTRUMENTATIONKEY: c3043e63-3383-4add-a507-e0adf8588e4a
+global:
+  subscriptionId: "a8140a9e-f1b0-481f-a4de-09e2ee23f7ab"
+  environment: "sbox"
+  ccd_environment: "aat"

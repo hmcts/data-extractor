@@ -42,7 +42,6 @@ variables:
   manual.branch.prefix: 'master'
   product: 'mi'
   vault: 'mi-vault-$(env)'
-  chart.env: 'preview'
   azure.prom.acr: 'ssprivate$(env.prom)'
   
 resources:
@@ -59,6 +58,9 @@ stages:
       applicationName: $(application.name)
       product: $(product)
       azureVault: $(vault)
+      chartEnv: $(environment)
+      promEnv: $(env.prom)
+      functionalTest: true
       azureSecreKeys: 'aat-ccdro-user,aat-ccdro-password,data-extractor-connection-string'
       azureKeyMapping: 
       - key: ETL_DB_USER

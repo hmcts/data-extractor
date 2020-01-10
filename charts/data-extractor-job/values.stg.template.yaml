@@ -1,0 +1,8 @@
+job:
+  image: ${IMAGE_NAME}
+  environment:
+    APPINSIGHTS_INSTRUMENTATIONKEY: 482eb1b8-a656-41e6-b2e8-8351d7986b2c
+global:
+  subscriptionId: "74dacd4f-a248-45bb-a2f0-af700dc4cf68"
+  environment: "stg"
+  ccd_environment: "aat"

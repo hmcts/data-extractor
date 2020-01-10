@@ -30,13 +30,21 @@ sourceSets {
     }
     resources.srcDir file('src/integrationTest/resources')
   }
-  e2e {
+  functionalTest {
     java {
       compileClasspath += main.output + test.output
       runtimeClasspath += main.output + test.output
-      srcDir('src/e2e/java')
+      srcDir('src/functionalTest/java')
     }
-    resources.srcDir file('src/e2e/resources')
+    resources.srcDir file('src/functionalTest/resources')
+  }
+  smokeTest {
+    java {
+      compileClasspath += main.output
+      runtimeClasspath += main.output
+      srcDir file('src/smokeTest/java')
+    }
+    resources.srcDir file('src/smokeTest/resources')
   }
 }
 
@@ -52,19 +60,25 @@ test {
   }
 }
 
-task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
+
+
+task integrationPreTest(type: Test, description: 'Runs the pre deploy integration setup.', group: 'Verification') {
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
   classpath = sourceSets.integrationTest.runtimeClasspath
   useJUnitPlatform()
-  mustRunAfter test
-  testLogging {
-    exceptionFormat = 'full'
-  }
 }
 
-task e2e(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
-  testClassesDirs = sourceSets.e2e.output.classesDirs
-  classpath = sourceSets.e2e.runtimeClasspath
+
+task integrationPostTest(type: Test, description: 'Runs the pre deploy integration setup.', group: 'Verification') {
+  testClassesDirs = sourceSets.integrationTest.output.classesDirs
+  classpath = sourceSets.integrationTest.runtimeClasspath
+  useJUnitPlatform()
+}
+
+
+task functional(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
+  testClassesDirs = sourceSets.functionalTest.output.classesDirs
+  classpath = sourceSets.functionalTest.runtimeClasspath
   useJUnitPlatform()
   mustRunAfter test
   testLogging {
@@ -72,17 +86,29 @@ task e2e(type: Test, description: 'Runs the integration tests.', group: 'Verific
   }
 }
 
-task functionalPostDeploy(type: Test) {
-  group = 'Functional Tests'
-  description = 'Verifies that files from functionPreDeploy step were processed following job creation in AKS'
-  setTestClassesDirs(sourceSets.e2e.output.classesDirs)
-  setClasspath(sourceSets.e2e.runtimeClasspath)
-  useJUnitPlatform()
-  include "uk/gov/hmcts/reform/dataextractor/functional/postdeploy/**"
+task smoke(type: Test) {
+  description = "Runs Smoke Tests"
+  testClassesDirs = sourceSets.smokeTest.output.classesDirs
+  classpath = sourceSets.smokeTest.runtimeClasspath
 }
 
-check {
-  dependsOn integration
+integrationPreTest {
+  filter {
+    includeTestsMatching "*PreDeployTest"
+  }
+}
+
+integrationPostTest {
+  filter {
+    excludeTestsMatching "*PreDeployTest"
+  }
+}
+
+functional {
+  useJUnitPlatform()
+  testLogging {
+    exceptionFormat = 'full'
+  }
 }
 
 checkstyle {
@@ -96,6 +122,7 @@ pmd {
   toolVersion = "6.11.0"
   sourceSets = [sourceSets.main, sourceSets.test, sourceSets.integrationTest]
   reportsDir = file("$project.buildDir/reports/pmd")
+  ruleSets = []
   ruleSetFiles = files("config/pmd/ruleset.xml")
 }
 
@@ -104,7 +131,7 @@ jacoco {
 }
 
 jacocoTestReport {
-  executionData(test, integration)
+  executionData(test, functional)
   reports {
     xml.enabled = true
     csv.enabled = false
@@ -119,13 +146,12 @@ def sonarExclusions = [
         "**/ManageIdentityStreamProvider.java"
 ]
 
-project.tasks['sonarqube'].dependsOn test, integration
+project.tasks['sonarqube'].dependsOn test, functional, jacocoTestReport
 sonarqube {
   properties {
     property "sonar.projectName", "data-extractor-job"
     property "sonar.projectKey", "data-extractor-job"
-    property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
-    property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/integration.exec"
+    property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
     property 'sonar.coverage.exclusions', sonarExclusions.join(", ")
   }
 }
@@ -184,14 +210,14 @@ def versions = [
 
 dependencies {
   integrationTestCompile(sourceSets.test.output)
-  e2eCompile(sourceSets.test.output)
+  functionalTestCompile(sourceSets.test.output)
 }
 
 configurations {
   integrationTestCompile.extendsFrom(testCompile)
   integrationTestRuntime.extendsFrom(testRuntime)
-  e2eRuntime.extendsFrom(testRuntime)
-  e2eCompile.extendsFrom(testCompile)
+  functionalTestRuntime.extendsFrom(testRuntime)
+  functionalTestCompile.extendsFrom(testCompile)
 }
 
 
@@ -251,16 +277,18 @@ dependencies {
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
 
-  integrationTestCompile 'org.testcontainers:postgresql:1.12.3'
-  integrationTestCompile 'org.testcontainers:junit-jupiter:1.12.3'
-  integrationTestCompile 'com.ninja-squad:DbSetup:2.1.0'
 
+  functionalTestCompile 'org.testcontainers:postgresql:1.12.3'
+  functionalTestCompile 'org.testcontainers:junit-jupiter:1.12.3'
+  functionalTestCompile 'com.ninja-squad:DbSetup:2.1.0'
+
+  functionalTestCompile sourceSets.main.runtimeClasspath
+  functionalTestCompile sourceSets.test.runtimeClasspath
+
+  integrationTestCompileOnly 'org.projectlombok:lombok'
+  integrationTestAnnotationProcessor "org.projectlombok:lombok"
   integrationTestCompile sourceSets.main.runtimeClasspath
   integrationTestCompile sourceSets.test.runtimeClasspath
-  
-  e2eCompile sourceSets.main.runtimeClasspath
-  e2eCompile sourceSets.test.runtimeClasspath
-
 }
 
 mainClassName = 'uk.gov.hmcts.reform.dataextractor.DataExtractorApplication'
