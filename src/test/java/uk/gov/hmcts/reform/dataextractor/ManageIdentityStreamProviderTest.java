@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.dataextractor;
 
-import com.microsoft.azure.storage.StorageCredentials;
 import com.microsoft.azure.storage.blob.BlobOutputStream;
 import com.microsoft.azure.storage.blob.BlobProperties;
 import com.microsoft.azure.storage.blob.CloudBlobClient;
