@@ -5,16 +5,17 @@ import com.microsoft.azure.storage.blob.BlobProperties;
 import com.microsoft.azure.storage.blob.CloudBlobClient;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.net.URISyntaxException;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -22,7 +23,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ManageIdentityStreamProviderTest {
 
     private static final String CLIENT_ID = "testClientId";
@@ -44,7 +45,7 @@ public class ManageIdentityStreamProviderTest {
     @Mock
     private BlobOutputStream blobOutputStreamMock;
 
-    @Before
+    @BeforeEach
     public void setup() {
         classToTest = spy(new ManageIdentityStreamProvider(CLIENT_ID, ACCOUNT_NAME));
     }
@@ -54,7 +55,6 @@ public class ManageIdentityStreamProviderTest {
         mockDependencies(true);
         assertThat(classToTest.getOutputStream(CONTAINER_NAME, FILE_NAME, TYPE), is(blobOutputStreamMock));
         verify(cloudBlobContainerMock, never()).create();
-
     }
 
     @Test
@@ -64,18 +64,17 @@ public class ManageIdentityStreamProviderTest {
         verify(cloudBlobContainerMock, times(1)).create();
     }
 
-    @Test(expected = WriterException.class)
+    @Test
     public void givenError_whenGetClient_thenThrowError() throws Exception {
         doThrow(new WriterException(new Exception("error"))).when(classToTest).getCredentials();
-        classToTest.getOutputStream(CONTAINER_NAME, FILE_NAME, TYPE);
+        assertThrows(WriterException.class, () -> classToTest.getOutputStream(CONTAINER_NAME, FILE_NAME, TYPE));
     }
 
-    @Test(expected = WriterException.class)
+    @Test
     public void givenUriException_whenGetClient_thenThrowError() throws Exception {
         doThrow(new URISyntaxException("error", "error")).when(classToTest).getClient();
-        classToTest.getOutputStream(CONTAINER_NAME, FILE_NAME, TYPE);
+        assertThrows(WriterException.class, () -> classToTest.getOutputStream(CONTAINER_NAME, FILE_NAME, TYPE));
     }
-
 
     private void mockDependencies(boolean containerExist) throws Exception {
         doReturn(cloudBlobClientMock).when(classToTest).getClient();

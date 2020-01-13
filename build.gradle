@@ -1,3 +1,11 @@
+buildscript {
+  configurations.maybeCreate("pitest")
+  dependencies {
+    classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.4.5'
+    pitest 'org.pitest:pitest-junit5-plugin:0.10'
+  }
+}
+
 plugins {
   id 'application'
   id 'java'
@@ -10,6 +18,7 @@ plugins {
   id "net.java.openjdk.shinyafox.jshell.gradle.plugin" version "1.0.4"
   id 'org.springframework.boot' version '2.2.1.RELEASE'
   id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+  id 'info.solidsoft.pitest' version '1.4.6'
 }
 
 group 'uk.gov.hmcts.reform'
@@ -140,10 +149,6 @@ jacocoTestReport {
 }
 
 def sonarExclusions = [
-        "**/uk/gov/hmcts/reform/dataextractor/Extractor*.java",
-        "**/uk/gov/hmcts/reform/dataextractor/Query*.java",
-        "**/uk/gov/hmcts/reform/dataextractor/BlobOut*.java",
-        "**/ManageIdentityStreamProvider.java"
 ]
 
 project.tasks['sonarqube'].dependsOn test, functional, jacocoTestReport
@@ -205,7 +210,10 @@ def versions = [
   jackson: '2.10.0',
   commonsBeanUtils: '1.9.4',
   springBoot: '2.2.1.RELEASE',
-  postgresql: '42.2.5'
+  postgresql: '42.2.5',
+  pitest: '1.4.10',
+  gradlePitest     : '1.4.5',
+  sonarPitest      : '0.5',
 ]
 
 dependencies {
@@ -264,6 +272,10 @@ dependencies {
   // needed for app insights
   compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
 
+  compile group: 'org.pitest', name: 'pitest', version: versions.pitest
+  compile group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
+  compile group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: versions.sonarPitest
+
   testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
   testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
   testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
@@ -289,6 +301,18 @@ dependencies {
   integrationTestAnnotationProcessor "org.projectlombok:lombok"
   integrationTestCompile sourceSets.main.runtimeClasspath
   integrationTestCompile sourceSets.test.runtimeClasspath
+}
+
+pitest {
+  targetClasses = ['uk.gov.hmcts.reform.dataextractor.*']
+  excludedClasses = ['uk.gov.hmcts.reform.dataextractor.config.*']
+  testSourceSets = [sourceSets.test, sourceSets.functionalTest]
+  threads = 10
+  outputFormats = ['XML', 'HTML']
+  timestampedReports = false
+  mutationThreshold = 80
+  verbose = true
+  testPlugin = "junit5" //or another test plugin
 }
 
 mainClassName = 'uk.gov.hmcts.reform.dataextractor.DataExtractorApplication'

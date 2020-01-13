@@ -28,7 +28,6 @@ public class ExtractorJsonLines extends ExtractorJson {
         }
     }
 
-    @Override
     protected void writeRow(JsonGenerator jsonGenerator, String columnName, Object data, String dataType)
         throws IOException {
         if (dataType.contains("json")) {

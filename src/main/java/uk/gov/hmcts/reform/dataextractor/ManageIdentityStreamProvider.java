@@ -8,8 +8,6 @@ import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.blob.CloudBlobClient;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
@@ -25,7 +23,6 @@ import java.net.URISyntaxException;
 @ConditionalOnProperty(value = "etl.msi-client-id")
 public class ManageIdentityStreamProvider implements OutputStreamProvider {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ManageIdentityStreamProvider.class);
     private static final String STORAGE_RESOURCE = "https://storage.azure.com/";
     private static final String CONNECTION_URI_TPL = "https://%s.blob.core.windows.net";
 
@@ -43,9 +40,6 @@ public class ManageIdentityStreamProvider implements OutputStreamProvider {
         credsProvider.updateClientId(clientId);
         try {
             String accessToken = credsProvider.getToken(STORAGE_RESOURCE).accessToken();
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Got access token: {}", accessToken != null ? accessToken.substring(0, 5) + "..." : "null");
-            }
             return new StorageCredentialsToken(accountName, accessToken);
         } catch (IOException | AzureMSICredentialException e) {
             throw new WriterException(e);

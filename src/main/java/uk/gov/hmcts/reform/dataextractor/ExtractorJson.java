@@ -35,15 +35,14 @@ public class ExtractorJson implements Extractor {
         while (resultSet.next()) {
             jsonGenerator.writeStartObject();
             for (int i = 1; i <= columnCount; i++) {
-                writeRow(jsonGenerator, metaData.getColumnName(i), resultSet.getObject(i),
-                        metaData.getColumnTypeName(i));
+                writeRow(jsonGenerator, metaData.getColumnName(i), resultSet.getObject(i));
             }
             jsonGenerator.writeEndObject();
         }
         jsonGenerator.writeEndArray();
     }
 
-    protected void writeRow(JsonGenerator jsonGenerator, String columnName, Object data, String dataType)
+    protected void writeRow(JsonGenerator jsonGenerator, String columnName, Object data)
         throws IOException {
         jsonGenerator.writeObjectField(columnName, data);
     }
