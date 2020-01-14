@@ -5,6 +5,14 @@
 
 name: '$(SourceBranchName)-$(Build.SourceVersion) Build-$(Build.BuildId)'
 
+schedules:
+  - cron: "15,45 * * * *"
+    displayName: Daily midnight build
+    branches:
+      include:
+        - master
+    always: true
+
 trigger:
   batch: true
   branches:
@@ -61,6 +69,7 @@ stages:
       azureVault: $(vault)
       chartEnv: $(environment)
       promEnv: $(env.prom)
+      mutationTest: ${{ eq( variables['Build.Reason'], 'Schedule') }}
       functionalTest: true
       azureSecreKeys: 'aat-ccdro-user,aat-ccdro-password,data-extractor-connection-string'
       azureKeyMapping: 
