@@ -149,6 +149,7 @@ jacocoTestReport {
 }
 
 def sonarExclusions = [
+    "**/uk/gov/hmcts/reform/dataextractor/DataExtractorApplication.java",
 ]
 
 project.tasks['sonarqube'].dependsOn test, functional, jacocoTestReport
