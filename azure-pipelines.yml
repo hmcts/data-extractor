@@ -70,6 +70,11 @@ stages:
       azureVault: $(vault)
       chartEnv: $(environment)
       promEnv: $(env.prom)
+      ${{ if eq(variables['Build.Reason'], 'Schedule') }}:
+        mutationTest: True
+      ${{ if ne(variables['Build.Reason'], 'Schedule') }}:
+        mutationTest: False
+#      mutationTest: $[ eq( variables['Build.Reason'], 'Schedule') }}
       functionalTest: true
       azureSecreKeys: 'aat-ccdro-user,aat-ccdro-password,data-extractor-connection-string'
       azureKeyMapping: 
