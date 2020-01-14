@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 @Testcontainers
-public class QueryExecutorTest extends DbTest {
+public class QueryExecutorFTest extends DbTest {
 
     @Test
     public void whenSimpleSelectQueryExecuted_thenResultSetReturned() throws Exception {

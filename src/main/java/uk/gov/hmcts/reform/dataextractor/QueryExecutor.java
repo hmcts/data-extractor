@@ -31,7 +31,7 @@ public class QueryExecutor implements AutoCloseable {
         this.sql = sql;
     }
 
-    private Connection connect() throws SQLException {
+    Connection connect() throws SQLException {
         return DriverManager.getConnection(jdbcUrl, user, password);
     }
 
@@ -57,17 +57,23 @@ public class QueryExecutor implements AutoCloseable {
 
     public void close() {
         try {
-            resultSet.close();
+            if (resultSet != null) {
+                resultSet.close();
+            }
         } catch (SQLException e) {
             LOGGER.warn("SQL Exception thrown while closing result set.", e);
         }
         try {
-            statement.close();
+            if (statement != null) {
+                statement.close();
+            }
         } catch (SQLException e) {
             LOGGER.warn("SQL Exception thrown while closing statement.", e);
         }
         try {
-            connection.close();
+            if (connection != null) {
+                connection.close();
+            }
         } catch (SQLException e) {
             LOGGER.warn("SQL Exception thrown while closing connection.", e);
         }

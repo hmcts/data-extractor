@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 @Testcontainers
-public class ExtractorJsonLinesTest extends DbTest {
+public class ExtractorJsonLinesFTest extends DbTest {
 
     @Test
     public void whenSimpleSelectQueryExecuted_thenJsonLinesReturned() throws Exception {

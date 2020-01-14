@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -38,7 +39,7 @@ import static org.mockito.Mockito.when;
 
 @Testcontainers
 @ExtendWith(MockitoExtension.class)
-public class BlobOutputWriterTest {
+public class BlobOutputWriterFTest {
 
     private CloudBlobClient cloudBlobClient;
 
@@ -47,7 +48,7 @@ public class BlobOutputWriterTest {
     private static final String BLOB_PREFIX = "testblob";
     private static final String ACCOUNT = "devstoreaccount1";
 
-    private final ManageIdentityStreamProvider miStreamProviderSpy =  spy(new ManageIdentityStreamProvider(CLIENT_ID, ACCOUNT));
+    private final ManageIdentityStreamProvider miStreamProviderSpy =  Mockito.spy(new ManageIdentityStreamProvider(CLIENT_ID, ACCOUNT));
 
     @Container
     public static final GenericContainer blobStorageContainer =
@@ -122,9 +123,9 @@ public class BlobOutputWriterTest {
         try (BlobOutputWriter writer = new BlobOutputWriter(containerName,
                 BLOB_PREFIX, DataExtractorApplication.Output.JSON_LINES, miStreamProviderSpy)) {
 
-            BlobOutputWriter writerSpy = spy(writer);
-            ManageIdentityStreamProvider spyManageIdentityStreamProvider =  spy(new ManageIdentityStreamProvider(CLIENT_ID, ACCOUNT));
-            spy(new ManageIdentityStreamProvider(CLIENT_ID, ACCOUNT));
+            BlobOutputWriter writerSpy = Mockito.spy(writer);
+            ManageIdentityStreamProvider spyManageIdentityStreamProvider =  Mockito.spy(new ManageIdentityStreamProvider(CLIENT_ID, ACCOUNT));
+            Mockito.spy(new ManageIdentityStreamProvider(CLIENT_ID, ACCOUNT));
             when(writerSpy.getOutputStreamProvider()).thenReturn(spyManageIdentityStreamProvider);
             doReturn(cloudBlobClient).when(spyManageIdentityStreamProvider).getClient();
 
@@ -175,7 +176,7 @@ public class BlobOutputWriterTest {
     }
     
     private BlobOutputWriter getSpyWriterWithMockClient(BlobOutputWriter writer) throws Exception {
-        BlobOutputWriter writerSpy = spy(writer);
+        BlobOutputWriter writerSpy = Mockito.spy(writer);
         when(writerSpy.getOutputStreamProvider()).thenReturn(miStreamProviderSpy);
         doReturn(cloudBlobClient).when(miStreamProviderSpy).getClient();
         return writerSpy;
