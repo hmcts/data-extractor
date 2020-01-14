@@ -6,7 +6,7 @@
 name: '$(SourceBranchName)-$(Build.SourceVersion) Build-$(Build.BuildId)'
 
 schedules:
-  - cron: "15,45 * * * *"
+  - cron: "0 0 * * *"
     displayName: Daily midnight build
     branches:
       include:
