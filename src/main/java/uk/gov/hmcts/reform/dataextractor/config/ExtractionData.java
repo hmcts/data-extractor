@@ -7,11 +7,7 @@ import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.dataextractor.DataExtractorApplication;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-
-import static java.time.ZoneOffset.UTC;
 
 @ConstructorBinding
 @Getter
@@ -37,9 +33,7 @@ public class ExtractionData {
     }
 
     public String getFileName() {
-        return String.format("%s-%s.%s", prefix,
-            date == null ? DATE_TIME_FORMATTER.format(LocalDateTime.now(ZoneId.from(UTC))) : date,
-            type.getExtension());
+        return String.format("%s-%s.%s", prefix, date, type.getExtension());
     }
 
     private String getDefaultStartDate() {

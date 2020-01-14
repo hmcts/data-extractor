@@ -90,7 +90,7 @@ public class DataExtractorApplication implements ApplicationRunner {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(DataExtractorApplication.class, args);
+        SpringApplication.run(DataExtractorApplication.class);
     }
 
 }
