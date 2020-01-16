@@ -38,7 +38,7 @@ job:
   aadIdentityName: mi
   keyVaults:
     "data-extractor":
-      resourceGroup: data-extractor
+      resourceGroup: data-extractor 
       secrets:
         - aat-ccdro-user
         - aat-ccdro-password
