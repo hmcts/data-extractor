@@ -5,6 +5,14 @@
 
 name: '$(SourceBranchName)-$(Build.SourceVersion) Build-$(Build.BuildId)'
 
+schedules:
+  - cron: "0 0 * * *"
+    displayName: Daily midnight build
+    branches:
+      include:
+        - master
+    always: true
+
 trigger:
   batch: true
   branches:
@@ -50,6 +58,7 @@ resources:
       type: github
       name: hmcts/mi-core-lib
       endpoint: hmcts
+      ref: mutation-test
 
 stages:
   - template: pipeline-steps//templates/build-deploy-stage.yaml@mi-core
@@ -60,6 +69,11 @@ stages:
       azureVault: $(vault)
       chartEnv: $(environment)
       promEnv: $(env.prom)
+      ${{ if eq(variables['Build.Reason'], 'Schedule') }}:
+        mutationTest: True
+      ${{ if ne(variables['Build.Reason'], 'Schedule') }}:
+        mutationTest: False
+#      mutationTest: $[ eq( variables['Build.Reason'], 'Schedule') }}
       functionalTest: true
       azureSecreKeys: 'aat-ccdro-user,aat-ccdro-password,data-extractor-connection-string'
       azureKeyMapping: 

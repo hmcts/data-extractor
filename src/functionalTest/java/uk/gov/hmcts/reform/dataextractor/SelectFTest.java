@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 @Testcontainers
-public class SelectTest extends DbTest {
+public class SelectFTest extends DbTest {
 
     @Test
     public void whenSelectQueryExecuted_thenResultsReturned() throws Exception {
