@@ -3,34 +3,22 @@
 # Add steps that install, analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
 
-name: '$(SourceBranchName)-$(Build.SourceVersion) Build-$(Build.BuildId)'
+name: 'Scheduled-$(SourceBranchName)-$(Build.SourceVersion) Build-$(Build.BuildId)'
 
-trigger:
-  batch: true
-  branches:
-    include:
-      - master
-
-  tags:
-    include:
-      - v*
-
-pr:
-  autoCancel: true
-  branches:
-    include:
-      - master
+schedules:
+  - cron: "0 0 * * *"
+    displayName: Daily midnight build
+    branches:
+      include:
+        - master
+        - pipeline-updates
+    always: true
 
 variables:
 #  group: pipeline-env-variables
-  ${{ if eq( variables['Build.Reason'], 'PullRequest') }}: 
-    environment: 'sbox'
-    env.upper: 'SBOX'
-  ${{ if ne( variables['Build.Reason'], 'PullRequest') }}: 
-    environment: 'test' #Uset test and promoting to stg until prod is ready
-    env.upper: 'TEST'
-  env.prom: 'stg'
-  env.prom.upper: 'STG'
+
+  environment: 'test' #Uset test and promoting to stg until prod is ready
+  env.upper: 'TEST'
   application.name: 'data-extractor-job'
   azure.container.registry: 'ssprivate$(env).azurecr.io'
   azure.subscription.endpoint: 'DTS-SHAREDSERVICES-$(env.upper)'
@@ -43,14 +31,14 @@ variables:
   product: 'mi'
   vault: 'mi-vault-$(env)'
   azure.prom.acr: 'ssprivate$(env.prom)'
-  
+  helmRepo: 'ssprivate-$(env)'
 resources:
   repositories:
     - repository: mi-core
       type: github
       name: hmcts/mi-core-lib
       endpoint: hmcts
-      ref: mutation-test
+      ref: cosmetic-pipeline-fix
 
 stages:
   - template: pipeline-steps/templates/build-deploy-stage.yaml@mi-core
@@ -60,8 +48,7 @@ stages:
       product: $(product)
       azureVault: $(vault)
       chartEnv: $(environment)
-      promEnv: $(env.prom)
-      mutationTest: False
+      mutationTest: True
       functionalTest: true
       azureSecreKeys: 'aat-ccdro-user,aat-ccdro-password,data-extractor-connection-string'
       azureKeyMapping: 
