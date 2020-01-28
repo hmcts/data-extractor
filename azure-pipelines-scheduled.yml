@@ -42,21 +42,21 @@ resources:
       endpoint: hmcts
 
 stages:
-  - template: pipeline-steps/templates/build-deploy-stage.yaml@mi-core
-    condition: eq(variables['Build.Reason'], 'Schedule')
-    parameters:
-      env: $(environment)
-      applicationName: $(application.name)
-      product: $(product)
-      azureVault: $(vault)
-      chartEnv: $(environment)
-      mutationTest: True
-      functionalTest: true
-      azureSecreKeys: 'aat-ccdro-user,aat-ccdro-password,data-extractor-connection-string'
-      azureKeyMapping: 
-      - key: ETL_DB_USER
-        value: 'aat-ccdro-user'
-      - key: ETL_DB_PASSWORD
-        value: 'aat-ccdro-password'
-      - key: ETL_CONNECTIONSTRING
-        value: 'data-extractor-connection-string'
+  - ${{ if eq(variables['Build.Reason'], 'Schedule') }}:
+    - template: pipeline-steps/templates/build-deploy-stage.yaml@mi-core
+      parameters:
+        env: $(environment)
+        applicationName: $(application.name)
+        product: $(product)
+        azureVault: $(vault)
+        chartEnv: $(environment)
+        mutationTest: True
+        functionalTest: true
+        azureSecreKeys: 'aat-ccdro-user,aat-ccdro-password,data-extractor-connection-string'
+        azureKeyMapping:
+        - key: ETL_DB_USER
+          value: 'aat-ccdro-user'
+        - key: ETL_DB_PASSWORD
+          value: 'aat-ccdro-password'
+        - key: ETL_CONNECTIONSTRING
+          value: 'data-extractor-connection-string'
