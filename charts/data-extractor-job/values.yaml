@@ -1,4 +1,4 @@
-job:
+mi-job:
   image: ${IMAGE_NAME}
   keyVaults:
     "mi-vault":
