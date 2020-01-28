@@ -14,9 +14,8 @@ schedules:
         - pipeline-updates
     always: true
 
-trigger:
-  - none
-    
+trigger: none
+
 variables:
 #  group: pipeline-env-variables
 
