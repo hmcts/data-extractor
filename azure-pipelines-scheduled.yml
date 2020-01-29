@@ -11,7 +11,6 @@ schedules:
     branches:
       include:
         - master
-        - pipeline-updates
     always: true
 
 trigger: none
