@@ -45,7 +45,6 @@ resources:
 
 stages:
   - template: pipeline-steps/templates/build-deploy-stage.yaml@mi-core
-    condition: eq(variables['Build.Reason'], 'Schedule')
     parameters:
       env: $(environment)
       applicationName: $(application.name)
