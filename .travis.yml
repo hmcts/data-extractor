@@ -23,7 +23,7 @@ cache:
 
 script:
   - ./gradlew test
-  - ./gradlew integration
+  - ./gradlew functional
 
 after_success:
   - ./gradlew jacocoTestReport

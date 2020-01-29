@@ -3,32 +3,24 @@
 # Add steps that install, analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
 
-name: '$(SourceBranchName)-$(Build.SourceVersion) Build-$(Build.BuildId)'
+name: 'Scheduled-$(SourceBranchName)-$(Build.SourceVersion) Build-$(Build.BuildId)'
 
-trigger:
-  batch: true
-  branches:
-    include:
-      - master
+schedules:
+  - cron: "0 0 * * *"
+    displayName: Daily midnight build
+    branches:
+      include:
+        - master
+    always: true
 
-  tags:
-    include:
-      - v*
-
-pr:
-  autoCancel: true
-  branches:
-    include:
-      - master
+trigger: none
+pr: none
 
 variables:
 #  group: pipeline-env-variables
-  ${{ if eq( variables['Build.Reason'], 'PullRequest') }}: 
-    environment: 'sbox'
-    env.upper: 'SBOX'
-  ${{ if ne( variables['Build.Reason'], 'PullRequest') }}: 
-    environment: 'test' #Uset test and promoting to stg until prod is ready
-    env.upper: 'TEST'
+
+  environment: 'test' #Uset test and promoting to stg until prod is ready
+  env.upper: 'TEST'
   env.prom: 'stg'
   env.prom.upper: 'STG'
   application.name: 'data-extractor-job'
@@ -43,7 +35,7 @@ variables:
   product: 'mi'
   vault: 'mi-vault-$(env)'
   azure.prom.acr: 'ssprivate$(env.prom)'
-  
+  helmRepo: 'ssprivate-$(env)'
 resources:
   repositories:
     - repository: mi-core
@@ -59,11 +51,10 @@ stages:
       product: $(product)
       azureVault: $(vault)
       chartEnv: $(environment)
-      promEnv: $(env.prom)
-      mutationTest: False
+      mutationTest: True
       functionalTest: true
       azureSecreKeys: 'aat-ccdro-user,aat-ccdro-password,data-extractor-connection-string'
-      azureKeyMapping: 
+      azureKeyMapping:
       - key: ETL_DB_USER
         value: 'aat-ccdro-user'
       - key: ETL_DB_PASSWORD
