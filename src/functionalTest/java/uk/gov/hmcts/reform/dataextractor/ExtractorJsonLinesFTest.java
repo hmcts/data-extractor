@@ -19,11 +19,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Testcontainers
 public class ExtractorJsonLinesFTest extends DbTest {
 
+
     @Test
     public void whenSimpleSelectQueryExecuted_thenJsonLinesReturned() throws Exception {
         try (Connection conn = DriverManager.getConnection(jdbcUrl, username, password);
              ResultSet resultSet = conn.createStatement()
-                     .executeQuery("SELECT ID, NAME FROM parent WHERE ID IN (1, 2)")) {
+                     .executeQuery("SELECT ID, NAME FROM case_data WHERE ID IN (1, 2)")) {
 
             ExtractorJson extractor = new ExtractorJsonLines();
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -34,11 +35,11 @@ public class ExtractorJsonLinesFTest extends DbTest {
 
     @Test
     public void whenJoinSelectQueryWithRawJsonExecuted_thenJsonLinesResultsReturned() throws Exception {
+
         try (Connection conn = DriverManager.getConnection(jdbcUrl, username, password);
              ResultSet resultSet =
-                 conn.createStatement().executeQuery(
-                     "SELECT P.ID, P.NAME, C.ID as \"child id\", C.DATA as data, C.NAME as \"child name\" "
-                         + "FROM parent P JOIN child C on P.ID = C.PARENT_ID WHERE P.ID = 1")) {
+                 conn.createStatement().executeQuery("SELECT P.ID, P.NAME, C.ID as \"child id\", C.NAME as \"child.name\", C.DATA "
+                     + "FROM case_data P JOIN case_event C on P.ID = C.case_data_id WHERE P.ID = 1")) {
 
             ExtractorJson extractor = new ExtractorJsonLines();
             ByteArrayOutputStream out = new ByteArrayOutputStream();

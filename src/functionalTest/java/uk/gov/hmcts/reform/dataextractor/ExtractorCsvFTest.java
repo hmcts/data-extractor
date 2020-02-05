@@ -11,6 +11,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static uk.gov.hmcts.reform.dataextractor.utils.TestConstants.DB_CONNECTION_QUERY;
+import static uk.gov.hmcts.reform.dataextractor.utils.TestConstants.DB_DATA_QUERY;
 
 
 @Testcontainers
@@ -20,7 +22,7 @@ public class ExtractorCsvFTest extends DbTest {
     @Test
     public void whenSimpleSelectQueryExecuted_thenCsvResultsReturned() throws Exception {
         try (Connection conn = DriverManager.getConnection(jdbcUrl, username, password);
-            ResultSet resultSet = conn.createStatement().executeQuery("SELECT ID, NAME FROM parent WHERE ID = 1")) {
+            ResultSet resultSet = conn.createStatement().executeQuery(DB_CONNECTION_QUERY)) {
 
             ExtractorCsv extractor = new ExtractorCsv();
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -33,9 +35,7 @@ public class ExtractorCsvFTest extends DbTest {
     public void whenJoinSelectQueryExecuted_thenCsvResultsReturned() throws Exception {
         try (Connection conn = DriverManager.getConnection(jdbcUrl, username, password);
             ResultSet resultSet =
-                conn.createStatement().executeQuery(
-                    "SELECT P.ID, P.NAME, C.ID as \"child id\", C.NAME as \"child,name\" "
-                        + "FROM parent P JOIN child C on P.ID = C.PARENT_ID WHERE P.ID = 1")) {
+                conn.createStatement().executeQuery(DB_DATA_QUERY)) {
 
             ExtractorCsv extractor = new ExtractorCsv();
             ByteArrayOutputStream out = new ByteArrayOutputStream();

@@ -33,7 +33,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.dataextractor.utils.TestConstants.AZURE_TEST_CONTAINER_IMAGE;
+import static uk.gov.hmcts.reform.dataextractor.utils.TestConstants.DEFAULT_COMMAND;
 import static uk.gov.hmcts.reform.dataextractor.utils.TestUtils.hasBlobThatStartsWith;
 
 @Testcontainers
@@ -42,11 +45,8 @@ import static uk.gov.hmcts.reform.dataextractor.utils.TestUtils.hasBlobThatStart
 @SpringBootTest(classes = TestApplicationConfiguration.class)
 public class BlobOutputWriterFTest {
 
-
-    private static final String CLIENT_ID = "testclientid";
     private static final String CONTAINER = "testcontainer";
     private static final String BLOB_PREFIX = "testblob";
-    private static final String ACCOUNT = "devstoreaccount1";
 
     @Autowired
     private BlobServiceImpl miStreamProvider;
@@ -57,8 +57,9 @@ public class BlobOutputWriterFTest {
 
     @Container
     public static final GenericContainer blobStorageContainer =
-        new GenericContainer("arafato/azurite:2.6.5")
+        new GenericContainer(AZURE_TEST_CONTAINER_IMAGE)
             .withEnv("executable", "blob")
+            .withCommand(DEFAULT_COMMAND)
             .withExposedPorts(10000);
 
     private BlobServiceClient testClient;
@@ -102,8 +103,6 @@ public class BlobOutputWriterFTest {
             assertNotNull(outputStream);
             InputStream inputStream = TestUtils.getStreamFromFile(filePath);
             IOUtils.copy(inputStream, outputStream);
-            outputStream.flush();
-            outputStream.close();
         }
         // retrieve uploaded blob
         BlobContainerClient container = testClient.getBlobContainerClient(CONTAINER);
@@ -115,77 +114,18 @@ public class BlobOutputWriterFTest {
         assertEquals(TestUtils.getDataFromFile(filePath), outputStream.toString());
     }
 
-    //    @Test
-    //    public void whenfileNotUploaded_thenMissingFromBlobStorage() throws Exception {
-    //        testClient.createBlobContainer(CONTAINER);
-    //        Assertions.assertThrows(NoSuchElementException.class, () -> {
-    //            testClient.getBlobContainerClient(CONTAINER);
-    //            miStreamProvider.getContainerLastUpdated()
-    //            testClient.listBlobs(BLOB_PREFIX).iterator().next();
-    //        });
-    //    }
-    //
-    //    @Test
-    //    public void whenContainerMissing_thenContainerIsCreated() throws Exception {
-    //        String filePath = "dataA1.json";
-    //        String containerName = "somenewcontainer";
-    //
-    //        try (BlobOutputWriter writer = new BlobOutputWriter(containerName,
-    //                BLOB_PREFIX, Output.JSON_LINES, miStreamProvider)) {
-    //
-    //            OutputStream outputStream = writer.outputStream();
-    //            assertNotNull(outputStream);
-    //            InputStream inputStream = TestUtils.getStreamFromFile(filePath);
-    //            IOUtils.copy(inputStream, outputStream);
-    //            outputStream.flush();
-    //            outputStream.close();
-    //        }
-    //        BlobContainerClient container = testClient.getBlobContainerClient(containerName);
-    //        TestUtils.hasBlobThatStartsWith(container, BLOB_PREFIX);
-    //        BlobClient blob = TestUtils.downloadFirstBlobThatStartsWith(container, BLOB_PREFIX);
-    //        assertTrue(blob.exists());
-    //        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    //        blob.download(outputStream);
-    //        assertEquals(TestUtils.getDataFromFile(filePath), outputStream.toString());
-    //
-    //    }
-    //
-    //    @Test
-    //    public void whenAuthorisedClientAvailable_thenBlobStorageCanBeAccessed() throws Exception {
-    //        String filePath = "dataA1.json";
-    //        try (BlobOutputWriter writer = new BlobOutputWriter(CONTAINER, BLOB_PREFIX,
-    //            DataExtractorApplication.Output.JSON_LINES, miStreamProviderSpy)) {
-    //
-    //            BlobOutputWriter writerSpy = getSpyWriterWithMockClient(writer);
-    //
-    //            OutputStream outputStream = writerSpy.outputStream();
-    //            assertNotNull(outputStream);
-    //            InputStream inputStream = TestUtils.getStreamFromFile(filePath);
-    //            IOUtils.copy(inputStream, outputStream);
-    //        }
-    //        // retrieve uploaded blob
-    //        CloudBlobContainer container = cloudBlobClient.getContainerReference(CONTAINER);
-    //        TestUtils.hasBlobThatStartsWith(container, BLOB_PREFIX);
-    //    }
-    //
-    //    @Test
-    //    public void whenOutputStreamExists_thenSameInstanceIsReturned() throws Exception {
-    //        try (BlobOutputWriter writer = new BlobOutputWriter(CONTAINER, BLOB_PREFIX,
-    //            DataExtractorApplication.Output.JSON_LINES, miStreamProviderSpy)) {
-    //            BlobOutputWriter writerSpy = getSpyWriterWithMockClient(writer);
-    //
-    //            OutputStream outputStream = writerSpy.outputStream();
-    //            assertNotNull(outputStream);
-    //            OutputStream newOutputStream = writerSpy.outputStream();
-    //            assertSame(outputStream, newOutputStream);
-    //        }
-    //    }
+    @Test
+    public void whenOutputStreamExists_thenSameInstanceIsReturned() {
+        testClient.createBlobContainer(CONTAINER);
 
-    //    private BlobOutputWriter getSpyWriterWithMockClient(BlobOutputWriter writer) throws Exception {
-    //        BlobOutputWriter writerSpy = Mockito.spy(writer);
-    //        when(writerSpy.getOutputStreamProvider()).thenReturn(miStreamProvider);
-    //        return writerSpy;
-    //    }
+        try (BlobOutputWriter writer = new BlobOutputWriter(CONTAINER, BLOB_PREFIX,
+            Output.JSON_LINES, miStreamProvider)) {
 
+            OutputStream outputStream = writer.outputStream();
+            assertNotNull(outputStream);
+            OutputStream newOutputStream = writer.outputStream();
+            assertSame(outputStream, newOutputStream);
+        }
+    }
 
 }

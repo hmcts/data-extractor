@@ -8,6 +8,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static uk.gov.hmcts.reform.dataextractor.utils.TestConstants.DB_CONNECTION_QUERY;
 
 
 @Testcontainers
@@ -16,7 +17,7 @@ public class SelectFTest extends DbTest {
     @Test
     public void whenSelectQueryExecuted_thenResultsReturned() throws Exception {
         try (Connection conn = DriverManager.getConnection(jdbcUrl, username, password);
-            ResultSet resultSet = conn.createStatement().executeQuery("SELECT ID FROM parent WHERE ID = 1")) {
+            ResultSet resultSet = conn.createStatement().executeQuery(DB_CONNECTION_QUERY)) {
 
             resultSet.next();
             int result = resultSet.getInt(1);

@@ -15,7 +15,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -52,8 +51,11 @@ public final class TestUtils {
     }
 
     public static boolean hasBlobThatStartsWith(BlobContainerClient container, String filePrefix) {
-        return StreamSupport.stream(container.listBlobs().spliterator(), false)
-                .anyMatch(listBlobItem -> listBlobItem.getName().startsWith(filePrefix));
+        ListBlobsOptions options = new ListBlobsOptions();
+        options.setPrefix(filePrefix);
+        options.setDetails(new BlobListDetails().setRetrieveMetadata(true));
+        return container.listBlobs(options, null)
+            .iterator().hasNext();
     }
 
     public static BlobClient downloadFirstBlobThatStartsWith(BlobContainerClient container, String filePrefix) {
