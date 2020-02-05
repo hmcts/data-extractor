@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.dataextractor;
+package uk.gov.hmcts.reform.dataextractor.service;
 
 import java.io.OutputStream;
 import java.sql.ResultSet;

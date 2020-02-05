@@ -6,6 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import uk.gov.hmcts.reform.dataextractor.model.Output;
+import uk.gov.hmcts.reform.dataextractor.service.OutputStreamProvider;
+
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -21,7 +24,7 @@ public class BlobOutputWriterTest {
 
     private static final String CONTAINER_NAME = "testContainer";
     private static final String FILE_PREFIX_NAME = "filePrefix";
-    private static final DataExtractorApplication.Output OUTPUT_TYPE = DataExtractorApplication.Output.JSON;
+    private static final Output OUTPUT_TYPE = Output.JSON;
 
     private BlobOutputWriter classToTest;
 

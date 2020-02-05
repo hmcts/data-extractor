@@ -1,8 +1,11 @@
-package uk.gov.hmcts.reform.dataextractor;
+package uk.gov.hmcts.reform.dataextractor.service.impl;
 
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import uk.gov.hmcts.reform.dataextractor.exception.ExtractorException;
+import uk.gov.hmcts.reform.dataextractor.service.Extractor;
 
 import java.io.IOException;
 import java.io.OutputStream;

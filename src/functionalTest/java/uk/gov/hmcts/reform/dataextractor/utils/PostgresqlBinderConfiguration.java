@@ -18,7 +18,7 @@ public class PostgresqlBinderConfiguration extends DefaultBinderConfiguration {
     @Override
     public Binder getBinder(ParameterMetaData metadata, int param) throws SQLException {
 
-        if (metadata.getParameterType(param) == Types.OTHER) {
+        if (metadata != null && metadata.getParameterType(param) == Types.OTHER) {
             return new PostgresqlCustomTypeBinder();
         }
 

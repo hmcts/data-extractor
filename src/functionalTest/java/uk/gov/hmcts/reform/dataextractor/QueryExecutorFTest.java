@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import uk.gov.hmcts.reform.dataextractor.exception.ExecutorException;
+
 import java.sql.ResultSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

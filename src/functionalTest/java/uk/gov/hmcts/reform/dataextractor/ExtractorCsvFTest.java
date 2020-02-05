@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.dataextractor;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import uk.gov.hmcts.reform.dataextractor.service.impl.ExtractorCsv;
+
 import java.io.ByteArrayOutputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;

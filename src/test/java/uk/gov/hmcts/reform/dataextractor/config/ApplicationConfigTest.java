@@ -6,11 +6,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import uk.gov.hmcts.reform.dataextractor.BlobOutputWriter;
-import uk.gov.hmcts.reform.dataextractor.DataExtractorApplication;
 import uk.gov.hmcts.reform.dataextractor.Factory;
-import uk.gov.hmcts.reform.dataextractor.OutputStreamProvider;
 import uk.gov.hmcts.reform.dataextractor.QueryExecutor;
+import uk.gov.hmcts.reform.dataextractor.model.Output;
+import uk.gov.hmcts.reform.dataextractor.service.OutputStreamProvider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,7 +33,7 @@ public class ApplicationConfigTest {
         Factory<ExtractionData, BlobOutputWriter> blobOutput = classToTest.blobOutputFactory();
         String containerName = "TestContainerName";
         String prefix = "testPrefix";
-        DataExtractorApplication.Output outputType = DataExtractorApplication.Output.CSV;
+        Output outputType = Output.CSV;
         ExtractionData extractionData = ExtractionData
             .builder()
             .type(outputType)

@@ -11,9 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.dataextractor.DataExtractorApplication;
+
 import uk.gov.hmcts.reform.dataextractor.QueryExecutor;
 import uk.gov.hmcts.reform.dataextractor.config.DbConfig;
+import uk.gov.hmcts.reform.dataextractor.model.Output;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -48,15 +49,15 @@ public class DataExtractorTest {
 
     static Stream<Arguments> caseTypeInfoProvider() {
         return Stream.of(
-            arguments("grantofrepresentation", "GrantOfRepresentation", DataExtractorApplication.Output.JSON_LINES, "CCD-PROB-GOR"),
-            arguments("divorce", "divorce", DataExtractorApplication.Output.JSON_LINES, "CCD-DIV")
+            arguments("grantofrepresentation", "GrantOfRepresentation", Output.JSON_LINES, "CCD-PROB-GOR"),
+            arguments("divorce", "divorce", Output.JSON_LINES, "CCD-DIV")
         );
     }
 
     @ParameterizedTest(name = "#{index} - Testing caseType: {1}")
     @MethodSource("caseTypeInfoProvider")
     @Disabled // Do not verify DB content
-    public void checkByCaseType(String container, String caseType, DataExtractorApplication.Output type, String prefix) {
+    public void checkByCaseType(String container, String caseType, Output type, String prefix) {
         String sqlQuery = getQueryByCaseType(caseType);
         String fileName = getFileName(prefix, type);
         QueryExecutor queryExecutor = new QueryExecutor(dbConfig.getUrl(), dbConfig.getUser(), dbConfig.getPassword(), sqlQuery);
@@ -79,7 +80,7 @@ public class DataExtractorTest {
 
     @ParameterizedTest(name = "#{index} - Testing caseType: {1}")
     @MethodSource("caseTypeInfoProvider")
-    public void checkBlobAreCreated(String container, String caseType, DataExtractorApplication.Output type, String prefix) {
+    public void checkBlobAreCreated(String container, String caseType, Output type, String prefix) {
         String fileName = getFileName(prefix, type);
 
         BlobClient blobClient = blobReader.getBlobClient(container, fileName);
@@ -87,7 +88,7 @@ public class DataExtractorTest {
         assertTrue(blobClient.getProperties().getBlobSize() > 0, "Blob empty");
     }
 
-    public String getFileName(String prefix, DataExtractorApplication.Output extension) {
+    public String getFileName(String prefix, Output extension) {
         return String.format("%s-%s.%s", prefix, DATE_TIME_FORMATTER.format(LocalDateTime.now(ZoneId.from(UTC)).minusDays(1)),
             extension.getExtension());
     }

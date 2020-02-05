@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.dataextractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.hmcts.reform.dataextractor.exception.ExecutorException;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
