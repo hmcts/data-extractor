@@ -8,4 +8,3 @@ spring:
       aliases:
         aat-ccdro-user: etl.db.user
         aat-ccdro-password: etl.db.password
-        data-extractor-connection-string: etl.connection-string
