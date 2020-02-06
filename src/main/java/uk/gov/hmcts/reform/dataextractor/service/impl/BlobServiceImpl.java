@@ -34,7 +34,7 @@ public class BlobServiceImpl implements OutputStreamProvider {
     private final BlobServiceClientFactory blobServiceClientFactory;
 
     @Autowired
-    public BlobServiceImpl(@Value("${azure.managed-identity.client-id:}") String clientId,
+    public BlobServiceImpl(@Value("${etl.msi-client-id:}") String clientId,
                            @Value("${etl.connection-string:}") String connectionString,
                            @Value("${etl.account:}") String storageAccountName,
                            BlobServiceClientFactory blobServiceClientFactory) {
