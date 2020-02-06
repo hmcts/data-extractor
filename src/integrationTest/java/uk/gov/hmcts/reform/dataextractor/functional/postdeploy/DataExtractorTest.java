@@ -29,7 +29,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:application_e2e.properties")
-@SpringBootTest
+@SpringBootTest(classes = TestApplicationConfiguration.class)
 @Slf4j
 public class DataExtractorTest {
     static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");

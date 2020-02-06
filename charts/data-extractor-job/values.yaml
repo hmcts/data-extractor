@@ -19,6 +19,11 @@ mi-job:
   environment:
     ETL_DB_URL: jdbc:postgresql://ccd-data-store-api-postgres-db-{{ .Values.global.ccd_environment }}.postgres.database.azure.com:5432/ccd_data_store
     APPINSIGHTS_INSTRUMENTATIONKEY: c3043e63-3383-4add-a507-e0adf8588e4a
+    EXTRACTION_CASETYPES[0].CONTAINER: "testContainer"
+    EXTRACTION_CASETYPES[0].CASETYPE: "DIVORCE"
+    EXTRACTION_CASETYPES[0].TYPE: "jsonlines"
+    EXTRACTION_CASETYPES[0].PREFIX: "CCD-DIV"
+    
 global:
   enableKeyVaults: true
   environment: "sbox"
