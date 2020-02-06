@@ -312,6 +312,8 @@ dependencies {
   integrationTestAnnotationProcessor "org.projectlombok:lombok"
   integrationTestCompile sourceSets.main.runtimeClasspath
   integrationTestCompile sourceSets.test.runtimeClasspath
+  integrationTestCompile group: 'uk.gov.hmcts.reform.mi', name: 'mi-core-lib', version: versions.miCoreLib
+
 }
 
 pitest {
