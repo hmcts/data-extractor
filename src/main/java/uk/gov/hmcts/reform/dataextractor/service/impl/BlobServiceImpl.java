@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.dataextractor.service.impl;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.models.BlobHttpHeaders;
+import com.azure.storage.blob.models.ParallelTransferOptions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,16 +61,21 @@ public class BlobServiceImpl implements OutputStreamProvider {
         }
     }
 
-    public void setLastUpdated(String containerName) {
+    public void setLastUpdated(String containerName, LocalDate lastUpdateDate) {
         BlobContainerClient containerClient = getContainerClient(containerName);
-        containerClient.setMetadata(Map.of(UPDATE_DATE_METADATA, DATE_TIME_FORMATTER.format(LocalDate.now())));
+        containerClient.setMetadata(Map.of(UPDATE_DATE_METADATA, DATE_TIME_FORMATTER.format(lastUpdateDate)));
     }
 
     public OutputStream getOutputStream(String containerName, String fileName, Output outputType) {
         BlobContainerClient client = getContainerClient(containerName);
         BlobHttpHeaders headers = new BlobHttpHeaders().setContentType(outputType.getApplicationContent());
+        Integer blockSize = 204800;
+        int bufferNumbers = 10;
+
+        ParallelTransferOptions transferOptions = new ParallelTransferOptions(blockSize, bufferNumbers, new BlobProgressReceiver());
+
         return client.getBlobClient(fileName).getBlockBlobClient()
-            .getBlobOutputStream(null, headers, null, null, null);
+            .getBlobOutputStream(transferOptions, headers, null, null, null);
     }
 
     public OutputStream getOutputStream(ExtractionData extractionData) {

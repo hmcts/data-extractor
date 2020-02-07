@@ -6,4 +6,7 @@ public class ExtractorException extends RuntimeException {
         super(cause);
     }
 
+    public ExtractorException(String message) {
+        super(message);
+    }
 }

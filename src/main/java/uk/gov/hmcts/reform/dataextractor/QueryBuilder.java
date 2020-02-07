@@ -31,9 +31,18 @@ public class QueryBuilder {
 
     private LocalDate fromDate;
 
+    private LocalDate toDate;
+
+    public QueryBuilder(ExtractionData extractionData, LocalDate fromDate, LocalDate toDate ) {
+        this.extractionData = extractionData;
+        this.fromDate = fromDate;
+        this.toDate = toDate;
+    }
+
     public QueryBuilder(ExtractionData extractionData, LocalDate fromDate) {
         this.extractionData = extractionData;
         this.fromDate = fromDate;
+        this.toDate = LocalDate.now();
     }
 
     public String getQuery() {
@@ -41,17 +50,11 @@ public class QueryBuilder {
 
         String fromDateQuery = Optional.ofNullable(fromDate)
             .map(DATE_TIME_FORMATTER::format)
-            .map(date -> String.format("AND CE.created_date >= (to_date('%s', 'yyyyMMdd') + time '00:00')\n", date))
+            .map(date -> String.format("AND CE.created_date >= (to_date('%s', 'yyyyMMdd') + time '00:00') ", date))
             .orElse("");
-        query.append(String.format("AND CE.created_date <= (to_date('%s', 'yyyyMMdd') + time '00:00')\n", getDefaultEndDate()))
+        query.append(String.format("AND CE.created_date <= (to_date('%s', 'yyyyMMdd') + time '00:00') ", DATE_TIME_FORMATTER.format(toDate)))
             .append(fromDateQuery)
             .append(QUERY_ORDER);
         return query.toString();
     }
-
-    private String getDefaultEndDate() {
-        LocalDate localDate = LocalDate.now();
-        return DATE_TIME_FORMATTER.format(localDate);
-    }
-
 }

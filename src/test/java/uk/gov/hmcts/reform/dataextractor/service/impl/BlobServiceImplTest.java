@@ -97,7 +97,7 @@ public class BlobServiceImplTest {
         when(blobServiceClientFactory.getBlobClientWithManagedIdentity(CLIENT_ID, STORAGE_ACCOUNT)).thenReturn(
             blobServiceClientMock);
         when(blobServiceClientMock.getBlobContainerClient(TEST_CONTAINER_NAME)).thenReturn(blobContainerClientMock);
-        classToTest.setLastUpdated(TEST_CONTAINER_NAME);
+        classToTest.setLastUpdated(TEST_CONTAINER_NAME, LocalDate.now());
         verify(blobContainerClientMock, times(1)).setMetadata(Map.of(UPDATE_DATE_METADATA, dateMetadata));
     }
 
