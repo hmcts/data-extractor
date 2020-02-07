@@ -51,6 +51,8 @@ public class ExtractionComponent {
                     extractor.apply(resultSet, writer.outputStream());
                     blobService.setLastUpdated(extractionData.getContainer());
                 }
+
+                log.info("Completed processing data for caseType {} with prefix {}", extractionData.getContainer(), extractionData.getPrefix());
             } catch (Exception e) {
                 log.error("Error processing case {}", extractionData.getContainer(), e);
             }
