@@ -19,10 +19,10 @@ mi-job:
     ETL_DB_URL: jdbc:postgresql://ccd-data-store-api-postgres-db-{{ .Values.global.ccd_environment }}.postgres.database.azure.com:5432/ccd_data_store
     APPINSIGHTS_INSTRUMENTATIONKEY: c3043e63-3383-4add-a507-e0adf8588e4a
     ETL_ACCOUNT: midataextractor{{ .Values.global.environment }}
-    EXTRACTION_CASETYPES[0]_CONTAINER: "testContainer"
-    EXTRACTION_CASETYPES[0]_CASETYPE: "DIVORCE"
-    EXTRACTION_CASETYPES[0]_TYPE: "jsonlines"
-    EXTRACTION_CASETYPES[0]_PREFIX: "CCD-DIV"
+    EXTRACTION_CASETYPES_0__CONTAINER: "testContainer"
+    EXTRACTION_CASETYPES_0__CASETYPE: "DIVORCE"
+    EXTRACTION_CASETYPES_0__TYPE: "jsonlines"
+    EXTRACTION_CASETYPES_0__PREFIX: "CCD-DIV"
 
 global:
   enableKeyVaults: true
