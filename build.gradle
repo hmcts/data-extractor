@@ -213,7 +213,7 @@ def versions = [
         azureStorage    : '12.3.0',
         azureSpringBoot : '2.2.0',
 
-        springBoot      : '2.2.1.RELEASE',
+        springBoot      : '2.2.4.RELEASE',
         postgresql      : '42.2.5',
         pitest          : '1.4.10',
         gradlePitest    : '1.4.5',
@@ -318,7 +318,7 @@ dependencies {
 
 pitest {
   targetClasses = ['uk.gov.hmcts.reform.dataextractor.*']
-  excludedClasses = ['uk.gov.hmcts.reform.dataextractor.config.*']
+  excludedClasses = ['uk.gov.hmcts.reform.dataextractor.DataExtractorApplication']
   testSourceSets = [sourceSets.test, sourceSets.functionalTest]
   threads = 10
   outputFormats = ['XML', 'HTML']

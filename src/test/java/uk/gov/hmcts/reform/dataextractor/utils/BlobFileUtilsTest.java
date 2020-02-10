@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.dataextractor.model.Output;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class BlobFileUtilsTest {
 
@@ -25,6 +26,24 @@ class BlobFileUtilsTest {
                     .withMonth(10)
                     .withDayOfMonth(1)),
             "Expected Name");
-
     }
+
+    @Test
+    void testEmptyData() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            BlobFileUtils.getFileName(null, LocalDate.now());
+        });
+    }
+
+    @Test
+    void testEmptyDate() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            BlobFileUtils.getFileName(ExtractionData
+                .builder()
+                .prefix("Test")
+                .type(Output.JSON_LINES)
+                .build(), null);
+        });
+    }
+
 }

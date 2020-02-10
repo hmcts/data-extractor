@@ -7,14 +7,15 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.dataextractor.config.ExtractionData;
 import uk.gov.hmcts.reform.dataextractor.config.Extractions;
 import uk.gov.hmcts.reform.dataextractor.model.Output;
-import uk.gov.hmcts.reform.dataextractor.service.CaseDataService;
 import uk.gov.hmcts.reform.dataextractor.service.Extractor;
 import uk.gov.hmcts.reform.dataextractor.service.impl.BlobServiceImpl;
+import uk.gov.hmcts.reform.dataextractor.service.impl.CaseDataServiceImpl;
 import uk.gov.hmcts.reform.dataextractor.utils.BlobFileUtils;
 
 import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 @Component
 @Slf4j
@@ -39,7 +40,7 @@ public class ExtractionComponent {
     private BlobServiceImpl blobService;
 
     @Autowired
-    private CaseDataService caseDataService;
+    private CaseDataServiceImpl caseDataService;
 
     @SuppressWarnings("PMD.CloseResource")
     public void execute() {
@@ -50,10 +51,7 @@ public class ExtractionComponent {
             LocalDate toDate;
 
             do {
-                LocalDate lastUpdated = blobService.getContainerLastUpdated(extractionData.getContainer());
-                if (lastUpdated == null) {
-                    lastUpdated = caseDataService.getFirstEventDate(extractionData.getCaseType());
-                }
+                LocalDate lastUpdated = getLastUpdateDate(extractionData);
                 toDate = lastUpdated.plusMonths(1).isBefore(now) ? lastUpdated.plusMonths(1) : now;
 
                 QueryBuilder queryBuilder = QueryBuilder
@@ -83,5 +81,11 @@ public class ExtractionComponent {
             } while (toDate.isBefore(now));
         }
 
+    }
+
+    private LocalDate getLastUpdateDate(ExtractionData extractionData) {
+        return Optional
+            .ofNullable(blobService.getContainerLastUpdated(extractionData.getContainer()))
+            .orElseGet(() -> caseDataService.getFirstEventDate(extractionData.getCaseType()));
     }
 }

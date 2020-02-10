@@ -39,12 +39,6 @@ public class QueryBuilder {
         this.toDate = toDate;
     }
 
-    public QueryBuilder(ExtractionData extractionData, LocalDate fromDate) {
-        this.extractionData = extractionData;
-        this.fromDate = fromDate;
-        this.toDate = LocalDate.now();
-    }
-
     public String getQuery() {
         StringBuilder query = new StringBuilder(String.format(BASE_QUERY, extractionData.getCaseType()));
 

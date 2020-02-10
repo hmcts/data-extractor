@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.dataextractor.config.Extractions;
 import uk.gov.hmcts.reform.dataextractor.model.Output;
 import uk.gov.hmcts.reform.dataextractor.service.Extractor;
 import uk.gov.hmcts.reform.dataextractor.service.impl.BlobServiceImpl;
+import uk.gov.hmcts.reform.dataextractor.service.impl.CaseDataServiceImpl;
 import uk.gov.hmcts.reform.dataextractor.utils.BlobFileUtils;
 
 import java.security.NoSuchAlgorithmException;
@@ -62,6 +63,9 @@ public class ExtractionComponentTest {
     @Mock
     private ResultSet resultSet;
 
+    @Mock
+    private CaseDataServiceImpl caseDataService;
+
     @Test
     public void givenExtractorList_thenProcessAllCases() throws SQLException {
         ExtractionData testExtractorData = ExtractionData
@@ -89,6 +93,38 @@ public class ExtractionComponentTest {
         when(queryExecutor.execute()).thenReturn(resultSet);
         when(resultSet.isBeforeFirst()).thenReturn(true);
         when(blobService.getContainerLastUpdated(CONTAINER_NAME)).thenReturn(updatedDate);
+        classToTest.execute();
+
+        verify(writer, times(2)).outputStream(BlobFileUtils.getFileName(testExtractorData, updatedDate));
+    }
+
+    @Test
+    public void givenNewCaseType_whenExtractData_thenProcessAllCases() throws SQLException {
+        ExtractionData testExtractorData = ExtractionData
+            .builder()
+            .container(CONTAINER_NAME)
+            .prefix(PREFIX)
+            .type(Output.JSON_LINES)
+            .build();
+
+
+        List<ExtractionData> extractionData = Arrays.asList(testExtractorData, testExtractorData);
+        LocalDate updatedDate = LocalDate.now();
+        String query = QueryBuilder
+            .builder()
+            .fromDate(updatedDate)
+            .toDate(updatedDate)
+            .extractionData(testExtractorData)
+            .build()
+            .getQuery();
+        when(blobOutputFactory.provide(any(ExtractionData.class))).thenReturn(writer);
+        when(queryExecutorFactory.provide(query)).thenReturn(queryExecutor);
+        when(caseDataService.getFirstEventDate(testExtractorData.getCaseType())).thenReturn(updatedDate);
+        when(extractorFactory.provide(testExtractorData.getType())).thenReturn(extractor);
+        when(extractions.getCaseTypes()).thenReturn(extractionData);
+        when(queryExecutor.execute()).thenReturn(resultSet);
+        when(resultSet.isBeforeFirst()).thenReturn(true);
+        when(blobService.getContainerLastUpdated(CONTAINER_NAME)).thenReturn(null);
         classToTest.execute();
 
         verify(writer, times(2)).outputStream(BlobFileUtils.getFileName(testExtractorData, updatedDate));
