@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.dataextractor.QueryBuilder;
 import uk.gov.hmcts.reform.dataextractor.model.Output;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -14,7 +13,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ExtractionDataTest {
-    static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
+    static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     @Test
     public void testQueryHasRightFilter() {
@@ -24,12 +23,13 @@ public class ExtractionDataTest {
             .builder()
             .caseType(caseType)
             .build();
-        String expectedToDate = ExtractionData.DATE_TIME_FORMATTER.format(LocalDate.now());
-        String expectedFromDate = ExtractionData.DATE_TIME_FORMATTER.format(fromDate);
+        String expectedToDate = DATE_FORMATTER.format(LocalDate.now());
+        String expectedFromDate = DATE_FORMATTER.format(fromDate);
 
         String extractionQuery = QueryBuilder
             .builder()
             .fromDate(fromDate)
+            .toDate(LocalDate.now())
             .extractionData(extractionData)
             .build()
             .getQuery();
@@ -44,26 +44,9 @@ public class ExtractionDataTest {
     }
 
     @Test
-    public void testDateIsOverriddenGetValidFileName() {
-        String caseType = "Test";
-        String expectedDate = "20100102";
-        String expectedFileName = "Test-20100102.jsonl";
-        ExtractionData extractionData = ExtractionData
-            .builder()
-            .prefix("Test")
-            .caseType(caseType)
-            .date(expectedDate)
-            .type(Output.JSON_LINES)
-            .build();
-        String fileName = extractionData.getFileName();
-        assertThat(expectedFileName, is(fileName));
-    }
-
-    @Test
     public void testWithDefaultDateGetValidFileName() {
         String caseType = "Test";
-        String expectedDate = DATE_TIME_FORMATTER.format(LocalDateTime.now().minusDays(1));
-        String expectedFileName = String.format("Test-%s.jsonl", expectedDate);
+        String expectedFileName = "Test.jsonl";
         ExtractionData extractionData = ExtractionData
             .builder()
             .prefix("Test")

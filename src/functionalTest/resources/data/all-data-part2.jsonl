@@ -1,0 +1,1 @@
+\{"extraction_date":"(\d+)-(\d+)","case_metadata_event_id":3,"ce_case_data_id":2,"ce_created_date":1578872746000,"ce_case_type_id":"test","ce_case_type_version":"v1","ce_state_id":"created","ce_data":\{"b1Data": \{"name": "B2", "subject": \{"name": \{"lastName": "B1S", "firstName": "Harry"\}, "address": "b1Address"\}\}\}\}

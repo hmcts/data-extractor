@@ -46,7 +46,7 @@ public class BlobOutputWriter implements AutoCloseable {
             return outputStream;
         }
         outputStream = new BufferedOutputStream(getOutputStreamProvider().getOutputStream(containerName,
-            namePrefix + fileName, outputType), OUTPUT_BUFFER_SIZE);
+            namePrefix, outputType), OUTPUT_BUFFER_SIZE);
         return outputStream;
     }
 

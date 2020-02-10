@@ -4,8 +4,8 @@
 import uk.gov.hmcts.contino.GradleBuilder
 
 def type = "java"
-def product = "data-extractor"
-def component = "job"
+def product = "mi"
+def component = "data-extractor"
 
 def secrets = [
   'data-extractor-${env}': [
@@ -28,7 +28,6 @@ GradleBuilder builder = new GradleBuilder(this, product)
 
 withPipeline(type, product, component) {
   env.TESTCONTAINERS_RYUK_DISABLED = 'true'
-  enableDockerBuild()
   loadVaultSecrets(secrets)
   disableLegacyDeployment()
   nonServiceApp()

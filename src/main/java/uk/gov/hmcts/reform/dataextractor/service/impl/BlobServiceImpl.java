@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import uk.gov.hmcts.reform.dataextractor.config.ExtractionData;
 import uk.gov.hmcts.reform.dataextractor.model.Output;
 import uk.gov.hmcts.reform.dataextractor.service.OutputStreamProvider;
 import uk.gov.hmcts.reform.mi.micore.factory.BlobServiceClientFactory;
@@ -74,15 +73,9 @@ public class BlobServiceImpl implements OutputStreamProvider {
 
         ParallelTransferOptions transferOptions = new ParallelTransferOptions(blockSize, bufferNumbers, new BlobProgressReceiver());
 
+        log.debug("Returning blobstream  with name {}", fileName);
         return client.getBlobClient(fileName).getBlockBlobClient()
             .getBlobOutputStream(transferOptions, headers, null, null, null);
-    }
-
-    public OutputStream getOutputStream(ExtractionData extractionData) {
-        BlobContainerClient client = getContainerClient(extractionData.getContainer());
-        BlobHttpHeaders headers = new BlobHttpHeaders().setContentType(extractionData.getType().getApplicationContent());
-        return client.getBlobClient(extractionData.getFileName()).getBlockBlobClient()
-            .getBlobOutputStream(null, headers, null, null, null);
     }
 
     BlobContainerClient getContainerClient(String containerName) {

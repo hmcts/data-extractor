@@ -5,6 +5,7 @@ import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.models.BlobContainerProperties;
 import com.azure.storage.blob.models.BlobHttpHeaders;
+import com.azure.storage.blob.models.ParallelTransferOptions;
 import com.azure.storage.blob.specialized.BlobOutputStream;
 import com.azure.storage.blob.specialized.BlockBlobClient;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +23,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -137,7 +139,7 @@ public class BlobServiceImplTest {
         BlobHttpHeaders blobHeaders = new BlobHttpHeaders()
             .setContentType(Output.JSON_LINES.getApplicationContent());
 
-        when(blockBlobClientMock.getBlobOutputStream(isNull(), Matchers.argsThat(blobHeaders),
+        when(blockBlobClientMock.getBlobOutputStream(any(ParallelTransferOptions.class), Matchers.argsThat(blobHeaders),
             isNull(), isNull(), isNull())).thenReturn(outputStream);
 
         assertEquals(classToTest.getOutputStream(TEST_CONTAINER_NAME, fileName, Output.JSON_LINES), outputStream, "Validate outputStream");

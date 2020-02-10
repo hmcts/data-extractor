@@ -22,20 +22,21 @@ public class CaseDataService {
         + "where case_type_id = '%s' order by CE.created_date asc limit 1;";
 
 
+    @SuppressWarnings("PMD.CloseResource") //Resource closed with QueryExecutor
     public LocalDate getFirstEventDate(String caseType) {
-            String query = String.format(FIRST_CREATED_QUERY, caseType);
-            try (QueryExecutor executor = queryExecutorFactory.provide(query)) {
-                ResultSet resultSet = executor.execute();
-                if (resultSet.next()) {
-                    Date date =  resultSet.getDate(1);
-                    return date.toLocalDate();
-                } else {
-                    throw new ExtractorException("Empty");
-                }
-
-            } catch (SQLException e) {
-                throw new ExtractorException(e);
+        String query = String.format(FIRST_CREATED_QUERY, caseType);
+        try (QueryExecutor executor = queryExecutorFactory.provide(query)) {
+            ResultSet resultSet = executor.execute();
+            if (resultSet.next()) {
+                Date date = resultSet.getDate(1);
+                return date.toLocalDate();
+            } else {
+                throw new ExtractorException("Case type without data");
             }
+
+        } catch (SQLException e) {
+            throw new ExtractorException(e);
+        }
     }
 
 }

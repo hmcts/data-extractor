@@ -116,10 +116,21 @@ public class ExtractionComponentFTest extends DbTest {
         assertTrue(blob.exists(), "Blob exist");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         blob.download(outputStream);
-
-        assertTrue(Pattern.compile(TestUtils.getDataFromFile("alldata.jsonl"))
+        assertTrue(Pattern.compile(TestUtils.getDataFromFile("data/all-data-part1.jsonl"))
             .matcher(outputStream.toString())
             .matches(),"Expected output");
+
+        blob.delete();
+        blob = TestUtils.downloadFirstBlobThatStartsWith(containerClient, BLOB_NAME_PREFIX);
+        assertTrue(blob.exists(), "Blob exist");
+
+
+        outputStream = new ByteArrayOutputStream();
+        blob.download(outputStream);
+        assertTrue(Pattern.compile(TestUtils.getDataFromFile("data/all-data-part2.jsonl"))
+            .matcher(outputStream.toString())
+            .matches(),"Expected output");
+
     }
 
 }

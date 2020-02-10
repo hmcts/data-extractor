@@ -10,13 +10,18 @@ import uk.gov.hmcts.reform.dataextractor.model.Output;
 import uk.gov.hmcts.reform.dataextractor.service.CaseDataService;
 import uk.gov.hmcts.reform.dataextractor.service.Extractor;
 import uk.gov.hmcts.reform.dataextractor.service.impl.BlobServiceImpl;
+import uk.gov.hmcts.reform.dataextractor.utils.BlobFileUtils;
 
 import java.sql.ResultSet;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Component
 @Slf4j
 public class ExtractionComponent {
+
+    static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("mmss");
+
 
     @Autowired
     private Factory<ExtractionData, BlobOutputWriter> blobOutputFactory;
@@ -38,40 +43,44 @@ public class ExtractionComponent {
 
     @SuppressWarnings("PMD.CloseResource")
     public void execute() {
+        LocalDate now = LocalDate.now();
+
         for (ExtractionData extractionData : extractions.getCaseTypes()) {
             log.info("Processing data for caseType {} with prefix {}", extractionData.getContainer(), extractionData.getPrefix());
-            LocalDate lastUpdated = blobService.getContainerLastUpdated(extractionData.getContainer());
-            int counter = 10; //TODO Fix the name
+            LocalDate toDate;
 
-            if (lastUpdated == null) {
-                lastUpdated = caseDataService.getFirstEventDate(extractionData.getCaseType());
-            }
-
-            //Batch extraction per months so the first to shard first extraction
-            LocalDate toDate = lastUpdated.plusMonths(1).isBefore(LocalDate.now()) ? lastUpdated.plusMonths(1) : LocalDate.now();
-
-            QueryBuilder queryBuilder = QueryBuilder
-                .builder()
-                .fromDate(lastUpdated)
-                .toDate(toDate)
-                .extractionData(extractionData)
-                .build();
-
-            try (QueryExecutor executor = queryExecutorFactory.provide(queryBuilder.getQuery())) {
-                BlobOutputWriter writer = blobOutputFactory.provide(extractionData);
-                Extractor extractor = extractorFactory.provide(extractionData.getType());
-                ResultSet resultSet = executor.execute();
-                if (resultSet.isBeforeFirst()) {
-                    extractor.apply(resultSet, writer.outputStream(String.valueOf(counter)));
-                    blobService.setLastUpdated(extractionData.getContainer(), queryBuilder.getToDate());
-                    counter++;
+            do {
+                LocalDate lastUpdated = blobService.getContainerLastUpdated(extractionData.getContainer());
+                if (lastUpdated == null) {
+                    lastUpdated = caseDataService.getFirstEventDate(extractionData.getCaseType());
                 }
+                toDate = lastUpdated.plusMonths(1).isBefore(now) ? lastUpdated.plusMonths(1) : now;
 
-                log.info("Completed processing data for caseType {} with prefix {} with end date {}",
-                    extractionData.getContainer(), extractionData.getPrefix(), queryBuilder.getToDate());
-            } catch (Exception e) {
-                log.error("Error processing case {}", extractionData.getContainer(), e);
-            }
+                QueryBuilder queryBuilder = QueryBuilder
+                    .builder()
+                    .fromDate(lastUpdated)
+                    .toDate(toDate)
+                    .extractionData(extractionData)
+                    .build();
+
+                try (QueryExecutor executor = queryExecutorFactory.provide(queryBuilder.getQuery())) {
+                    BlobOutputWriter writer = blobOutputFactory.provide(extractionData);
+                    Extractor extractor = extractorFactory.provide(extractionData.getType());
+                    ResultSet resultSet = executor.execute();
+                    if (resultSet.isBeforeFirst()) {
+                        extractor.apply(resultSet, writer.outputStream(BlobFileUtils.getFileName(extractionData, toDate)));
+                    } else {
+                        toDate = now;
+                    }
+                    blobService.setLastUpdated(extractionData.getContainer(), toDate);
+
+                    log.info("Completed processing data for caseType {} with prefix {} with end date {}",
+                        extractionData.getContainer(), extractionData.getPrefix(), queryBuilder.getToDate());
+                } catch (Exception e) {
+                    log.error("Error processing case {}", extractionData.getContainer(), e);
+                    break;
+                }
+            } while (toDate.isBefore(now));
         }
 
     }

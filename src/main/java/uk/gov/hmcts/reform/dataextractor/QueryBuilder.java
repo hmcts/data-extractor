@@ -33,7 +33,7 @@ public class QueryBuilder {
 
     private LocalDate toDate;
 
-    public QueryBuilder(ExtractionData extractionData, LocalDate fromDate, LocalDate toDate ) {
+    public QueryBuilder(ExtractionData extractionData, LocalDate fromDate, LocalDate toDate) {
         this.extractionData = extractionData;
         this.fromDate = fromDate;
         this.toDate = toDate;

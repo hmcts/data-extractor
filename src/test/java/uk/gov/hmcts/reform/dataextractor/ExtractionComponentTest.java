@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.dataextractor.config.Extractions;
 import uk.gov.hmcts.reform.dataextractor.model.Output;
 import uk.gov.hmcts.reform.dataextractor.service.Extractor;
 import uk.gov.hmcts.reform.dataextractor.service.impl.BlobServiceImpl;
+import uk.gov.hmcts.reform.dataextractor.utils.BlobFileUtils;
 
 import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
@@ -76,6 +77,7 @@ public class ExtractionComponentTest {
         String query = QueryBuilder
             .builder()
             .fromDate(updatedDate)
+            .toDate(updatedDate)
             .extractionData(testExtractorData)
             .build()
             .getQuery();
@@ -89,7 +91,7 @@ public class ExtractionComponentTest {
         when(blobService.getContainerLastUpdated(CONTAINER_NAME)).thenReturn(updatedDate);
         classToTest.execute();
 
-        verify(writer, times(2)).outputStream();
+        verify(writer, times(2)).outputStream(BlobFileUtils.getFileName(testExtractorData, updatedDate));
     }
 
     @Test
@@ -102,6 +104,7 @@ public class ExtractionComponentTest {
         final String query = QueryBuilder
             .builder()
             .fromDate(updatedDate)
+            .toDate(updatedDate)
             .extractionData(testExtractorData)
             .build()
             .getQuery();
