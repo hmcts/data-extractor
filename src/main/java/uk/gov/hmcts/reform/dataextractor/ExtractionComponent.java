@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.dataextractor.config.ExtractionData;
 import uk.gov.hmcts.reform.dataextractor.config.Extractions;
 import uk.gov.hmcts.reform.dataextractor.model.Output;
+import uk.gov.hmcts.reform.dataextractor.service.CaseDataService;
 import uk.gov.hmcts.reform.dataextractor.service.Extractor;
 import uk.gov.hmcts.reform.dataextractor.service.impl.BlobServiceImpl;
-import uk.gov.hmcts.reform.dataextractor.service.impl.CaseDataServiceImpl;
 import uk.gov.hmcts.reform.dataextractor.utils.BlobFileUtils;
 
 import java.sql.ResultSet;
@@ -40,7 +40,7 @@ public class ExtractionComponent {
     private BlobServiceImpl blobService;
 
     @Autowired
-    private CaseDataServiceImpl caseDataService;
+    private CaseDataService caseDataService;
 
     @SuppressWarnings("PMD.CloseResource")
     public void execute() {

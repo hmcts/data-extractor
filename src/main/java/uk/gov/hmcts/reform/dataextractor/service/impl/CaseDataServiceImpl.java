@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.dataextractor.service;
+package uk.gov.hmcts.reform.dataextractor.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.dataextractor.Factory;
 import uk.gov.hmcts.reform.dataextractor.QueryExecutor;
 import uk.gov.hmcts.reform.dataextractor.exception.ExtractorException;
+import uk.gov.hmcts.reform.dataextractor.service.CaseDataService;
 
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -15,7 +16,7 @@ import java.time.LocalDate;
 
 @Component
 @RequiredArgsConstructor
-public class CaseDataService {
+public class CaseDataServiceImpl implements CaseDataService {
 
     @Autowired
     private final Factory<String, QueryExecutor> queryExecutorFactory;
