@@ -20,7 +20,7 @@ public class BlobReader {
         this.connectStr = connectStr;
     }
 
-    protected BlobServiceClient getBlobServiceClient() {
+    public BlobServiceClient getBlobServiceClient() {
         try {
             return new BlobServiceClientBuilder().connectionString(connectStr).buildClient();
         } catch (IllegalArgumentException e) {
