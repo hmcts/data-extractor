@@ -14,15 +14,11 @@ import uk.gov.hmcts.reform.dataextractor.utils.BlobFileUtils;
 
 import java.sql.ResultSet;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @Component
 @Slf4j
-public class ExtractionComponent {
-
-    static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("mmss");
-
+public class ExtractionComponent {ExtractionData
 
     @Autowired
     private Factory<ExtractionData, BlobOutputWriter> blobOutputFactory;

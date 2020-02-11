@@ -6,14 +6,10 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 
 import uk.gov.hmcts.reform.dataextractor.model.Output;
 
-import java.time.format.DateTimeFormatter;
-
 @ConstructorBinding
 @Getter
 @Builder
 public class ExtractionData {
-
-    static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     private String container;
     private Output type;
@@ -30,5 +26,5 @@ public class ExtractionData {
     public String getFileName() {
         return String.format("%s.%s", prefix,  type.getExtension());
     }
-    
+
 }

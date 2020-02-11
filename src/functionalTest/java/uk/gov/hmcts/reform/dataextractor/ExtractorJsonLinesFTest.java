@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.dataextractor;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -44,7 +43,7 @@ public class ExtractorJsonLinesFTest extends DbTest {
             ExtractorJson extractor = new ExtractorJsonLines();
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             extractor.apply(resultSet, out);
-            Assertions.assertEquals(TestUtils.getDataFromFile("joinSelectQueryExpectedResult.json"), out.toString());
+            assertEquals(TestUtils.getDataFromFile("joinSelectQueryExpectedResult.json"), out.toString());
         }
 
     }

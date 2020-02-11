@@ -29,6 +29,8 @@ import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.dataextractor.service.ContainerConstants.UPDATE_DATE_METADATA;
+import static uk.gov.hmcts.reform.dataextractor.utils.TestConstants.AZURE_TEST_CONTAINER_IMAGE;
+import static uk.gov.hmcts.reform.dataextractor.utils.TestConstants.DEFAULT_COMMAND;
 
 @Testcontainers
 @ExtendWith(SpringExtension.class)
@@ -37,8 +39,6 @@ import static uk.gov.hmcts.reform.dataextractor.service.ContainerConstants.UPDAT
 public class ExtractionComponentFTest extends DbTest {
 
     private static final String TEST_CONTAINER_NAME = "test-container";
-    private static final String AZURE_TEST_CONTAINER_IMAGE = "mcr.microsoft.com/azure-storage/azurite:3.4.0";
-    private static final String DEFAULT_COMMAND = "azurite -l /data --blobHost 0.0.0.0 --loose";
     private static final String BLOB_NAME_PREFIX = "JLines";
     @Container
     public static final GenericContainer blobStorageContainer =
