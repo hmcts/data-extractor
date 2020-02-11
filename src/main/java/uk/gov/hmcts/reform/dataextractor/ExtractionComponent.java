@@ -18,7 +18,7 @@ import java.util.Optional;
 
 @Component
 @Slf4j
-public class ExtractionComponent {ExtractionData
+public class ExtractionComponent {
 
     @Autowired
     private Factory<ExtractionData, BlobOutputWriter> blobOutputFactory;
