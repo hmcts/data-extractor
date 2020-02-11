@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.dataextractor;
+package uk.gov.hmcts.reform.dataextractor.exception;
 
 public class ExtractorException extends RuntimeException {
 
@@ -6,4 +6,7 @@ public class ExtractorException extends RuntimeException {
         super(cause);
     }
 
+    public ExtractorException(String message) {
+        super(message);
+    }
 }

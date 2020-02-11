@@ -2,6 +2,7 @@ mi-job:
   image: ${IMAGE_NAME}
   environment:
     APPINSIGHTS_INSTRUMENTATIONKEY: 350a1a4c-d746-4c63-814c-4fee92e6e07c
+    ETL_MSICLIENTID: 905cc792-3ecc-4c1e-ae18-40ed86ca6a8d
 global:
   subscriptionId: "3eec5bde-7feb-4566-bfb6-805df6e10b90"
   environment: test

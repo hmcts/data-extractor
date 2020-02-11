@@ -24,8 +24,8 @@ pr:
 variables:
 #  group: pipeline-env-variables
   ${{ if eq( variables['Build.Reason'], 'PullRequest') }}: 
-    environment: 'sbox'
-    env.upper: 'SBOX'
+    environment: 'test'
+    env.upper: 'TEST'
   ${{ if ne( variables['Build.Reason'], 'PullRequest') }}: 
     environment: 'test' #Uset test and promoting to stg until prod is ready
     env.upper: 'TEST'
@@ -62,6 +62,7 @@ stages:
       promEnv: $(env.prom)
       mutationTest: False
       functionalTest: true
+      preIntegrationTest: true
       azureSecreKeys: 'aat-ccdro-user,aat-ccdro-password,data-extractor-connection-string'
       azureKeyMapping: 
       - key: ETL_DB_USER

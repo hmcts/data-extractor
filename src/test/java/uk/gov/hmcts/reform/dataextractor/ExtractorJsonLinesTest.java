@@ -6,6 +6,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import uk.gov.hmcts.reform.dataextractor.exception.ExtractorException;
+import uk.gov.hmcts.reform.dataextractor.service.impl.ExtractorJsonLines;
+
 import java.io.OutputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;

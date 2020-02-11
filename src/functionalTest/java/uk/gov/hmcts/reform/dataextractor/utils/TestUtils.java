@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.dataextractor.utils;
 
-import com.microsoft.azure.storage.StorageException;
-import com.microsoft.azure.storage.blob.CloudBlobContainer;
-import com.microsoft.azure.storage.blob.CloudBlockBlob;
-import com.microsoft.azure.storage.blob.ListBlobItem;
+import com.azure.storage.blob.BlobClient;
+import com.azure.storage.blob.BlobContainerClient;
+import com.azure.storage.blob.models.BlobItem;
+import com.azure.storage.blob.models.BlobListDetails;
+import com.azure.storage.blob.models.ListBlobsOptions;
 import org.testcontainers.shaded.org.apache.commons.io.FileUtils;
+
 import uk.gov.hmcts.reform.dataextractor.DbTest;
 
 import java.io.File;
@@ -12,9 +14,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.stream.StreamSupport;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 
 public final class TestUtils {
@@ -48,19 +50,24 @@ public final class TestUtils {
         return new File(classLoader.getResource(filePath).getFile());
     }
 
-    public static boolean hasBlobThatStartsWith(CloudBlobContainer container, String filePrefix) {
-        return StreamSupport.stream(container.listBlobs().spliterator(), false)
-                .anyMatch(listBlobItem -> listBlobItem.getUri().getPath().startsWith(filePrefix));
+    public static boolean hasBlobThatStartsWith(BlobContainerClient container, String filePrefix) {
+        ListBlobsOptions options = new ListBlobsOptions();
+        options.setPrefix(filePrefix);
+        options.setDetails(new BlobListDetails().setRetrieveMetadata(true));
+        return container.listBlobs(options, null)
+            .iterator().hasNext();
     }
 
-    public static CloudBlockBlob downloadFirstBlobThatStartsWith(CloudBlobContainer container, String filePrefix) {
-        ListBlobItem firstBlob = container.listBlobs(filePrefix).iterator().next();
-        assertNotNull(firstBlob.getStorageUri());
-        try {
-            return new CloudBlockBlob(firstBlob.getStorageUri());
-        } catch (StorageException e) {
-            throw new RuntimeException(e);
-        }
+    public static BlobClient downloadFirstBlobThatStartsWith(BlobContainerClient container, String filePrefix) {
+        ListBlobsOptions options = new ListBlobsOptions();
+        options.setPrefix(filePrefix);
+
+        options.setDetails(new BlobListDetails().setRetrieveMetadata(true));
+        Optional<BlobItem> blobItem = container.listBlobs(options, null)
+                .stream()
+                .findFirst();
+        assertFalse(blobItem.isEmpty(), "BlobItem expected with prefix " + filePrefix);
+        return container.getBlobClient(blobItem.get().getName());
     }
 
     private TestUtils() {

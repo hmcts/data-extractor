@@ -5,7 +5,8 @@ import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.dataextractor.WriterException;
+
+import uk.gov.hmcts.reform.dataextractor.exception.WriterException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -19,7 +20,7 @@ public class BlobReader {
         this.connectStr = connectStr;
     }
 
-    protected BlobServiceClient getBlobServiceClient() {
+    public BlobServiceClient getBlobServiceClient() {
         try {
             return new BlobServiceClientBuilder().connectionString(connectStr).buildClient();
         } catch (IllegalArgumentException e) {

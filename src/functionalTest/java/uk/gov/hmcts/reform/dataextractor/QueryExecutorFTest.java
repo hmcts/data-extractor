@@ -4,9 +4,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import uk.gov.hmcts.reform.dataextractor.exception.ExecutorException;
+
 import java.sql.ResultSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static uk.gov.hmcts.reform.dataextractor.utils.TestConstants.DB_CONNECTION_QUERY;
 
 
 @Testcontainers
@@ -14,7 +17,7 @@ public class QueryExecutorFTest extends DbTest {
 
     @Test
     public void whenSimpleSelectQueryExecuted_thenResultSetReturned() throws Exception {
-        String sql = "SELECT ID, NAME FROM parent WHERE ID = 1";
+        String sql = DB_CONNECTION_QUERY;
         try (QueryExecutor executor = new QueryExecutor(jdbcUrl, username, password, sql);
              ResultSet resultSet = executor.execute()) {
             boolean next = resultSet.next();
