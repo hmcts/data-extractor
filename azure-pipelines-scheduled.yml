@@ -53,6 +53,7 @@ stages:
       chartEnv: $(environment)
       mutationTest: True
       functionalTest: true
+      preIntegrationTest: true
       azureSecreKeys: 'aat-ccdro-user,aat-ccdro-password,data-extractor-connection-string'
       azureKeyMapping:
       - key: ETL_DB_USER
