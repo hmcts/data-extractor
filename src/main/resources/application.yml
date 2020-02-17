@@ -16,7 +16,7 @@ etl:
 
 extraction:
   caseTypes:
-    - container: "mi-extraction-service-job-1581698400-xddlv"
+    - container: "grantofrepresentation"
       caseType: "GrantOfRepresentation"
       type: "jsonlines"
       prefix: "CCD-PROB-GOR"
