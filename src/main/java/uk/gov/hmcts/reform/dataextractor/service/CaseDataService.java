@@ -6,4 +6,5 @@ public interface CaseDataService {
 
     LocalDate getFirstEventDate(String caseType);
 
+    void checkConnection();
 }
