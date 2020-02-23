@@ -24,7 +24,7 @@ public class HealthService implements HealthCheck {
     @Override
     public void check() throws ServiceNotAvailableException {
         try {
-            blobService.listBlobs();
+            blobService.listContainers().iterator().hasNext();
             caseDataService.checkConnection();
             log.info("Health check completed");
         } catch (Exception e) {

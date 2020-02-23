@@ -80,7 +80,7 @@ public class BlobServiceImpl implements OutputStreamProvider {
             .getBlobOutputStream(transferOptions, headers, null, null, null);
     }
 
-    public PagedIterable<BlobContainerItem> listBlobs() {
+    public PagedIterable<BlobContainerItem> listContainers() {
         return getConnection().listBlobContainers();
     }
 
