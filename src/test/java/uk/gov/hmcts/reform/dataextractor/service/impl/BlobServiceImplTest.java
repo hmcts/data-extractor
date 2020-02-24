@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.dataextractor.service.impl;
 
+import com.azure.core.http.rest.PagedIterable;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
+import com.azure.storage.blob.models.BlobContainerItem;
 import com.azure.storage.blob.models.BlobContainerProperties;
 import com.azure.storage.blob.models.BlobHttpHeaders;
 import com.azure.storage.blob.models.ParallelTransferOptions;
@@ -16,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import uk.gov.hmcts.reform.dataextractor.model.Output;
 import uk.gov.hmcts.reform.dataextractor.test.utils.Matchers;
+import uk.gov.hmcts.reform.dataextractor.test.utils.PagedIterableStub;
 import uk.gov.hmcts.reform.mi.micore.factory.BlobServiceClientFactory;
 
 import java.time.LocalDate;
@@ -143,6 +146,16 @@ public class BlobServiceImplTest {
             isNull(), isNull(), isNull())).thenReturn(outputStream);
 
         assertEquals(classToTest.getOutputStream(TEST_CONTAINER_NAME, fileName, Output.JSON_LINES), outputStream, "Validate outputStream");
+    }
+
+    @Test
+    public void testListContainers() {
+        classToTest = new BlobServiceImpl(StringUtils.EMPTY, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory);
+        when(blobServiceClientFactory.getBlobClientWithConnectionString(CONNECTION_STRING)).thenReturn(
+            blobServiceClientMock);
+        PagedIterable<BlobContainerItem> expected = new PagedIterableStub<>();
+        when(blobServiceClientMock.listBlobContainers()).thenReturn(expected);
+        assertEquals(classToTest.listContainers(), expected, "Expected container list");
     }
 
     private BlobContainerProperties createEmptyBlobContainerProperties() {

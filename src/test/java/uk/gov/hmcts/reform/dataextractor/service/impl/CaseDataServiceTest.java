@@ -47,4 +47,27 @@ public class CaseDataServiceTest {
         verify(queryExecutor, times(1)).close();
     }
 
+    @Test
+    public void testCheckConnection() throws SQLException {
+        when(queryExecutorFactory.provide(anyString())).thenReturn(queryExecutor);
+        when(queryExecutor.execute()).thenReturn(resultSet);
+        classToTest.checkConnection();
+
+        verify(queryExecutor, times(1)).close();
+        verify(resultSet, times(1)).next();
+    }
+
+    @Test
+    public void givenSqlException_whenCheckConnection_thenRaiseExtractionException() throws SQLException {
+        when(queryExecutorFactory.provide(anyString())).thenReturn(queryExecutor);
+        when(queryExecutor.execute()).thenReturn(resultSet);
+
+        when(resultSet.next()).thenThrow(new SQLException());
+
+        assertThrows(ExtractorException.class, () -> classToTest.checkConnection(),
+            "Expected ExtractorException");
+
+        verify(queryExecutor, times(1)).close();
+    }
+
 }
