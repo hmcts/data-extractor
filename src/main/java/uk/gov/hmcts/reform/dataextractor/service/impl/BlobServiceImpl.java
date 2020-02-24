@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.dataextractor.service.impl;
 
+import com.azure.core.http.rest.PagedIterable;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
+import com.azure.storage.blob.models.BlobContainerItem;
 import com.azure.storage.blob.models.BlobHttpHeaders;
 import com.azure.storage.blob.models.ParallelTransferOptions;
 import lombok.extern.slf4j.Slf4j;
@@ -76,6 +78,10 @@ public class BlobServiceImpl implements OutputStreamProvider {
         log.debug("Returning blobstream  with name {}", fileName);
         return client.getBlobClient(fileName).getBlockBlobClient()
             .getBlobOutputStream(transferOptions, headers, null, null, null);
+    }
+
+    public PagedIterable<BlobContainerItem> listContainers() {
+        return getConnection().listBlobContainers();
     }
 
     BlobContainerClient getContainerClient(String containerName) {

@@ -42,4 +42,13 @@ public class CaseDataServiceImpl implements CaseDataService {
         }
     }
 
+    @Override
+    public void checkConnection() {
+        try (QueryExecutor executor = queryExecutorFactory.provide("Select 1")) {
+            executor.execute().next();
+        } catch (SQLException e) {
+            throw new ExtractorException(e);
+        }
+    }
+
 }
