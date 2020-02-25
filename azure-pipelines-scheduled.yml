@@ -19,10 +19,10 @@ pr: none
 variables:
 #  group: pipeline-env-variables
 
-  environment: 'test' #Uset test and promoting to stg until prod is ready
-  env.upper: 'TEST'
-  env.prom: 'stg'
-  env.prom.upper: 'STG'
+  environment: 'stg' #Uset test and promoting to stg until prod is ready
+  env.upper: 'STG'
+  env.prom: 'prod'
+  env.prom.upper: 'PROD'
   application.name: 'data-extractor-job'
   azure.container.registry: 'ssprivate$(env).azurecr.io'
   azure.subscription.endpoint: 'DTS-SHAREDSERVICES-$(env.upper)'
