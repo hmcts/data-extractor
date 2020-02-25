@@ -4,8 +4,9 @@ mi-job:
     "mi-vault":
       resourceGroup: mi-{{ .Values.global.environment }}-rg
       secrets:
-        - aat-ccdro-user
-        - aat-ccdro-password
+        - ccdro-user
+        - ccdro-password
+        - appinsights-instrumentationkey
   memoryLimits: '2048Mi'
   cpuLimits: '2000m'
   kind: Job
@@ -17,7 +18,6 @@ mi-job:
     app.kubernetes.io/name: data-extractor-job
   environment:
     ETL_DB_URL: jdbc:postgresql://ccd-data-store-api-postgres-db-{{ .Values.global.ccd_environment }}.postgres.database.azure.com:5432/ccd_data_store
-    APPINSIGHTS_INSTRUMENTATIONKEY: c3043e63-3383-4add-a507-e0adf8588e4a
     ETL_ACCOUNT: midataextractor{{ .Values.global.environment }}
     EXTRACTION_CASETYPES_0__CONTAINER: "test-container"
     EXTRACTION_CASETYPES_0__CASETYPE: "Caveat"

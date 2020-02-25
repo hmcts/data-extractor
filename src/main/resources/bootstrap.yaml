@@ -6,5 +6,6 @@ spring:
       paths: /mnt/secrets/data-extractor,/mnt/secrets/mi-vault
       name: mi-vault
       aliases:
-        aat-ccdro-user: etl.db.user
-        aat-ccdro-password: etl.db.password
+        ccdro-user: etl.db.user
+        ccdro-password: etl.db.password
+        appinsights-instrumentationkey: azure.application-insights.instrumentation-key

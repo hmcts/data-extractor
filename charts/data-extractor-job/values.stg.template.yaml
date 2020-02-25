@@ -1,7 +1,6 @@
 mi-job:
   image: ${IMAGE_NAME}
   environment:
-    APPINSIGHTS_INSTRUMENTATIONKEY: 482eb1b8-a656-41e6-b2e8-8351d7986b2c
     ETL_MSICLIENTID: e7251f8f-268e-4d5f-98d1-8eb777ef71c3
 
 global:
