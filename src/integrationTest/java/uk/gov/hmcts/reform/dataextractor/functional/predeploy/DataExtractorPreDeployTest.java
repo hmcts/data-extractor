@@ -35,7 +35,7 @@ public class DataExtractorPreDeployTest {
         if (!containerClient.exists()) {
             containerClient.create();
         }
-        
+      
         String metadataValue = DateTimeUtils.dateToString(LocalDate.now().minusDays(DATA_DAYS));
         containerClient.setMetadata(Map.of(ContainerConstants.UPDATE_DATE_METADATA,
             DateTimeUtils.dateToString(LocalDate.now().minusDays(DATA_DAYS))));
