@@ -10,6 +10,7 @@ trigger:
   branches:
     include:
       - master
+      - ithc
 
   tags:
     include:
@@ -29,8 +30,8 @@ variables:
   ${{ if ne( variables['Build.Reason'], 'PullRequest') }}: 
     environment: 'stg' #Uset test and promoting to stg until prod is ready
     env.upper: 'STG'
-  env.prom: 'prod'
-  env.prom.upper: 'PROD'
+  env.prom: 'ithc'
+  env.prom.upper: 'ITHC'
   application.name: 'data-extractor-job'
   azure.container.registry: 'ssprivate$(env).azurecr.io'
   azure.subscription.endpoint: 'DTS-SHAREDSERVICES-$(env.upper)'
@@ -50,6 +51,7 @@ resources:
       type: github
       name: hmcts/mi-core-lib
       endpoint: hmcts
+      ref: ithc
 
 stages:
   - template: pipeline-steps/templates/build-deploy-stage.yaml@mi-core
