@@ -54,11 +54,11 @@ stages:
       mutationTest: True
       functionalTest: true
       preIntegrationTest: true
-      azureSecreKeys: 'aat-ccdro-user,aat-ccdro-password,data-extractor-connection-string'
+      azureSecreKeys: 'ccdro-user,ccdro-password,data-extractor-connection-string'
       azureKeyMapping:
       - key: ETL_DB_USER
-        value: 'aat-ccdro-user'
+        value: 'ccdro-user'
       - key: ETL_DB_PASSWORD
-        value: 'aat-ccdro-password'
+        value: 'ccdro-password'
       - key: ETL_CONNECTIONSTRING
         value: 'data-extractor-connection-string'
