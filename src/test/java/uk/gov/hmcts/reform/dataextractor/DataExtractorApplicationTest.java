@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.dataextractor;
 
+import com.microsoft.applicationinsights.TelemetryClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,12 +29,15 @@ public class DataExtractorApplicationTest {
     @Mock
     private HealthCheck healthCheck;
 
+    @Mock
+    private TelemetryClient client;
+
     @Test
     public void testApplicationExecuted() throws Exception {
         classToTest.run(null);
         verify(extractionComponent, times(1)).execute();
         verify(healthCheck, never()).check();
-
+        verify(client, times(1)).flush();
     }
 
     @Test
@@ -42,6 +46,7 @@ public class DataExtractorApplicationTest {
         classToTest.run(null);
         verify(healthCheck, times(1)).check();
         verify(extractionComponent, never()).execute();
+        verify(client, times(1)).flush();
     }
 
     @Test
