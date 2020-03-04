@@ -50,7 +50,7 @@ extraction:
       caseType: "MoneyClaimCase"
       type: "jsonlines"
       prefix: "CMC"
-    - container: "ia"
+    - container: "asylum"
       caseType: "Asylum"
       type: "jsonlines"
       prefix: "ASYLUM"
