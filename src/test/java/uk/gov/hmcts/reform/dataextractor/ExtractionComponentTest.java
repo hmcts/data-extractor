@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -153,5 +155,21 @@ public class ExtractionComponentTest {
         classToTest.execute();
 
         verify(queryExecutorFactory, times(2)).provide(query);
+    }
+
+    @Test
+    public void givenErrorOnLastUpdateProcessingOneExtractor_thenProcessAll() {
+        ExtractionData testExtractorData = ExtractionData
+            .builder()
+            .container(CONTAINER_NAME)
+            .build();
+        List<ExtractionData> extractionData = Arrays.asList(testExtractorData, testExtractorData);
+        when(extractions.getCaseTypes()).thenReturn(extractionData);
+        when(blobService.getContainerLastUpdated(CONTAINER_NAME)).thenThrow(new RuntimeException("Any error"));
+
+        classToTest.execute();
+
+        verify(blobService, times(2)).getContainerLastUpdated(CONTAINER_NAME);
+        verify(queryExecutorFactory, never()).provide(anyString());
     }
 }

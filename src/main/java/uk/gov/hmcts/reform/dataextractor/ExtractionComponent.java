@@ -47,7 +47,13 @@ public class ExtractionComponent {
             LocalDate toDate;
 
             do {
-                LocalDate lastUpdated = getLastUpdateDate(extractionData);
+                LocalDate lastUpdated = null;
+                try {
+                    lastUpdated = getLastUpdateDate(extractionData);
+                } catch (Exception  e) {
+                    log.error("Can not retrieve last update from {}", extractionData.getCaseType());
+                    break;
+                }
                 toDate = lastUpdated.plusMonths(1).isBefore(now) ? lastUpdated.plusMonths(1) : now;
 
                 QueryBuilder queryBuilder = QueryBuilder
