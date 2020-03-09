@@ -12,12 +12,14 @@ It obtains its configuration from the following environment variables:
 * ETL_DB_URL: jdbc connection url  (e.g. "jdbc:postgresql://localhost:5432")
 * ETL_DB_USER_FILE: file containing the db username relative to "/mnt/secrets" (e.g. data-extractor/aat-ccd-user)
 * ETL_DB_PASSWORD_FILE: file containing the db password relative to "/mnt/secrets" (e.g. data-extractor/aat-ccd-pwd)
-* ETL_SQL: sql statement to execute (e.g. "SELECT ID FROM parent WHERE ID = 1")
 * ETL_MSI_CLIENT_ID: pod identity client id to get credentials from keyvault and write access to blob storage. 
+* ETL_CONNECTIONSTRING: This is an alternative authentication system in case manage identity is not setup in the cluster. 
 * ETL_ACCOUNT: Azure storage account where output should be saved (e.g. "devstoreaccount1")
-* ETL_CONTAINER: Azure storage container where output should be saved (e.g. "testcontainer")
-* ETL_FILE_TYPE: output file type. One of: jsonlines, csv, json (default "jsonlines")
-* ETL_FILE_PREFIX: prefix for the output file (e.g. "test01"). 
+* EXTRACTION_CASETYPES: Configuration list to extract each case type. This list can contain the following values:
+    * CONTAINER: Azure storage container where output should be saved (e.g. "testcontainer")
+    * TYPE: output file type. One of: jsonlines, csv, json (default "jsonlines")
+    * PREFIX: prefix for the output file (e.g. "test01"). 
+    * CASETYPE: CCD case type to extract
 
 The 2 values: ETL_DB_USER_FILE and ETL_DB_PASSWORD_FILE are useful if the username and password are retrieved 
 from Azure keyvault and exposed as flexvolumes. The same username and password can alternatively be passed as environment 
@@ -42,6 +44,7 @@ job:
       secrets:
         - ccdro-user
         - ccdro-password
+        - appinsights-instrumentationkey
   labels:
     app.kubernetes.io/instance : data-extractor-job-001
     app.kubernetes.io/name: data-extractor-job
@@ -58,10 +61,11 @@ job:
       AND created_date < (current_date + time '00:00')
       ORDER BY created_date ASC;
     ETL_ACCOUNT: midatastg
-    ETL_CONTAINER: probate
-    ETL_FILE_TYPE: jsonlines
-    ETL_FILE_PREFIX: test01
     ETL_MSI_CLIENT_ID: 1461ff03-675c-423c-95a4-fb50d31254ff
+    EXTRACTION_CASETYPES_0__CONTAINER: "test-container"
+    EXTRACTION_CASETYPES_0__CASETYPE: "Caveat"
+    EXTRACTION_CASETYPES_0__TYPE: "jsonlines"
+    EXTRACTION_CASETYPES_0__PREFIX: "CCD-TEST"
 global:
   job:
     kind: Job
