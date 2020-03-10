@@ -1,75 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.1.xsd">
-
-  <suppress>
-    <gav regex="true">^com\.google\.guava:guava:.*$</gav>
-    <cpe>cpe:/a:google:guava</cpe>
-  </suppress>
-
-  <suppress>
-    <notes><![CDATA[Used only for testing not used in prod]]></notes>
-    <filePath regex="true">.*postgresql-1\.10\.6\.jar</filePath>
-    <cpe>cpe:/a:postgresql:postgresql:1.10.6</cpe>
-  </suppress>
-
-  <suppress>
-    <notes><![CDATA[Used only for testing not used in prod]]></notes>
-    <filePath regex="true">.*postgresql-1\.12\.3\.jar</filePath>
-    <cpe>cpe:/a:postgresql:postgresql:1.12.3</cpe>
-  </suppress>
-
-  <suppress>
-    <notes><![CDATA[Used only in tests]]></notes>
-    <gav regex="true">org\.apache\.sling:org\.apache\.sling\.javax\.activation:0\.1\.0$</gav>
-    <cpe>cpe:/a:apache:sling</cpe>
-  </suppress>
-
-  <suppress>
-    <notes><![CDATA[ slf4j only has a beta version released with the 'fix', looks like lots of changes in it... ]]></notes>
-    <cve>CVE-2018-8088</cve>
-  </suppress>
-  
   <suppress>
     <notes><![CDATA[
-    file name: spring-security-crypto-5.1.3.RELEASE.jar
-    ]]></notes>
-    <filePath regex="true">.*spring-security-crypto-5.1.3.RELEASE.jar</filePath>
+     Suppressing as it's a false positive (see: https://pivotal.io/security/cve-2018-1258)
+   ]]></notes>
+    <gav regex="true">org\.springframework\.security:spring-security-\w+:5.2.[0-1].RELEASE</gav>
+    <cpe>cpe:/a:pivotal_software:spring_security</cpe>
     <cve>CVE-2018-1258</cve>
   </suppress>
 
   <suppress>
     <notes><![CDATA[
-    file name: gatling-app-3.1.1.jar
-    ]]></notes>
-    <filePath regex="true">.*gatling-app-3.1.1.jar</filePath>
-    <cve>CVE-2018-13661</cve>
-  </suppress>
-
-  <suppress>
-    <notes><![CDATA[
-    Suppressing as it seems a false positive as per https://github.com/jeremylong/DependencyCheck/issues/1573
-    ]]></notes>
-    <gav regex="true">^io\.netty:netty-tcnative-boringssl-static:.*</gav>
-    <cve>CVE-2014-3488</cve>
-    <cve>CVE-2015-2156</cve>
-  </suppress>
-
-  <suppress>
-    <gav regex="true">.*</gav>
-    <cve>CVE-2014-3488</cve>
-    <cve>CVE-2015-2156</cve>
-    <cve>CVE-2019-16869</cve>
-    <cve>CVE-2018-1258</cve>
-  </suppress>
-
-  <suppress>
-    <notes><![CDATA[
-            This is a false positive on gradle-pi-test
-            which fails because it is prefixed with gradle ]]>
-    </notes>
-    <gav regex="true">.*</gav>
-    <cve>CVE-2019-15052</cve>
-    <cve>CVE-2019-16370</cve>
-    <cve>CVE-2019-11065</cve>
+      Checkstyle library not part of production.
+   ]]></notes>
+    <cve>CVE-2019-10782</cve>
   </suppress>
 </suppressions>

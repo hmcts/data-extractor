@@ -22,6 +22,7 @@ public class HealthService implements HealthCheck {
     private CaseDataService caseDataService;
 
     @Override
+    @SuppressWarnings("java:S899")
     public void check() throws ServiceNotAvailableException {
         try {
             blobService.listContainers().iterator().hasNext();

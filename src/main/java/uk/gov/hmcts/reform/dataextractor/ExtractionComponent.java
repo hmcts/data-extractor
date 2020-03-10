@@ -24,7 +24,7 @@ public class ExtractionComponent {
     private Factory<ExtractionData, BlobOutputWriter> blobOutputFactory;
 
     @Autowired
-    private Factory<String,  QueryExecutor> queryExecutorFactory;
+    private Factory<String, QueryExecutor> queryExecutorFactory;
 
     @Autowired
     private Factory<Output, Extractor> extractorFactory;
@@ -45,25 +45,23 @@ public class ExtractionComponent {
         for (ExtractionData extractionData : extractions.getCaseTypes()) {
             log.info("Processing data for caseType {} with prefix {}", extractionData.getContainer(), extractionData.getPrefix());
             LocalDate toDate;
+            QueryExecutor executor = null;
 
-            do {
-                LocalDate lastUpdated = null;
-                try {
-                    lastUpdated = getLastUpdateDate(extractionData);
-                } catch (Exception  e) {
-                    log.error("Can not retrieve last update from {}", extractionData.getCaseType());
-                    break;
-                }
-                toDate = lastUpdated.plusMonths(1).isBefore(now) ? lastUpdated.plusMonths(1) : now;
+            try {
+                do {
 
-                QueryBuilder queryBuilder = QueryBuilder
-                    .builder()
-                    .fromDate(lastUpdated)
-                    .toDate(toDate)
-                    .extractionData(extractionData)
-                    .build();
+                    LocalDate lastUpdated = getLastUpdateDate(extractionData);
 
-                try (QueryExecutor executor = queryExecutorFactory.provide(queryBuilder.getQuery())) {
+                    toDate = lastUpdated.plusMonths(1).isBefore(now) ? lastUpdated.plusMonths(1) : now;
+
+                    QueryBuilder queryBuilder = QueryBuilder
+                        .builder()
+                        .fromDate(lastUpdated)
+                        .toDate(toDate)
+                        .extractionData(extractionData)
+                        .build();
+
+                    executor = queryExecutorFactory.provide(queryBuilder.getQuery());
                     BlobOutputWriter writer = blobOutputFactory.provide(extractionData);
                     Extractor extractor = extractorFactory.provide(extractionData.getType());
                     ResultSet resultSet = executor.execute();
@@ -76,11 +74,15 @@ public class ExtractionComponent {
 
                     log.info("Completed processing data for caseType {} with prefix {} with end date {}",
                         extractionData.getContainer(), extractionData.getPrefix(), queryBuilder.getToDate());
-                } catch (Exception e) {
-                    log.error("Error processing case {}", extractionData.getContainer(), e);
-                    break;
+
+                } while (toDate.isBefore(now));
+            } catch (Exception e) {
+                log.error("Error processing case {}", extractionData.getContainer(), e);
+            } finally {
+                if (executor != null) {
+                    executor.close();
                 }
-            } while (toDate.isBefore(now));
+            }
         }
 
     }
