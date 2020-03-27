@@ -13,3 +13,9 @@ extraction:
       type: "jsonlines"
       prefix: "JLines"
       query: "SELECT ID, NAME FROM parent WHERE ID = 1"
+    - container: "disabled-container"
+      caseType: "disabled-test"
+      type: "jsonlines"
+      prefix: "JLines"
+      disabled: true
+      query: "SELECT ID, NAME FROM parent WHERE ID = 1"

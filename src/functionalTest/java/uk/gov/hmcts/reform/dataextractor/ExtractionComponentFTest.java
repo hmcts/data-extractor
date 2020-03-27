@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.dataextractor.service.ContainerConstants.UPDATE_DATE_METADATA;
 import static uk.gov.hmcts.reform.dataextractor.utils.TestConstants.AZURE_TEST_CONTAINER_IMAGE;
@@ -39,6 +40,7 @@ import static uk.gov.hmcts.reform.dataextractor.utils.TestConstants.DEFAULT_COMM
 public class ExtractionComponentFTest extends DbTest {
 
     private static final String TEST_CONTAINER_NAME = "test-container";
+    private static final String DISABLED_TEST_CONTAINER_NAME = "disabled-container";
     private static final String BLOB_NAME_PREFIX = "JLines";
     @Container
     public static final GenericContainer blobStorageContainer =
@@ -110,6 +112,8 @@ public class ExtractionComponentFTest extends DbTest {
 
         extractionComponent.execute();
         BlobContainerClient containerClient = testClient.getBlobContainerClient(TEST_CONTAINER_NAME);
+        BlobContainerClient disabledContainerName = testClient.getBlobContainerClient(DISABLED_TEST_CONTAINER_NAME);
+
         assertTrue(containerClient.exists());
 
         BlobClient blob = TestUtils.downloadFirstBlobThatStartsWith(containerClient, BLOB_NAME_PREFIX);
@@ -124,13 +128,12 @@ public class ExtractionComponentFTest extends DbTest {
         blob = TestUtils.downloadFirstBlobThatStartsWith(containerClient, BLOB_NAME_PREFIX);
         assertTrue(blob.exists(), "Blob exist");
 
-
         outputStream = new ByteArrayOutputStream();
         blob.download(outputStream);
         assertTrue(Pattern.compile(TestUtils.getDataFromFile("data/all-data-part2.jsonl"))
             .matcher(outputStream.toString())
             .matches(),"Expected output");
-
+        assertFalse(disabledContainerName.exists(), "Expected container not exist");
     }
 
 }

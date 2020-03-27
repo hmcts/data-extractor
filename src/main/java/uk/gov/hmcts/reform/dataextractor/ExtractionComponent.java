@@ -14,7 +14,9 @@ import uk.gov.hmcts.reform.dataextractor.utils.BlobFileUtils;
 
 import java.sql.ResultSet;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -42,18 +44,15 @@ public class ExtractionComponent {
     public void execute() {
         LocalDate now = LocalDate.now();
 
-        for (ExtractionData extractionData : extractions.getCaseTypes()) {
+        for (ExtractionData extractionData : getCaseTypesToExtract()) {
             log.info("Processing data for caseType {} with prefix {}", extractionData.getContainer(), extractionData.getPrefix());
             LocalDate toDate;
             QueryExecutor executor = null;
 
             try {
                 do {
-
                     LocalDate lastUpdated = getLastUpdateDate(extractionData);
-
                     toDate = lastUpdated.plusMonths(1).isBefore(now) ? lastUpdated.plusMonths(1) : now;
-
                     QueryBuilder queryBuilder = QueryBuilder
                         .builder()
                         .fromDate(lastUpdated)
@@ -85,6 +84,12 @@ public class ExtractionComponent {
             }
         }
 
+    }
+
+    private List<ExtractionData> getCaseTypesToExtract() {
+        return extractions.getCaseTypes().stream()
+            .filter(extractionData -> !extractionData.isDisabled())
+            .collect(Collectors.toList());
     }
 
     private LocalDate getLastUpdateDate(ExtractionData extractionData) {
