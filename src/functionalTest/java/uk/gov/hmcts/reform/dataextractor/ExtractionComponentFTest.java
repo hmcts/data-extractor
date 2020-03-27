@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.dataextractor.service.ContainerConstants.UPDATE_DATE_METADATA;
 import static uk.gov.hmcts.reform.dataextractor.utils.TestConstants.AZURE_TEST_CONTAINER_IMAGE;
@@ -39,6 +40,7 @@ import static uk.gov.hmcts.reform.dataextractor.utils.TestConstants.DEFAULT_COMM
 public class ExtractionComponentFTest extends DbTest {
 
     private static final String TEST_CONTAINER_NAME = "test-container";
+    private static final String DISABLED_TEST_CONTAINER_NAME = "disabled-container";
     private static final String BLOB_NAME_PREFIX = "JLines";
     @Container
     public static final GenericContainer blobStorageContainer =
@@ -70,11 +72,11 @@ public class ExtractionComponentFTest extends DbTest {
             + "AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;"
             + "BlobEndpoint=http://127.0.0.1:" + blobMappedPort + "/devstoreaccount1;";
 
-        ReflectionTestUtils.setField(blobService, "connectionString",  connString);
+        ReflectionTestUtils.setField(blobService, "connectionString", connString);
 
-        ReflectionTestUtils.setField(dbConfig, "url",  jdbcUrl);
-        ReflectionTestUtils.setField(dbConfig, "user",  username);
-        ReflectionTestUtils.setField(dbConfig, "password",  password);
+        ReflectionTestUtils.setField(dbConfig, "url", jdbcUrl);
+        ReflectionTestUtils.setField(dbConfig, "user", username);
+        ReflectionTestUtils.setField(dbConfig, "password", password);
         testClient = blobServiceClientFactory.getBlobClientWithConnectionString(connString);
     }
 
@@ -102,7 +104,7 @@ public class ExtractionComponentFTest extends DbTest {
 
         assertTrue(Pattern.compile(TestUtils.getDataFromFile("filtered-data.jsonl"))
             .matcher(outputStream.toString())
-            .matches(),"Expected output");
+            .matches(), "Expected output");
     }
 
     @Test
@@ -110,6 +112,7 @@ public class ExtractionComponentFTest extends DbTest {
 
         extractionComponent.execute();
         BlobContainerClient containerClient = testClient.getBlobContainerClient(TEST_CONTAINER_NAME);
+
         assertTrue(containerClient.exists());
 
         BlobClient blob = TestUtils.downloadFirstBlobThatStartsWith(containerClient, BLOB_NAME_PREFIX);
@@ -118,19 +121,20 @@ public class ExtractionComponentFTest extends DbTest {
         blob.download(outputStream);
         assertTrue(Pattern.compile(TestUtils.getDataFromFile("data/all-data-part1.jsonl"))
             .matcher(outputStream.toString())
-            .matches(),"Expected output");
+            .matches(), "Expected output");
 
         blob.delete();
         blob = TestUtils.downloadFirstBlobThatStartsWith(containerClient, BLOB_NAME_PREFIX);
         assertTrue(blob.exists(), "Blob exist");
 
-
         outputStream = new ByteArrayOutputStream();
         blob.download(outputStream);
         assertTrue(Pattern.compile(TestUtils.getDataFromFile("data/all-data-part2.jsonl"))
             .matcher(outputStream.toString())
-            .matches(),"Expected output");
+            .matches(), "Expected output");
 
+        BlobContainerClient disabledContainerName = testClient.getBlobContainerClient(DISABLED_TEST_CONTAINER_NAME);
+        assertFalse(disabledContainerName.exists(), "Expected container not exist");
     }
 
 }

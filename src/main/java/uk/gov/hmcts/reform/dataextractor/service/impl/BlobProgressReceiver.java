@@ -7,6 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 public class BlobProgressReceiver implements ProgressReceiver {
     @Override
     public void reportProgress(long bytesTransferred) {
-        log.info("Current uploaded bytes " + bytesTransferred);
+        log.debug("Current uploaded bytes " + bytesTransferred);
     }
 }
