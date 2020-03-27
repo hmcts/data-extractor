@@ -72,11 +72,11 @@ public class ExtractionComponentFTest extends DbTest {
             + "AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;"
             + "BlobEndpoint=http://127.0.0.1:" + blobMappedPort + "/devstoreaccount1;";
 
-        ReflectionTestUtils.setField(blobService, "connectionString",  connString);
+        ReflectionTestUtils.setField(blobService, "connectionString", connString);
 
-        ReflectionTestUtils.setField(dbConfig, "url",  jdbcUrl);
-        ReflectionTestUtils.setField(dbConfig, "user",  username);
-        ReflectionTestUtils.setField(dbConfig, "password",  password);
+        ReflectionTestUtils.setField(dbConfig, "url", jdbcUrl);
+        ReflectionTestUtils.setField(dbConfig, "user", username);
+        ReflectionTestUtils.setField(dbConfig, "password", password);
         testClient = blobServiceClientFactory.getBlobClientWithConnectionString(connString);
     }
 
@@ -104,7 +104,7 @@ public class ExtractionComponentFTest extends DbTest {
 
         assertTrue(Pattern.compile(TestUtils.getDataFromFile("filtered-data.jsonl"))
             .matcher(outputStream.toString())
-            .matches(),"Expected output");
+            .matches(), "Expected output");
     }
 
     @Test
@@ -112,7 +112,6 @@ public class ExtractionComponentFTest extends DbTest {
 
         extractionComponent.execute();
         BlobContainerClient containerClient = testClient.getBlobContainerClient(TEST_CONTAINER_NAME);
-        BlobContainerClient disabledContainerName = testClient.getBlobContainerClient(DISABLED_TEST_CONTAINER_NAME);
 
         assertTrue(containerClient.exists());
 
@@ -122,7 +121,7 @@ public class ExtractionComponentFTest extends DbTest {
         blob.download(outputStream);
         assertTrue(Pattern.compile(TestUtils.getDataFromFile("data/all-data-part1.jsonl"))
             .matcher(outputStream.toString())
-            .matches(),"Expected output");
+            .matches(), "Expected output");
 
         blob.delete();
         blob = TestUtils.downloadFirstBlobThatStartsWith(containerClient, BLOB_NAME_PREFIX);
@@ -132,7 +131,9 @@ public class ExtractionComponentFTest extends DbTest {
         blob.download(outputStream);
         assertTrue(Pattern.compile(TestUtils.getDataFromFile("data/all-data-part2.jsonl"))
             .matcher(outputStream.toString())
-            .matches(),"Expected output");
+            .matches(), "Expected output");
+
+        BlobContainerClient disabledContainerName = testClient.getBlobContainerClient(DISABLED_TEST_CONTAINER_NAME);
         assertFalse(disabledContainerName.exists(), "Expected container not exist");
     }
 
