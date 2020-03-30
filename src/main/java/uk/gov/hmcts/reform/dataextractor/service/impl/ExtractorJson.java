@@ -24,27 +24,30 @@ public class ExtractorJson implements Extractor {
             objectMapper.getFactory()
             .createGenerator(outputStream, JsonEncoding.UTF8)
         ) {
-            writeResultSetToJson(resultSet, jsonGenerator);
+            int processedData = writeResultSetToJson(resultSet, jsonGenerator);
             jsonGenerator.flush();
-            log.info("Flushing data");
+            log.info("Total data processed in current batch: {}", processedData);
         } catch (IOException | SQLException e) {
             throw new ExtractorException(e);
         }
     }
 
-    protected void writeResultSetToJson(ResultSet resultSet, JsonGenerator jsonGenerator)
+    protected int  writeResultSetToJson(ResultSet resultSet, JsonGenerator jsonGenerator)
         throws SQLException, IOException {
         final ResultSetMetaData metaData = resultSet.getMetaData();
         final int columnCount = metaData.getColumnCount();
         jsonGenerator.writeStartArray();
+        int counter = 0;
         while (resultSet.next()) {
             jsonGenerator.writeStartObject();
             for (int i = 1; i <= columnCount; i++) {
                 writeRow(jsonGenerator, metaData.getColumnName(i), resultSet.getObject(i));
             }
             jsonGenerator.writeEndObject();
+            counter++;
         }
         jsonGenerator.writeEndArray();
+        return  counter;
     }
 
     protected void writeRow(JsonGenerator jsonGenerator, String columnName, Object data)

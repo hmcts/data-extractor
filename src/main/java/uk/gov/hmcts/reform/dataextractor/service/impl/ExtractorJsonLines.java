@@ -14,7 +14,7 @@ import java.sql.SQLException;
 public class ExtractorJsonLines extends ExtractorJson {
 
     @Override
-    protected void writeResultSetToJson(ResultSet resultSet, JsonGenerator jsonGenerator)
+    protected int writeResultSetToJson(ResultSet resultSet, JsonGenerator jsonGenerator)
         throws SQLException, IOException {
         final ResultSetMetaData metaData = resultSet.getMetaData();
         final int columnCount = metaData.getColumnCount();
@@ -28,11 +28,10 @@ public class ExtractorJsonLines extends ExtractorJson {
             }
             jsonGenerator.writeEndObject();
             jsonGenerator.writeRaw('\n');
-            if (counter % 100 == 0) {
-                log.info("Printed row {}", counter);
-            }
+
             counter++;
         }
+        return counter;
     }
 
     protected void writeRow(JsonGenerator jsonGenerator, String columnName, Object data, String dataType)

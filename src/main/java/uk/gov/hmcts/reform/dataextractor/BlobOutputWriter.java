@@ -4,14 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 
 import uk.gov.hmcts.reform.dataextractor.model.Output;
 import uk.gov.hmcts.reform.dataextractor.service.OutputStreamProvider;
-import uk.gov.hmcts.reform.dataextractor.utils.LoggedBufferedOutputStream;
 
 import java.io.OutputStream;
 
 @Slf4j
 public class BlobOutputWriter implements AutoCloseable {
-
-    static final int OUTPUT_BUFFER_SIZE = 50_000_000; //100_000_000;
 
     private final String containerName;
 
@@ -37,8 +34,7 @@ public class BlobOutputWriter implements AutoCloseable {
         if (outputStream != null) {
             return outputStream;
         }
-        outputStream = new LoggedBufferedOutputStream(getOutputStreamProvider()
-            .getOutputStream(containerName, fileName, outputType), OUTPUT_BUFFER_SIZE);
+        outputStream = getOutputStreamProvider().getOutputStream(containerName, fileName, outputType);
         return outputStream;
     }
 
@@ -46,10 +42,7 @@ public class BlobOutputWriter implements AutoCloseable {
         if (outputStream != null) {
             return outputStream;
         }
-        outputStream = getOutputStreamProvider().getOutputStream(containerName,
-            namePrefix, outputType);
-        //new LoggedBufferedOutputStream(getOutputStreamProvider().getOutputStream(containerName,
-        //namePrefix, outputType), OUTPUT_BUFFER_SIZE);
+        outputStream =  getOutputStreamProvider().getOutputStream(containerName, namePrefix, outputType);
         return outputStream;
     }
 

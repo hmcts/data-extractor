@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.dataextractor;
+package uk.gov.hmcts.reform.dataextractor.service.impl;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import uk.gov.hmcts.reform.dataextractor.exception.ExtractorException;
-import uk.gov.hmcts.reform.dataextractor.service.impl.ExtractorCsv;
 
 import java.io.OutputStream;
 import java.sql.ResultSet;
