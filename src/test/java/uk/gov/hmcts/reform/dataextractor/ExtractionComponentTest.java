@@ -140,11 +140,12 @@ public class ExtractionComponentTest {
             .builder()
             .container(CONTAINER_NAME)
             .build();
-        LocalDate updatedDate = LocalDate.now();
+        LocalDate fromDate = LocalDate.now().minusMonths(6);
+
         final String query = QueryBuilder
             .builder()
-            .fromDate(updatedDate)
-            .toDate(updatedDate)
+            .fromDate(fromDate)
+            .toDate(fromDate.plusMonths(1))
             .extractionData(testExtractorData)
             .build()
             .getQuery();
@@ -152,11 +153,11 @@ public class ExtractionComponentTest {
         when(extractions.getCaseTypes()).thenReturn(extractionData);
         when(blobOutputFactory.provide(any(ExtractionData.class))).thenThrow(new RuntimeException("Any error"));
         when(queryExecutorFactory.provide(query)).thenReturn(queryExecutor);
-        when(blobService.getContainerLastUpdated(CONTAINER_NAME)).thenReturn(updatedDate);
+        when(blobService.getContainerLastUpdated(CONTAINER_NAME)).thenReturn(fromDate);
 
         classToTest.execute();
 
-        verify(queryExecutorFactory, times(2)).provide(query);
+        verify(queryExecutorFactory, times(2)).provide(any());
     }
 
     @Test
