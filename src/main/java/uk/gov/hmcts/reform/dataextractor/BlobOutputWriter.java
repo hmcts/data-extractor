@@ -55,6 +55,7 @@ public class BlobOutputWriter implements AutoCloseable {
             if (outputStream != null) {
                 outputStream.flush();
                 outputStream.close();
+                outputStream = null;
             }
         } catch (Exception e) {
             // Blob storage client has already closed the stream. This exception cannot be

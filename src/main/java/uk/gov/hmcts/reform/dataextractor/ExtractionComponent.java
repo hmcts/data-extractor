@@ -80,7 +80,6 @@ public class ExtractionComponent {
                 } finally {
                     closeQueryExecutor(executor);
                     executor = null;
-                    closeWriter(writer);
                 }
             } while (isToDateBeforeNow(toDate, now));
         }
@@ -90,12 +89,6 @@ public class ExtractionComponent {
     private void closeQueryExecutor(QueryExecutor queryExecutor) {
         if (queryExecutor != null) {
             queryExecutor.close();
-        }
-    }
-
-    private void closeWriter(BlobOutputWriter writer) {
-        if (writer != null) {
-            writer.close();
         }
     }
 
