@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.dataextractor.exception.ExtractorException;
 import uk.gov.hmcts.reform.dataextractor.service.Extractor;
 
@@ -14,6 +15,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 
+@Slf4j
 public class ExtractorJson implements Extractor {
 
     public void apply(ResultSet resultSet, OutputStream outputStream) {
@@ -24,6 +26,7 @@ public class ExtractorJson implements Extractor {
         ) {
             writeResultSetToJson(resultSet, jsonGenerator);
             jsonGenerator.flush();
+            log.info("Flushing data");
         } catch (IOException | SQLException e) {
             throw new ExtractorException(e);
         }
