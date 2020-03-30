@@ -48,6 +48,7 @@ public class ExtractionComponent {
             log.info("Processing data for caseType {} with prefix {}", extractionData.getContainer(), extractionData.getPrefix());
             LocalDate toDate;
             QueryExecutor executor = null;
+            BlobOutputWriter writer = null;
 
             try {
                 do {
@@ -61,7 +62,7 @@ public class ExtractionComponent {
                         .build();
 
                     executor = queryExecutorFactory.provide(queryBuilder.getQuery());
-                    BlobOutputWriter writer = blobOutputFactory.provide(extractionData);
+                    writer = blobOutputFactory.provide(extractionData);
                     Extractor extractor = extractorFactory.provide(extractionData.getType());
                     ResultSet resultSet = executor.execute();
                     if (resultSet.isBeforeFirst()) {
@@ -80,6 +81,9 @@ public class ExtractionComponent {
             } finally {
                 if (executor != null) {
                     executor.close();
+                }
+                if (writer != null) {
+                    writer.close();
                 }
             }
         }

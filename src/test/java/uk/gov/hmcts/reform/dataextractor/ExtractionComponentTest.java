@@ -130,6 +130,8 @@ public class ExtractionComponentTest {
         classToTest.execute();
 
         verify(writer, times(2)).outputStream(BlobFileUtils.getFileName(testExtractorData, updatedDate));
+        verify(writer, times(2)).close();
+
     }
 
     @Test
