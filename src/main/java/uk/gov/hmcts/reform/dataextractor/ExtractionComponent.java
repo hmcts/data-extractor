@@ -81,7 +81,7 @@ public class ExtractionComponent {
                     closeQueryExecutor(executor);
                     executor = null;
                 }
-            } while (isToDateBeforeNow(toDate, now));
+            } while (toDate.isBefore(now));
         }
 
     }
@@ -90,10 +90,6 @@ public class ExtractionComponent {
         if (queryExecutor != null) {
             queryExecutor.close();
         }
-    }
-
-    private boolean isToDateBeforeNow(LocalDate toDate, LocalDate now) {
-        return toDate != null && toDate.isBefore(now);
     }
 
     private LocalDate getToDate(LocalDate lastUpdated, LocalDate currentDate) {
