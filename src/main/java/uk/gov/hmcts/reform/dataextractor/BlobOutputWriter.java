@@ -11,7 +11,7 @@ import java.io.OutputStream;
 @Slf4j
 public class BlobOutputWriter implements AutoCloseable {
 
-    static final int OUTPUT_BUFFER_SIZE = 100_000_000;
+    static final int OUTPUT_BUFFER_SIZE = 50_000_000; //100_000_000;
 
     private final String containerName;
 
