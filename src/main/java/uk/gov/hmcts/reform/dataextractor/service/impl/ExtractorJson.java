@@ -20,7 +20,6 @@ public class ExtractorJson implements Extractor {
         final ObjectMapper objectMapper = new ObjectMapper();
         try (JsonGenerator jsonGenerator =
             objectMapper.getFactory()
-            .configure(JsonGenerator.Feature.FLUSH_PASSED_TO_STREAM, false)
             .createGenerator(outputStream, JsonEncoding.UTF8)
         ) {
             writeResultSetToJson(resultSet, jsonGenerator);

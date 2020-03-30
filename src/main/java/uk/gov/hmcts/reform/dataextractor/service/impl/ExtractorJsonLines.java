@@ -25,7 +25,6 @@ public class ExtractorJsonLines extends ExtractorJson {
             }
             jsonGenerator.writeEndObject();
             jsonGenerator.writeRaw('\n');
-            jsonGenerator.flush();
         }
     }
 
