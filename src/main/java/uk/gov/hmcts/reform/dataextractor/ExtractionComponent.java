@@ -78,18 +78,29 @@ public class ExtractionComponent {
                     log.error("Error processing case {}", extractionData.getContainer(), e);
                     break;
                 } finally {
-                    if (executor != null) {
-                        executor.close();
-                        executor = null;
-                    }
-                    if (writer != null) {
-                        writer.close();
-                        writer = null;
-                    }
+                    closeQueryExecutor(executor);
+                    executor = null;
+                    closeWriter(writer);
                 }
-            } while (toDate != null && toDate.isBefore(now));
+            } while (isToDateBeforeNow(toDate, now));
         }
 
+    }
+
+    private void closeQueryExecutor(QueryExecutor queryExecutor) {
+        if (queryExecutor != null) {
+            queryExecutor.close();
+        }
+    }
+
+    private void closeWriter(BlobOutputWriter writer) {
+        if (writer != null) {
+            writer.close();
+        }
+    }
+
+    private boolean isToDateBeforeNow(LocalDate toDate, LocalDate now) {
+        return toDate != null && toDate.isBefore(now);
     }
 
     private LocalDate getToDate(LocalDate lastUpdated, LocalDate currentDate) {
