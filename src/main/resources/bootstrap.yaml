@@ -9,3 +9,4 @@ spring:
         ccdro-user: etl.db.user
         ccdro-password: etl.db.password
         appinsights-instrumentationkey: azure.application-insights.instrumentation-key
+        data-extractor-connection-string: etl.connection-string

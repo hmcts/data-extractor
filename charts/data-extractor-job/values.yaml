@@ -7,6 +7,7 @@ mi-job:
         - ccdro-user
         - ccdro-password
         - appinsights-instrumentationkey
+        - data-extractor-connection-string
   memoryLimits: '2048Mi'
   cpuLimits: '2000m'
   kind: Job
