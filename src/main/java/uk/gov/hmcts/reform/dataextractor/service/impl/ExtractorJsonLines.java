@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.dataextractor.service.impl;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.MinimalPrettyPrinter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -9,14 +10,16 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 
+@Slf4j
 public class ExtractorJsonLines extends ExtractorJson {
 
     @Override
-    protected void writeResultSetToJson(ResultSet resultSet, JsonGenerator jsonGenerator)
+    protected int writeResultSetToJson(ResultSet resultSet, JsonGenerator jsonGenerator)
         throws SQLException, IOException {
         final ResultSetMetaData metaData = resultSet.getMetaData();
         final int columnCount = metaData.getColumnCount();
         jsonGenerator.setPrettyPrinter(new MinimalPrettyPrinter(""));
+        int counter = 0;
         while (resultSet.next()) {
             jsonGenerator.writeStartObject();
             for (int i = 1; i <= columnCount; i++) {
@@ -25,7 +28,10 @@ public class ExtractorJsonLines extends ExtractorJson {
             }
             jsonGenerator.writeEndObject();
             jsonGenerator.writeRaw('\n');
+
+            counter++;
         }
+        return counter;
     }
 
     protected void writeRow(JsonGenerator jsonGenerator, String columnName, Object data, String dataType)

@@ -46,22 +46,22 @@ public class ExtractionComponent {
 
         for (ExtractionData extractionData : getCaseTypesToExtract()) {
             log.info("Processing data for caseType {} with prefix {}", extractionData.getContainer(), extractionData.getPrefix());
-            LocalDate toDate;
+            LocalDate toDate = null;
             QueryExecutor executor = null;
+            BlobOutputWriter writer = null;
 
-            try {
-                do {
+            do {
+                try {
                     LocalDate lastUpdated = getLastUpdateDate(extractionData);
-                    toDate = lastUpdated.plusMonths(1).isBefore(now) ? lastUpdated.plusMonths(1) : now;
+                    toDate = getToDate(lastUpdated, now);
                     QueryBuilder queryBuilder = QueryBuilder
                         .builder()
                         .fromDate(lastUpdated)
                         .toDate(toDate)
                         .extractionData(extractionData)
                         .build();
-
                     executor = queryExecutorFactory.provide(queryBuilder.getQuery());
-                    BlobOutputWriter writer = blobOutputFactory.provide(extractionData);
+                    writer = blobOutputFactory.provide(extractionData);
                     Extractor extractor = extractorFactory.provide(extractionData.getType());
                     ResultSet resultSet = executor.execute();
                     if (resultSet.isBeforeFirst()) {
@@ -70,20 +70,29 @@ public class ExtractionComponent {
                         toDate = now;
                     }
                     blobService.setLastUpdated(extractionData.getContainer(), toDate);
-
                     log.info("Completed processing data for caseType {} with prefix {} with end date {}",
                         extractionData.getContainer(), extractionData.getPrefix(), queryBuilder.getToDate());
 
-                } while (toDate.isBefore(now));
-            } catch (Exception e) {
-                log.error("Error processing case {}", extractionData.getContainer(), e);
-            } finally {
-                if (executor != null) {
-                    executor.close();
+                } catch (Exception e) {
+                    log.error("Error processing case {}", extractionData.getContainer(), e);
+                    break;
+                } finally {
+                    closeQueryExecutor(executor);
+                    executor = null;
                 }
-            }
+            } while (toDate.isBefore(now));
         }
 
+    }
+
+    private void closeQueryExecutor(QueryExecutor queryExecutor) {
+        if (queryExecutor != null) {
+            queryExecutor.close();
+        }
+    }
+
+    private LocalDate getToDate(LocalDate lastUpdated, LocalDate currentDate) {
+        return lastUpdated.plusMonths(1).isBefore(currentDate) ? lastUpdated.plusMonths(1) : currentDate;
     }
 
     private List<ExtractionData> getCaseTypesToExtract() {

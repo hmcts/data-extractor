@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.dataextractor;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
+import com.azure.storage.blob.specialized.BlobOutputStream;
 import com.microsoft.applicationinsights.core.dependencies.apachecommons.io.IOUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +25,6 @@ import uk.gov.hmcts.reform.dataextractor.service.impl.BlobServiceImpl;
 import uk.gov.hmcts.reform.dataextractor.utils.TestUtils;
 import uk.gov.hmcts.reform.mi.micore.factory.BlobServiceClientFactory;
 
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -88,7 +88,7 @@ public class BlobOutputWriterFTest {
         try (BlobOutputWriter writer = new BlobOutputWriter(CONTAINER, BLOB_PREFIX,
             Output.JSON_LINES, miStreamProvider)) {
             OutputStream outputStream = writer.outputStream();
-            assertThat(outputStream, instanceOf(BufferedOutputStream.class));
+            assertThat(outputStream, instanceOf(BlobOutputStream.class));
         }
     }
 
