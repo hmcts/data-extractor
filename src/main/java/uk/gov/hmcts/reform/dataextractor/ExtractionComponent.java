@@ -70,7 +70,6 @@ public class ExtractionComponent {
                         toDate = now;
                     }
                     blobService.setLastUpdated(extractionData.getContainer(), toDate);
-                    log.info("\n\n");
                     log.info("Completed processing data for caseType {} with prefix {} with end date {}",
                         extractionData.getContainer(), extractionData.getPrefix(), queryBuilder.getToDate());
 
