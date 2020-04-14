@@ -11,6 +11,13 @@
 
   <suppress>
     <notes><![CDATA[
+      Netty dependency pending of azure sdk upgrade
+   ]]></notes>
+    <cve>CVE-2020-11612</cve>
+  </suppress>
+
+  <suppress>
+    <notes><![CDATA[
       Checkstyle library not part of production.
    ]]></notes>
     <cve>CVE-2019-10782</cve>
