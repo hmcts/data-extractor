@@ -261,7 +261,7 @@ dependencies {
 
   compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
   compile group: 'org.apache.commons', name: 'commons-csv', version: '1.8'
-  compile group: 'com.google.guava', name: 'guava', version: '28.2-jre'
+  compile group: 'com.google.guava', name: 'guava', version: '29.0-jre'
   compile group: 'com.typesafe', name: 'config', version: '1.4.0'
 
   compileOnly 'org.projectlombok:lombok'
