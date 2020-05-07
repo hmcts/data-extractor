@@ -30,7 +30,7 @@ public class ApplicationConfig {
 
     @Bean
     public Factory<String,  QueryExecutor> queryExecutorFactory() {
-        return this::blobOutputWriter;
+        return this::queryExecutor;
     }
 
     @Bean
@@ -42,7 +42,7 @@ public class ApplicationConfig {
         return new BlobOutputWriter(config.getContainer(), config.getFileName(), config.getType(), outputStreamProvider);
     }
 
-    private QueryExecutor blobOutputWriter(String sqlQuery) {
+    private QueryExecutor queryExecutor(String sqlQuery) {
         return new QueryExecutor(dbConfig.getUrl(), dbConfig.getUser(), dbConfig.getPassword(), sqlQuery);
     }
 

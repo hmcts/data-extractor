@@ -5,6 +5,7 @@ import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.models.BlobContainerItem;
 import com.azure.storage.blob.models.BlobHttpHeaders;
+import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.ParallelTransferOptions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -82,6 +83,10 @@ public class BlobServiceImpl implements OutputStreamProvider {
 
     public PagedIterable<BlobContainerItem> listContainers() {
         return getConnection().listBlobContainers();
+    }
+
+    public PagedIterable<BlobItem> listContainerBlobs(String containerName) {
+        return getContainerClient(containerName).listBlobs();
     }
 
     BlobContainerClient getContainerClient(String containerName) {

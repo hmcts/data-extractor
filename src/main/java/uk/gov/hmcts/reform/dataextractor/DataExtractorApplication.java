@@ -9,12 +9,19 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.context.ApplicationContext;
 
+import uk.gov.hmcts.reform.dataextractor.task.PreExecutor;
 import uk.gov.hmcts.reform.mi.micore.component.HealthCheck;
+
+import java.util.Map;
 
 @Slf4j
 @SpringBootApplication(scanBasePackages = "uk.gov.hmcts.reform", exclude = {DataSourceAutoConfiguration.class})
 public class DataExtractorApplication implements ApplicationRunner {
+
+    @Autowired
+    private ApplicationContext context;
 
     @Autowired
     private ExtractionComponent extractionComponent;
@@ -37,6 +44,7 @@ public class DataExtractorApplication implements ApplicationRunner {
             if (smokeTest) {
                 healthCheck.check();
             } else {
+                runPreExecutionTasks();
                 extractionComponent.execute();
             }
         } catch (Exception e) {
@@ -45,6 +53,15 @@ public class DataExtractorApplication implements ApplicationRunner {
         } finally {
             client.flush();
             waitTelemetryGracefulPeriod();
+        }
+    }
+
+    private void runPreExecutionTasks() {
+        Map<String, PreExecutor> beans = context.getBeansOfType(PreExecutor.class);
+        for (PreExecutor preExecutor : beans.values()) {
+            if (preExecutor.isEnabled()) {
+                preExecutor.execute();
+            }
         }
     }
 

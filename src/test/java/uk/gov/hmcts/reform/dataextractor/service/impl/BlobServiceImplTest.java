@@ -7,6 +7,7 @@ import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.models.BlobContainerItem;
 import com.azure.storage.blob.models.BlobContainerProperties;
 import com.azure.storage.blob.models.BlobHttpHeaders;
+import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.ParallelTransferOptions;
 import com.azure.storage.blob.specialized.BlobOutputStream;
 import com.azure.storage.blob.specialized.BlockBlobClient;
@@ -156,6 +157,17 @@ public class BlobServiceImplTest {
         PagedIterable<BlobContainerItem> expected = new PagedIterableStub<>();
         when(blobServiceClientMock.listBlobContainers()).thenReturn(expected);
         assertEquals(classToTest.listContainers(), expected, "Expected container list");
+    }
+
+    @Test
+    public void testListBlobs() {
+        classToTest = new BlobServiceImpl(StringUtils.EMPTY, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory);
+        when(blobServiceClientFactory.getBlobClientWithConnectionString(CONNECTION_STRING)).thenReturn(
+            blobServiceClientMock);
+        PagedIterable<BlobItem> expected = new PagedIterableStub<>();
+        when(blobServiceClientMock.getBlobContainerClient(TEST_CONTAINER_NAME)).thenReturn(blobContainerClientMock);
+        when(blobContainerClientMock.listBlobs()).thenReturn(expected);
+        assertEquals(classToTest.listContainerBlobs(TEST_CONTAINER_NAME), expected, "Expected container blob list");
     }
 
     private BlobContainerProperties createEmptyBlobContainerProperties() {
