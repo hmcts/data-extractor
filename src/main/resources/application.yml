@@ -46,27 +46,27 @@ extraction:
     - container: "finredmvp2"
       caseType: "FinancialRemedyMVP2"
       type: "jsonlines"
-      prefix: "CCD-FINRED-MVP2"
+      prefix: "FINRED-MVP2"
       disabled: ${EXTRACTION_FINREDMVP2_DISABLED:false}
     - container: "finredcontested"
       caseType: "FinancialRemedyContested"
       type: "jsonlines"
-      prefix: "CCD-FINRED-CONTESTED"
+      prefix: "FINRED-CONTESTED"
       disabled: ${EXTRACTION_FINREDCONTESTED_DISABLED:false}
     - container: "cmc"
       caseType: "MoneyClaimCase"
       type: "jsonlines"
-      prefix: "CCD-CMC"
+      prefix: "CMC"
       disabled: ${EXTRACTION_CMC_DISABLED:false}
     - container: "asylum"
       caseType: "Asylum"
       type: "jsonlines"
-      prefix: "CCD-ASYLUM"
+      prefix: "ASYLUM"
       disabled: ${EXTRACTION_ASYLUM_DISABLED:false}
     - container: "sscs"
       caseType: "Benefit"
       type: "jsonlines"
-      prefix: "CCD-SSCS"
+      prefix: "SSCS"
       disabled: ${EXTRACTION_SSCS_DISABLED:false}
 application-insights:
   default:
