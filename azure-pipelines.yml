@@ -25,8 +25,8 @@ pr:
 variables:
 #  group: pipeline-env-variables
   ${{ if eq( variables['Build.Reason'], 'PullRequest') }}:
-    environment: 'sbox'
-    env.upper: 'SBOX'
+    environment: 'test'
+    env.upper: 'TEST'
   ${{ if ne( variables['Build.Reason'], 'PullRequest') }}: 
     environment: 'stg' #Uset test and promoting to stg until prod is ready
     env.upper: 'STG'
