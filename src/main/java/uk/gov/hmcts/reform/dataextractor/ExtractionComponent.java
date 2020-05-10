@@ -65,9 +65,17 @@ public class ExtractionComponent {
                     writer = blobOutputFactory.provide(extractionData);
                     Extractor extractor = extractorFactory.provide(extractionData.getType());
                     ResultSet resultSet = executor.execute();
+                    String fileName = BlobFileUtils.getFileName(extractionData, toDate);
+
                     if (resultSet.isBeforeFirst()) {
-                        extractor.apply(resultSet, writer.outputStream(BlobFileUtils.getFileName(extractionData, toDate)));
-                        blobService.setLastUpdated(extractionData.getContainer(), toDate);
+                        extractor.apply(resultSet, writer.outputStream(fileName));
+                        if (!blobService.validateBlob(extractionData.getContainer(), fileName, extractionData.getType())) {
+                            blobService.deleteBlob(extractionData.getContainer(), fileName);
+                            log.warn("Corrupted blob {}  has been deleted", fileName);
+                        } else {
+                            blobService.setLastUpdated(extractionData.getContainer(), toDate);
+                        }
+
                         log.info("Completed processing data for caseType {} with prefix {} with end date {}",
                             extractionData.getContainer(), extractionData.getPrefix(), queryBuilder.getToDate());
                     } else {
@@ -86,6 +94,7 @@ public class ExtractionComponent {
         }
 
     }
+
 
     private void closeQueryExecutor(QueryExecutor queryExecutor) {
         if (queryExecutor != null) {
