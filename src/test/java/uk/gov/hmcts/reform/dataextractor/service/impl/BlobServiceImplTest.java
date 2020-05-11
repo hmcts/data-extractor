@@ -7,7 +7,9 @@ import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.models.BlobContainerItem;
 import com.azure.storage.blob.models.BlobContainerProperties;
 import com.azure.storage.blob.models.BlobHttpHeaders;
+import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.ParallelTransferOptions;
+import com.azure.storage.blob.specialized.BlobInputStream;
 import com.azure.storage.blob.specialized.BlobOutputStream;
 import com.azure.storage.blob.specialized.BlockBlobClient;
 import org.apache.commons.lang3.StringUtils;
@@ -16,18 +18,31 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import uk.gov.hmcts.reform.dataextractor.Factory;
 import uk.gov.hmcts.reform.dataextractor.model.Output;
+import uk.gov.hmcts.reform.dataextractor.service.BlobOutputValidator;
 import uk.gov.hmcts.reform.dataextractor.test.utils.Matchers;
 import uk.gov.hmcts.reform.dataextractor.test.utils.PagedIterableStub;
 import uk.gov.hmcts.reform.mi.micore.factory.BlobServiceClientFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,7 +56,7 @@ public class BlobServiceImplTest {
     private static final String CLIENT_ID = "testClientId";
     private static final String CONNECTION_STRING = "testStorageConnectionString";
     private static final String TEST_CONTAINER_NAME = "testContainer";
-
+    private static final String BLOB_NAME = "blobName";
 
     private BlobServiceImpl classToTest;
 
@@ -57,10 +72,16 @@ public class BlobServiceImplTest {
     private BlockBlobClient blockBlobClientMock;
     @Mock
     private BlobOutputStream outputStream;
+    @Mock
+    private BlobOutputValidator blobOutputValidator;
+    @Mock
+    private BlobInputStream blobInputStream;
+    @Mock
+    private Factory<Output, BlobOutputValidator> blobOutputValidatorFactory;
 
     @Test
     public void givenNonExistingContainer_whenGetLastUpdated_thenReturnNull() {
-        classToTest = new BlobServiceImpl(CLIENT_ID, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory);
+        classToTest = new BlobServiceImpl(CLIENT_ID, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory, blobOutputValidatorFactory);
         when(blobServiceClientFactory.getBlobClientWithManagedIdentity(CLIENT_ID, STORAGE_ACCOUNT)).thenReturn(
             blobServiceClientMock);
 
@@ -71,7 +92,7 @@ public class BlobServiceImplTest {
 
     @Test
     public void givenNullMetadata_whenGetLastUpdated_thenReturnNull() {
-        classToTest = new BlobServiceImpl(CLIENT_ID, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory);
+        classToTest = new BlobServiceImpl(CLIENT_ID, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory, blobOutputValidatorFactory);
         when(blobServiceClientFactory.getBlobClientWithManagedIdentity(CLIENT_ID, STORAGE_ACCOUNT)).thenReturn(
             blobServiceClientMock);
         when(blobServiceClientMock.getBlobContainerClient(TEST_CONTAINER_NAME)).thenReturn(blobContainerClientMock);
@@ -82,7 +103,7 @@ public class BlobServiceImplTest {
 
     @Test
     public void givenValidMetadata_whenGetLastUpdated_thenReturnMetadataDate() {
-        classToTest = new BlobServiceImpl(CLIENT_ID, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory);
+        classToTest = new BlobServiceImpl(CLIENT_ID, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory, blobOutputValidatorFactory);
 
         final LocalDate expectedDate = LocalDate.now();
 
@@ -96,7 +117,7 @@ public class BlobServiceImplTest {
 
     @Test
     public void whenSetLastUpdated_thenApiIsCalled() {
-        classToTest = new BlobServiceImpl(CLIENT_ID, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory);
+        classToTest = new BlobServiceImpl(CLIENT_ID, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory, blobOutputValidatorFactory);
 
         final String dateMetadata = DATE_TIME_FORMATTER.format(LocalDate.now());
         when(blobServiceClientFactory.getBlobClientWithManagedIdentity(CLIENT_ID, STORAGE_ACCOUNT)).thenReturn(
@@ -108,7 +129,7 @@ public class BlobServiceImplTest {
 
     @Test
     public void whenHasClientId_thenUseManageIdentityClient() throws Exception {
-        classToTest = new BlobServiceImpl(CLIENT_ID, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory);
+        classToTest = new BlobServiceImpl(CLIENT_ID, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory, blobOutputValidatorFactory);
 
         when(blobServiceClientFactory.getBlobClientWithManagedIdentity(CLIENT_ID, STORAGE_ACCOUNT)).thenReturn(
             blobServiceClientMock);
@@ -119,7 +140,8 @@ public class BlobServiceImplTest {
 
     @Test
     public void whenEmptyClientId_thenUseConnectionStringClient() throws Exception {
-        classToTest = new BlobServiceImpl(StringUtils.EMPTY, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory);
+        classToTest = new BlobServiceImpl(StringUtils.EMPTY, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory,
+            blobOutputValidatorFactory);
         when(blobServiceClientFactory.getBlobClientWithConnectionString(CONNECTION_STRING)).thenReturn(
             blobServiceClientMock);
 
@@ -129,7 +151,8 @@ public class BlobServiceImplTest {
 
     @Test
     public void createBlobWithContentType() {
-        classToTest = new BlobServiceImpl(StringUtils.EMPTY, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory);
+        classToTest = new BlobServiceImpl(StringUtils.EMPTY, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory,
+            blobOutputValidatorFactory);
         String fileName = "testFileName.jsonline";
         when(blobServiceClientFactory.getBlobClientWithConnectionString(CONNECTION_STRING)).thenReturn(
             blobServiceClientMock);
@@ -150,12 +173,78 @@ public class BlobServiceImplTest {
 
     @Test
     public void testListContainers() {
-        classToTest = new BlobServiceImpl(StringUtils.EMPTY, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory);
+        classToTest = new BlobServiceImpl(StringUtils.EMPTY, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory,
+            blobOutputValidatorFactory);
         when(blobServiceClientFactory.getBlobClientWithConnectionString(CONNECTION_STRING)).thenReturn(
             blobServiceClientMock);
         PagedIterable<BlobContainerItem> expected = new PagedIterableStub<>();
         when(blobServiceClientMock.listBlobContainers()).thenReturn(expected);
         assertEquals(classToTest.listContainers(), expected, "Expected container list");
+    }
+
+    @Test
+    public void testListBlobs() {
+        classToTest = new BlobServiceImpl(StringUtils.EMPTY, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory,
+            blobOutputValidatorFactory);
+        when(blobServiceClientFactory.getBlobClientWithConnectionString(CONNECTION_STRING)).thenReturn(
+            blobServiceClientMock);
+        PagedIterable<BlobItem> expected = new PagedIterableStub<>();
+        when(blobServiceClientMock.getBlobContainerClient(TEST_CONTAINER_NAME)).thenReturn(blobContainerClientMock);
+        when(blobContainerClientMock.listBlobs()).thenReturn(expected);
+        assertEquals(classToTest.listContainerBlobs(TEST_CONTAINER_NAME), expected, "Expected container blob list");
+    }
+
+    @Test
+    public void givenException_whenValidateBlob_thenReturnFalse() throws IOException {
+        classToTest = spy(new BlobServiceImpl(StringUtils.EMPTY, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory,
+            blobOutputValidatorFactory));
+        when(blobOutputValidatorFactory.provide(Output.JSON_LINES)).thenReturn(blobOutputValidator);
+        when(blobServiceClientFactory.getBlobClientWithConnectionString(CONNECTION_STRING)).thenReturn(
+            blobServiceClientMock);
+        when(blobServiceClientMock.getBlobContainerClient(TEST_CONTAINER_NAME)).thenReturn(blobContainerClientMock);
+        when(blobContainerClientMock.getBlobClient(BLOB_NAME)).thenReturn(blobClientMock);
+        when(blobClientMock.openInputStream()).thenReturn(blobInputStream);
+        doThrow(new IOException("Test error")).when(blobInputStream).read(any(), anyInt(), anyInt());
+        assertFalse(classToTest.validateBlob(TEST_CONTAINER_NAME, BLOB_NAME, Output.JSON_LINES));
+        verify(blobInputStream, times(1)).close();
+
+    }
+
+    @Test
+    public void givenValidBlob_whenValidateBlob_thenReturnTrue() throws IOException {
+        classToTest = spy(new BlobServiceImpl(StringUtils.EMPTY, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory,
+            blobOutputValidatorFactory));
+        InputStream inputStream = spy(new ByteArrayInputStream("{}\n{}".getBytes()));
+        doReturn(inputStream).when(classToTest).getInputStream(eq(TEST_CONTAINER_NAME), anyString());
+        when(blobOutputValidatorFactory.provide(Output.JSON_LINES)).thenReturn(blobOutputValidator);
+        assertTrue(classToTest.validateBlob(TEST_CONTAINER_NAME, BLOB_NAME, Output.JSON_LINES));
+        verify(inputStream, times(1)).close();
+        verify(blobOutputValidator, times(2)).isNotValid("{}");
+    }
+
+    @Test
+    public void givenInvalidBlob_whenValidateBlob_thenReturnFalse() throws IOException {
+        classToTest = spy(new BlobServiceImpl(StringUtils.EMPTY, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory,
+            blobOutputValidatorFactory));
+        InputStream inputStream = spy(new ByteArrayInputStream("{}\n{}".getBytes()));
+        when(blobOutputValidatorFactory.provide(Output.JSON_LINES)).thenReturn(blobOutputValidator);
+        doReturn(inputStream).when(classToTest).getInputStream(eq(TEST_CONTAINER_NAME), anyString());
+        when(blobOutputValidator.isNotValid("{}")).thenReturn(true);
+        assertFalse(classToTest.validateBlob(TEST_CONTAINER_NAME, BLOB_NAME, Output.JSON_LINES));
+        verify(inputStream, times(1)).close();
+        verify(blobOutputValidator, times(1)).isNotValid("{}");
+    }
+
+    @Test
+    public void testDeleteBlob() {
+        classToTest = new BlobServiceImpl(StringUtils.EMPTY, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory,
+            blobOutputValidatorFactory);
+        when(blobServiceClientFactory.getBlobClientWithConnectionString(CONNECTION_STRING)).thenReturn(
+            blobServiceClientMock);
+        when(blobServiceClientMock.getBlobContainerClient(TEST_CONTAINER_NAME)).thenReturn(blobContainerClientMock);
+        when(blobContainerClientMock.getBlobClient(BLOB_NAME)).thenReturn(blobClientMock);
+        classToTest.deleteBlob(TEST_CONTAINER_NAME, BLOB_NAME);
+        verify(blobClientMock, times(1)).delete();
     }
 
     private BlobContainerProperties createEmptyBlobContainerProperties() {

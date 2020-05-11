@@ -77,3 +77,6 @@ application-insights:
 azure:
   application-insights:
     instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:""}
+
+task:
+  SetLastUpdateMetadata: ${TASK_SET_LAST_UPDATE:false}

@@ -77,7 +77,6 @@ public class ExtractionComponentTest {
             .type(Output.JSON_LINES)
             .build();
 
-
         List<ExtractionData> extractionData = Arrays.asList(testExtractorData, testExtractorData);
         LocalDate updatedDate = LocalDate.now();
         String query = QueryBuilder
@@ -98,6 +97,8 @@ public class ExtractionComponentTest {
         classToTest.execute();
 
         verify(writer, times(2)).outputStream(BlobFileUtils.getFileName(testExtractorData, updatedDate));
+        verify(queryExecutor, times(2)).close();
+
     }
 
     @Test
@@ -156,6 +157,8 @@ public class ExtractionComponentTest {
         classToTest.execute();
 
         verify(queryExecutorFactory, times(2)).provide(any());
+        verify(queryExecutor, times(2)).close();
+
     }
 
     @Test
@@ -172,5 +175,41 @@ public class ExtractionComponentTest {
 
         verify(blobService, times(2)).getContainerLastUpdated(CONTAINER_NAME);
         verify(queryExecutorFactory, never()).provide(anyString());
+    }
+
+    @Test
+    public void givenCorruptedFile_thenDeleteFile() throws SQLException {
+        ExtractionData testExtractorData = ExtractionData
+            .builder()
+            .container(CONTAINER_NAME)
+            .prefix(PREFIX)
+            .type(Output.JSON_LINES)
+            .build();
+        List<ExtractionData> extractionData = Arrays.asList(testExtractorData, testExtractorData);
+        LocalDate updatedDate = LocalDate.now();
+        final String blobName = BlobFileUtils.getFileName(testExtractorData, updatedDate);
+        String query = QueryBuilder
+            .builder()
+            .fromDate(updatedDate)
+            .toDate(updatedDate)
+            .extractionData(testExtractorData)
+            .build()
+            .getQuery();
+        when(blobOutputFactory.provide(any(ExtractionData.class))).thenReturn(writer);
+        when(queryExecutorFactory.provide(query)).thenReturn(queryExecutor);
+        when(extractorFactory.provide(testExtractorData.getType())).thenReturn(extractor);
+        when(extractions.getCaseTypes()).thenReturn(extractionData);
+        when(queryExecutor.execute()).thenReturn(resultSet);
+        when(resultSet.isBeforeFirst()).thenReturn(true);
+        when(blobService.validateBlob(CONTAINER_NAME, blobName, Output.JSON_LINES))
+            .thenReturn(false);
+
+        when(blobService.getContainerLastUpdated(CONTAINER_NAME)).thenReturn(updatedDate);
+        classToTest.execute();
+
+        verify(writer, times(2)).outputStream(blobName);
+        verify(queryExecutor, times(2)).close();
+        verify(blobService, times(2)).deleteBlob(CONTAINER_NAME, blobName);
+
     }
 }

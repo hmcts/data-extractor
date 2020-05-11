@@ -24,7 +24,7 @@ pr:
 
 variables:
 #  group: pipeline-env-variables
-  ${{ if eq( variables['Build.Reason'], 'PullRequest') }}: 
+  ${{ if eq( variables['Build.Reason'], 'PullRequest') }}:
     environment: 'test'
     env.upper: 'TEST'
   ${{ if ne( variables['Build.Reason'], 'PullRequest') }}: 

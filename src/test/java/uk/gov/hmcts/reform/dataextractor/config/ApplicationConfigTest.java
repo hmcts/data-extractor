@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.dataextractor.Factory;
 import uk.gov.hmcts.reform.dataextractor.QueryExecutor;
 import uk.gov.hmcts.reform.dataextractor.model.Output;
 import uk.gov.hmcts.reform.dataextractor.service.OutputStreamProvider;
+import uk.gov.hmcts.reform.dataextractor.service.impl.DefaultBlobValidator;
+import uk.gov.hmcts.reform.dataextractor.service.impl.JsonValidator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -21,6 +23,12 @@ public class ApplicationConfigTest {
 
     @Mock
     private OutputStreamProvider outputStreamProvider;
+
+    @Mock
+    private JsonValidator jsonValidator;
+
+    @Mock
+    private DefaultBlobValidator defaultBlobValidator;
 
     @Spy
     private DbConfig dbConfig;
@@ -56,5 +64,15 @@ public class ApplicationConfigTest {
         QueryExecutor result = queryExecutorFactory.provide("sqlQuery");
         QueryExecutor expected = new QueryExecutor(dbConfig.getUrl(), dbConfig.getUser(), dbConfig.getPassword(), "sqlQuery");
         assertThat(result).isEqualToComparingFieldByField(expected);
+    }
+
+    @Test
+    public void testJsonValidator() {
+        assertThat(classToTest.blobOutputValidator().provide(Output.JSON_LINES)).isEqualTo(jsonValidator);
+    }
+
+    @Test
+    public void testDefaultValidator() {
+        assertThat(classToTest.blobOutputValidator().provide(Output.CSV)).isEqualTo(defaultBlobValidator);
     }
 }

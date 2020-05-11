@@ -8,11 +8,16 @@ import uk.gov.hmcts.reform.dataextractor.BlobOutputWriter;
 import uk.gov.hmcts.reform.dataextractor.Factory;
 import uk.gov.hmcts.reform.dataextractor.QueryExecutor;
 import uk.gov.hmcts.reform.dataextractor.model.Output;
+import uk.gov.hmcts.reform.dataextractor.service.BlobOutputValidator;
 import uk.gov.hmcts.reform.dataextractor.service.Extractor;
 import uk.gov.hmcts.reform.dataextractor.service.OutputStreamProvider;
+import uk.gov.hmcts.reform.dataextractor.service.impl.DefaultBlobValidator;
 import uk.gov.hmcts.reform.dataextractor.service.impl.ExtractorCsv;
 import uk.gov.hmcts.reform.dataextractor.service.impl.ExtractorJson;
 import uk.gov.hmcts.reform.dataextractor.service.impl.ExtractorJsonLines;
+import uk.gov.hmcts.reform.dataextractor.service.impl.JsonValidator;
+
+import static uk.gov.hmcts.reform.dataextractor.model.Output.JSON_LINES;
 
 @Configuration
 public class ApplicationConfig {
@@ -23,6 +28,12 @@ public class ApplicationConfig {
     @Autowired
     private DbConfig dbConfig;
 
+    @Autowired
+    private JsonValidator jsonLineValidator;
+
+    @Autowired
+    private DefaultBlobValidator defaultBlobValidator;
+
     @Bean
     public Factory<ExtractionData, BlobOutputWriter> blobOutputFactory() {
         return this::blobOutputWriter;
@@ -30,7 +41,7 @@ public class ApplicationConfig {
 
     @Bean
     public Factory<String,  QueryExecutor> queryExecutorFactory() {
-        return this::blobOutputWriter;
+        return this::queryExecutor;
     }
 
     @Bean
@@ -38,11 +49,16 @@ public class ApplicationConfig {
         return this::extractor;
     }
 
+    @Bean
+    public Factory<Output, BlobOutputValidator> blobOutputValidator() {
+        return this::validator;
+    }
+
     private BlobOutputWriter blobOutputWriter(ExtractionData config) {
         return new BlobOutputWriter(config.getContainer(), config.getFileName(), config.getType(), outputStreamProvider);
     }
 
-    private QueryExecutor blobOutputWriter(String sqlQuery) {
+    private QueryExecutor queryExecutor(String sqlQuery) {
         return new QueryExecutor(dbConfig.getUrl(), dbConfig.getUser(), dbConfig.getPassword(), sqlQuery);
     }
 
@@ -53,5 +69,12 @@ public class ApplicationConfig {
             case CSV: return new ExtractorCsv();
             default: return extractor(Output.defaultOutput());
         }
+    }
+
+    private BlobOutputValidator validator(Output outputType) {
+        if (JSON_LINES.equals(outputType)) {
+            return jsonLineValidator;
+        }
+        return defaultBlobValidator;
     }
 }
