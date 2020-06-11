@@ -43,6 +43,14 @@ public class DbTest {
                     + "    case_type_version VARCHAR(50),"
                     + "    state_id  VARCHAR(50),"
                     + "    case_type_id VARCHAR(50),"
+                    + "    state_name VARCHAR(50),"
+                    + "    event_id  VARCHAR(50),"
+                    + "    event_name VARCHAR(50),"
+                    + "    user_id VARCHAR(100),"
+                    + "    user_first_name VARCHAR(100),"
+                    + "    user_last_name VARCHAR(100),"
+                    + "    summary VARCHAR(100),"
+                    + "    description VARCHAR(100),"
                     + "    security_classification VARCHAR(50)"
                     + ");"
             ));
@@ -56,10 +64,14 @@ public class DbTest {
                 .build(),
             insertInto("case_event")
                 .columns("id", "name", "created_date", "case_data_id", "case_type_id", "case_type_version",
-                    "state_id", "security_classification", "data")
-                .values(1, "A1", "2019-12-10 23:45:46", 1, "test", "v1", "created", "PUBLIC", TestUtils.getDataFromFile("dataA1.json"))
-                .values(2, "A2", "2019-12-10 23:45:47", 1, "test", "v1", "created", "PUBLIC", TestUtils.getDataFromFile("dataA2.json"))
-                .values(3, "B1", "2020-01-12 23:45:46", 2, "test", "v1", "created", "PUBLIC", TestUtils.getDataFromFile("dataB1.json"))
+                    "state_id", "security_classification", "state_name", "event_id", "event_name", "summary",
+                    "description", "user_id", "user_first_name", "user_last_name", "data")
+                .values(1, "A1", "2019-12-10 23:45:46", 1, "test", "v1", "created", "PUBLIC", "stateName", "eventId", "eventName", "summary",
+                    "description", "userId", "userFirstName", "userLastName", TestUtils.getDataFromFile("dataA1.json"))
+                .values(2, "A2", "2019-12-10 23:45:47", 1, "test", "v1", "created", "PUBLIC", "stateName", "eventId", "eventName", "summary",
+                    "description", "userId", "userFirstName", "userLastName", TestUtils.getDataFromFile("dataA2.json"))
+                .values(3, "B1", "2020-01-12 23:45:46", 2, "test", "v1", "created", "PUBLIC", "stateName", "eventId", "eventName", "summary",
+                    "description", "userId", "userFirstName", "userLastName", TestUtils.getDataFromFile("dataB1.json"))
                 .build());
 
     @BeforeAll
