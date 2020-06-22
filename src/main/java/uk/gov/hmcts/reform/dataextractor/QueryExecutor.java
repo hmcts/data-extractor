@@ -62,7 +62,7 @@ public class QueryExecutor implements AutoCloseable {
             if (resultSet != null) {
                 resultSet.close();
                 resultSet = null;
-                LOGGER.info("Closed result set");
+                LOGGER.debug("Closed result set");
             }
         } catch (SQLException e) {
             LOGGER.warn("SQL Exception thrown while closing result set.", e);
@@ -71,7 +71,7 @@ public class QueryExecutor implements AutoCloseable {
             if (statement != null) {
                 statement.close();
                 statement = null;
-                LOGGER.info("Closed statement");
+                LOGGER.debug("Closed statement");
 
             }
         } catch (SQLException e) {
@@ -84,7 +84,7 @@ public class QueryExecutor implements AutoCloseable {
                 LOGGER.info("Closed connection");
             }
         } catch (SQLException e) {
-            LOGGER.warn("SQL Exception thrown while closing connection.", e);
+            LOGGER.debug("SQL Exception thrown while closing connection.", e);
         }
     }
 
