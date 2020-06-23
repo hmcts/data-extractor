@@ -7,6 +7,13 @@ etl:
   connection-string: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:52189/devstoreaccount1;"
 
 extraction:
+  filter:
+    jurisdiction:
+      in:
+      out:
+        - "'PUBLICLAW'"
+        - "'AUTOTEST1'"
+        - "'TEST'"
   caseTypes:
     - container: "test-container"
       caseType: "test"
