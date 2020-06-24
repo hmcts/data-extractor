@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.mi.micore.factory.BlobServiceClientFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -105,15 +106,13 @@ public class ExtractionComponentFTest extends DbTest {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         blob.download(outputStream);
-        LOG.info(outputStream.toString());
         assertTrue(Pattern.compile(TestUtils.getDataFromFile("filtered-data.jsonl"))
             .matcher(outputStream.toString())
-            .matches(), "Expected output :" + outputStream.toString());
+            .matches(), String.format("Expected output :[%s] \n with timezone %s" + outputStream.toString() , TimeZone.getDefault().getID());
     }
 
     @Test
     public void givenInitialExecution_thenExtractAllData() {
-
         extractionComponent.execute(true);
         BlobContainerClient containerClient = testClient.getBlobContainerClient(TEST_CONTAINER_NAME);
 
