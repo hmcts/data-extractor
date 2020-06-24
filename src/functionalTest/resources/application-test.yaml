@@ -7,22 +7,24 @@ etl:
   connection-string: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:52189/devstoreaccount1;"
 
 extraction:
+  max:
+    batch:
+      row: 1
   filter:
     jurisdiction:
       in:
       out:
-        - "'PUBLICLAW'"
         - "'AUTOTEST1'"
         - "'TEST'"
   caseTypes:
-    - container: "test-container"
-      caseType: "test"
-      type: "jsonlines"
-      prefix: "JLines"
-      query: "SELECT ID, NAME FROM parent WHERE ID = 1"
-    - container: "disabled-container"
-      caseType: "disabled-test"
-      type: "jsonlines"
-      prefix: "JLines"
-      disabled: true
-      query: "SELECT ID, NAME FROM parent WHERE ID = 1"
+  - container: "test-container"
+    caseType: "test"
+    type: "jsonlines"
+    prefix: "JLines"
+    query: "SELECT ID, NAME FROM parent WHERE ID = 1"
+  - container: "disabled-container"
+    caseType: "disabled-test"
+    type: "jsonlines"
+    prefix: "JLines"
+    disabled: true
+    query: "SELECT ID, NAME FROM parent WHERE ID = 1"

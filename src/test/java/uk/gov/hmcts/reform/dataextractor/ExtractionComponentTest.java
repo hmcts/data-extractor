@@ -1,15 +1,18 @@
 package uk.gov.hmcts.reform.dataextractor;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import uk.gov.hmcts.reform.dataextractor.config.ExtractionData;
 import uk.gov.hmcts.reform.dataextractor.config.Extractions;
 import uk.gov.hmcts.reform.dataextractor.model.CaseDefinition;
+import uk.gov.hmcts.reform.dataextractor.model.ExtractionWindow;
 import uk.gov.hmcts.reform.dataextractor.model.Output;
 import uk.gov.hmcts.reform.dataextractor.service.Extractor;
 import uk.gov.hmcts.reform.dataextractor.service.impl.BlobServiceImpl;
@@ -73,6 +76,11 @@ public class ExtractionComponentTest {
     @Mock
     private CaseDataServiceImpl caseDataService;
 
+    @BeforeEach
+    public void setUp() {
+        ReflectionTestUtils.setField(classToTest, "maxRowPerBatch", 100000);
+    }
+
     @Test
     public void givenExtractorList_thenProcessAllCases() throws SQLException {
         ExtractionData testExtractorData = ExtractionData
@@ -106,7 +114,7 @@ public class ExtractionComponentTest {
         when(blobService.getContainerLastUpdated(CONTAINER_NAME)).thenReturn(updatedDate);
         when(caseDataService.getCaseDefinitions()).thenReturn(Arrays.asList(new CaseDefinition("", CASE_TYPE1), new CaseDefinition("", CASE_TYPE2)));
 
-        classToTest.execute();
+        classToTest.execute(false);
 
         verify(writer, times(2)).outputStream(BlobFileUtils.getFileName(testExtractorData, updatedDate));
         verify(queryExecutor, times(2)).close();
@@ -153,8 +161,15 @@ public class ExtractionComponentTest {
         when(queryExecutor.execute()).thenReturn(resultSet);
         when(resultSet.isBeforeFirst()).thenReturn(true);
         when(blobService.getContainerLastUpdated(CONTAINER_NAME)).thenReturn(null);
+
+        when(caseDataService.getCaseTypeRows(CASE_TYPE1)).thenReturn(1L);
+        when(caseDataService.getDates(CASE_TYPE1)).thenReturn(new ExtractionWindow(System.currentTimeMillis(), System.currentTimeMillis()));
+
+        when(caseDataService.getCaseTypeRows(CASE_TYPE2)).thenReturn(1L);
+        when(caseDataService.getDates(CASE_TYPE2)).thenReturn(new ExtractionWindow(System.currentTimeMillis(), System.currentTimeMillis()));
+
         when(caseDataService.getCaseDefinitions()).thenReturn(Arrays.asList(new CaseDefinition("", CASE_TYPE1), new CaseDefinition("", CASE_TYPE2)));
-        classToTest.execute();
+        classToTest.execute(true);
 
         verify(writer, times(2)).outputStream(BlobFileUtils.getFileName(testExtractorData, updatedDate));
     }
@@ -190,7 +205,7 @@ public class ExtractionComponentTest {
         when(blobService.getContainerLastUpdated(CONTAINER_NAME)).thenReturn(fromDate);
         when(caseDataService.getCaseDefinitions()).thenReturn(Arrays.asList(new CaseDefinition("", CASE_TYPE1), new CaseDefinition("", CASE_TYPE2)));
 
-        classToTest.execute();
+        classToTest.execute(false);
 
         verify(queryExecutorFactory, times(2)).provide(any());
         verify(queryExecutor, times(2)).close();
@@ -216,7 +231,7 @@ public class ExtractionComponentTest {
 
         when(caseDataService.getCaseDefinitions()).thenReturn(Arrays.asList(new CaseDefinition("", CASE_TYPE1), new CaseDefinition("", CASE_TYPE2)));
 
-        classToTest.execute();
+        classToTest.execute(false);
 
         verify(blobService, times(1)).getContainerLastUpdated(CONTAINER_NAME);
         verify(blobService, times(1)).getContainerLastUpdated(CONTAINER_NAME2);
@@ -264,7 +279,7 @@ public class ExtractionComponentTest {
             .thenReturn(false);
         when(blobService.getContainerLastUpdated(CONTAINER_NAME)).thenReturn(updatedDate);
         when(caseDataService.getCaseDefinitions()).thenReturn(Arrays.asList(new CaseDefinition("", CASE_TYPE1), new CaseDefinition("", CASE_TYPE2)));
-        classToTest.execute();
+        classToTest.execute(false);
 
         verify(writer, times(2)).outputStream(blobName);
         verify(queryExecutor, times(2)).close();

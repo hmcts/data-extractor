@@ -45,7 +45,7 @@ public class DataExtractorApplication implements ApplicationRunner {
                 healthCheck.check();
             } else {
                 runPreExecutionTasks();
-                extractionComponent.execute();
+                extractionComponent.execute(true);
             }
         } catch (Exception e) {
             log.error("Error executing integration service", e);

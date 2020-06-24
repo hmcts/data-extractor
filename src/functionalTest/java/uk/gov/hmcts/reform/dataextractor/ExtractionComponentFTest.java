@@ -90,7 +90,7 @@ public class ExtractionComponentFTest extends DbTest {
         BlobContainerClient containerClient = testClient.createBlobContainer(TEST_CONTAINER_NAME);
         containerClient.setMetadata(Map.of(UPDATE_DATE_METADATA, "20200101"));
 
-        extractionComponent.execute();
+        extractionComponent.execute(false);
 
         PagedIterable<BlobContainerItem> containers = testClient.listBlobContainers();
         testClient.getBlobContainerClient(TEST_CONTAINER_NAME);
@@ -110,7 +110,7 @@ public class ExtractionComponentFTest extends DbTest {
     @Test
     public void givenInitialExecution_thenExtractAllData() {
 
-        extractionComponent.execute();
+        extractionComponent.execute(true);
         BlobContainerClient containerClient = testClient.getBlobContainerClient(TEST_CONTAINER_NAME);
 
         assertTrue(containerClient.exists());

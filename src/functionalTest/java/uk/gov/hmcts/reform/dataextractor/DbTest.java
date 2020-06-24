@@ -39,6 +39,8 @@ public class DbTest {
                     + "  case_type_id VARCHAR(50) NOT NULL,"
                     + "  state VARCHAR(50) NOT NULL,"
                     + "  last_modified TIMESTAMP,"
+                    + "  data jsonb NOT NULL,"
+                    + "  data_classification JSONB NOT NULL,"
                     + "  last_state_modified_date TIMESTAMP,"
                     + "  created_date TIMESTAMP NOT NULL"
                     + ");",
@@ -68,9 +70,11 @@ public class DbTest {
         sequenceOf(
             insertInto("case_data")
                 .columns("id", "name", "jurisdiction", "case_type_id", "last_modified", "state", "reference",
-                    "security_classification", "created_date")
-                .values(1, "A", "jur", "test", "2019-04-12 23:45:45", "created", "1", "public", "2019-04-12 23:45:45")
-                .values(2, "B", "jur", "test", "2019-04-12 23:45:45", "created", "2", "public", "2019-04-14 23:45:45")
+                    "security_classification", "created_date", "data", "data_classification")
+                .values(1, "A", "jur", "test", "2019-04-12 23:45:45", "created", "1", "public", "2019-04-12 23:45:45",
+                    TestUtils.getDataFromFile("dataA1.json"), TestUtils.getDataFromFile("dataA1.json"))
+                .values(2, "B", "jur", "test", "2019-04-12 23:45:45", "created", "2", "public", "2019-04-14 23:45:45",
+                    TestUtils.getDataFromFile("dataA1.json"), TestUtils.getDataFromFile("dataA1.json"))
                 .build(),
             insertInto("case_event")
                 .columns("id", "name", "created_date", "case_data_id", "case_type_id", "case_type_version",

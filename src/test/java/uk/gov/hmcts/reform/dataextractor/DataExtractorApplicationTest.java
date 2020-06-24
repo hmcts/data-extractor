@@ -47,7 +47,7 @@ public class DataExtractorApplicationTest {
     @Test
     public void testApplicationExecuted() throws Exception {
         classToTest.run(null);
-        verify(extractionComponent, times(1)).execute();
+        verify(extractionComponent, times(1)).execute(true);
         verify(healthCheck, never()).check();
         verify(client, times(1)).flush();
     }
@@ -57,7 +57,7 @@ public class DataExtractorApplicationTest {
         ReflectionTestUtils.setField(classToTest, "smokeTest", true);
         classToTest.run(null);
         verify(healthCheck, times(1)).check();
-        verify(extractionComponent, never()).execute();
+        verify(extractionComponent, never()).execute(false);
         verify(client, times(1)).flush();
     }
 
@@ -70,7 +70,7 @@ public class DataExtractorApplicationTest {
                 "disabledExecutorMock", disabledExecutorMock));
         when(preExecutorMock.isEnabled()).thenReturn(true);
         classToTest.run(null);
-        verify(extractionComponent, times(1)).execute();
+        verify(extractionComponent, times(1)).execute(true);
         verify(healthCheck, never()).check();
         verify(client, times(1)).flush();
         verify(preExecutorMock, times(1)).execute();
@@ -83,6 +83,6 @@ public class DataExtractorApplicationTest {
         doThrow(new ServiceNotAvailableException("Not available")).when(healthCheck).check();
         assertThrows(ServiceNotAvailableException.class, () -> classToTest.run(null));
         verify(healthCheck, times(1)).check();
-        verify(extractionComponent, never()).execute();
+        verify(extractionComponent, never()).execute(false);
     }
 }

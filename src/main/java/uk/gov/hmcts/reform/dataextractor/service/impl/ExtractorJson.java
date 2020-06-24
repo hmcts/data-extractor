@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.dataextractor.service.impl;
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.extern.slf4j.Slf4j;
+
 import uk.gov.hmcts.reform.dataextractor.exception.ExtractorException;
 import uk.gov.hmcts.reform.dataextractor.service.Extractor;
 
@@ -18,18 +18,19 @@ import java.sql.SQLException;
 @Slf4j
 public class ExtractorJson implements Extractor {
 
-    public void apply(ResultSet resultSet, OutputStream outputStream) {
+    public int apply(ResultSet resultSet, OutputStream outputStream) {
         final ObjectMapper objectMapper = new ObjectMapper();
+        int processedData = 0;
         try (JsonGenerator jsonGenerator =
-            objectMapper.getFactory()
-            .createGenerator(outputStream, JsonEncoding.UTF8)
+                 objectMapper.getFactory()
+                     .createGenerator(outputStream, JsonEncoding.UTF8)
         ) {
-            int processedData = writeResultSetToJson(resultSet, jsonGenerator);
+            processedData = writeResultSetToJson(resultSet, jsonGenerator);
             jsonGenerator.flush();
-            log.info("Total data processed in current batch: {}", processedData);
         } catch (IOException | SQLException e) {
             throw new ExtractorException(e);
         }
+        return processedData;
     }
 
     protected int  writeResultSetToJson(ResultSet resultSet, JsonGenerator jsonGenerator)

@@ -9,11 +9,14 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("etl.db")
 @Data
 public class DbConfig {
-
     @Value("${base.dir:/mnt/secrets/}")
     private String baseDir;
 
     private String url;
     private String user;
     private String password;
+
+    private String cloneUrl;
+    private String cloneUser;
+    private String clonePassword;
 }
