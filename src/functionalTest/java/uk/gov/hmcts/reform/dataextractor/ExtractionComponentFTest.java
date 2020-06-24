@@ -9,6 +9,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -38,6 +40,8 @@ import static uk.gov.hmcts.reform.dataextractor.utils.TestConstants.DEFAULT_COMM
 @ActiveProfiles(profiles = "test")
 @SpringBootTest(classes = TestApplicationConfiguration.class)
 public class ExtractionComponentFTest extends DbTest {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ExtractionComponentFTest.class);
 
     private static final String TEST_CONTAINER_NAME = "test-container";
     private static final String DISABLED_TEST_CONTAINER_NAME = "disabled-container";
@@ -101,7 +105,7 @@ public class ExtractionComponentFTest extends DbTest {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         blob.download(outputStream);
-
+        LOG.info(outputStream.toString());
         assertTrue(Pattern.compile(TestUtils.getDataFromFile("filtered-data.jsonl"))
             .matcher(outputStream.toString())
             .matches(), "Expected output");
