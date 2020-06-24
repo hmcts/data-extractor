@@ -108,7 +108,7 @@ public class ExtractionComponentFTest extends DbTest {
         blob.download(outputStream);
         assertTrue(Pattern.compile(TestUtils.getDataFromFile("filtered-data.jsonl"))
             .matcher(outputStream.toString())
-            .matches(), String.format("Expected output :[%s] \n with timezone %s" + outputStream.toString(), TimeZone.getDefault().getID()));
+            .matches(), String.format("Expected output :[%s] \n with timezone %s", outputStream.toString(), TimeZone.getDefault().getID()));
     }
 
     @Test
