@@ -108,7 +108,7 @@ public class ExtractionComponentFTest extends DbTest {
         LOG.info(outputStream.toString());
         assertTrue(Pattern.compile(TestUtils.getDataFromFile("filtered-data.jsonl"))
             .matcher(outputStream.toString())
-            .matches(), "Expected output");
+            .matches(), "Expected output :" + outputStream.toString());
     }
 
     @Test
