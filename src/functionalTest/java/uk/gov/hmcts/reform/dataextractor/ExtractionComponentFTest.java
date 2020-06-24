@@ -83,6 +83,7 @@ public class ExtractionComponentFTest extends DbTest {
         ReflectionTestUtils.setField(dbConfig, "user", username);
         ReflectionTestUtils.setField(dbConfig, "password", password);
         testClient = blobServiceClientFactory.getBlobClientWithConnectionString(connString);
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
     }
 
     @AfterEach
@@ -134,7 +135,7 @@ public class ExtractionComponentFTest extends DbTest {
         blob.download(outputStream);
         assertTrue(Pattern.compile(TestUtils.getDataFromFile("data/all-data-part2.jsonl"))
             .matcher(outputStream.toString())
-            .matches(), "Expected output");
+            .matches(), "Expected output ");
 
         BlobContainerClient disabledContainerName = testClient.getBlobContainerClient(DISABLED_TEST_CONTAINER_NAME);
         assertFalse(disabledContainerName.exists(), "Expected container not exist");

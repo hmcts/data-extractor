@@ -15,10 +15,14 @@ import uk.gov.hmcts.reform.dataextractor.task.PreExecutor;
 import uk.gov.hmcts.reform.mi.micore.component.HealthCheck;
 
 import java.util.Map;
+import java.util.TimeZone;
+import javax.annotation.PostConstruct;
 
 @Slf4j
 @SpringBootApplication(scanBasePackages = "uk.gov.hmcts.reform", exclude = {DataSourceAutoConfiguration.class})
 public class DataExtractorApplication implements ApplicationRunner {
+
+    private static final String DEFAULT_TIME_ZONE = "UTC";
 
     @Autowired
     private ApplicationContext context;
@@ -55,6 +59,12 @@ public class DataExtractorApplication implements ApplicationRunner {
             waitTelemetryGracefulPeriod();
         }
         log.info("CCD Data extractor process completed");
+    }
+
+    @PostConstruct
+    void started() {
+        log.info("Set default timezone to {}", DEFAULT_TIME_ZONE);
+        TimeZone.setDefault(TimeZone.getTimeZone(DEFAULT_TIME_ZONE));
     }
 
     private void runPreExecutionTasks() {
