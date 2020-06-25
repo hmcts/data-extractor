@@ -7,12 +7,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import uk.gov.hmcts.reform.dataextractor.config.ExtractionData;
 import uk.gov.hmcts.reform.dataextractor.config.Extractions;
 import uk.gov.hmcts.reform.dataextractor.model.CaseDefinition;
-import uk.gov.hmcts.reform.dataextractor.model.ExtractionWindow;
 import uk.gov.hmcts.reform.dataextractor.model.Output;
 import uk.gov.hmcts.reform.dataextractor.service.Extractor;
 import uk.gov.hmcts.reform.dataextractor.service.impl.BlobServiceImpl;
@@ -78,7 +76,7 @@ public class ExtractionComponentTest {
 
     @BeforeEach
     public void setUp() {
-        ReflectionTestUtils.setField(classToTest, "maxRowPerBatch", 100000);
+    //        ReflectionTestUtils.setField(classToTest, "maxRowPerBatch", 100000);
     }
 
     @Test
@@ -162,11 +160,14 @@ public class ExtractionComponentTest {
         when(resultSet.isBeforeFirst()).thenReturn(true);
         when(blobService.getContainerLastUpdated(CONTAINER_NAME)).thenReturn(null);
 
-        when(caseDataService.getCaseTypeRows(CASE_TYPE1)).thenReturn(1L);
-        when(caseDataService.getDates(CASE_TYPE1)).thenReturn(new ExtractionWindow(System.currentTimeMillis(), System.currentTimeMillis()));
+        //        when(caseDataService.getDates()).thenReturn(1L);
+        //        when(caseDataService.getCaseTypeRows(CASE_TYPE2)).thenReturn(1L);
 
-        when(caseDataService.getCaseTypeRows(CASE_TYPE2)).thenReturn(1L);
-        when(caseDataService.getDates(CASE_TYPE2)).thenReturn(new ExtractionWindow(System.currentTimeMillis(), System.currentTimeMillis()));
+        //        when(caseDataService.getCaseTypeRows(CASE_TYPE1)).thenReturn(1L);
+        //        when(caseDataService.getDates(CASE_TYPE1)).thenReturn(new ExtractionWindow(System.currentTimeMillis(), System.currentTimeMillis()));
+        //
+        //        when(caseDataService.getCaseTypeRows(CASE_TYPE2)).thenReturn(1L);
+        //        when(caseDataService.getDates(CASE_TYPE2)).thenReturn(new ExtractionWindow(System.currentTimeMillis(), System.currentTimeMillis()));
 
         when(caseDataService.getCaseDefinitions()).thenReturn(Arrays.asList(new CaseDefinition("", CASE_TYPE1), new CaseDefinition("", CASE_TYPE2)));
         classToTest.execute(true);

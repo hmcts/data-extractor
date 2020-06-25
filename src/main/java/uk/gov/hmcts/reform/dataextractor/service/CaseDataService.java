@@ -17,4 +17,6 @@ public interface CaseDataService {
     ExtractionWindow getDates(String caseType);
 
     long getCaseTypeRows(String caseType);
+
+    int calculateExtractionWindow(String caseType);
 }

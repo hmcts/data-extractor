@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.dataextractor.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -16,7 +17,11 @@ import uk.gov.hmcts.reform.dataextractor.service.CaseDataService;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,20 +38,17 @@ public class CaseDataServiceImpl implements CaseDataService {
 
 
     private static final String INIT_END_DATA = "select  max.created_date as last_date, min.created_date as first_date \n"
-        + "from (SELECT created_date \n"
-        + "FROM case_event CE\n"
-        + "where CE.case_type_id = '%s'\n"
-        + "order by created_date desc \n"
-        + "limit 1) as max,\n"
-        + "(SELECT created_date \n"
-        + "FROM case_event CE\n"
-        + "where CE.case_type_id = '%s'\n"
-        + "order by created_date asc \n"
-        + "limit 1) as min";
+        + "from (SELECT created_date FROM case_event CE where CE.case_type_id = '%s' order by created_date desc limit 1) as max,\n"
+        + "(SELECT created_date FROM case_event CE where CE.case_type_id = '%s' order by created_date asc limit 1) as min";
 
     private static final String DATA_COUNT = "select count(*) \n"
         + "FROM case_event \n"
         + "WHERE case_type_id = '%s';";
+
+    private static final int MINIMUM_WINDOW = 7;
+
+    @Value("${extraction.max.batch.row:100_000}")
+    private int maxRowPerBatch;
 
     @Autowired
     private final Factory<String, QueryExecutor> queryExecutorFactory;
@@ -130,6 +132,23 @@ public class CaseDataServiceImpl implements CaseDataService {
             throw new ExtractorException(e);
         }
     }
+
+    public int calculateExtractionWindow(String caseType) {
+        long caseCount = this.getCaseTypeRows(caseType);
+        if (caseCount == 0) {
+            return MINIMUM_WINDOW;
+        }
+        ExtractionWindow dates = this.getDates(caseType);
+        LocalDateTime dateTime1 = LocalDateTime.ofInstant(Instant.ofEpochMilli(dates.getStart()), ZoneId.systemDefault());
+        LocalDateTime dateTime2 = LocalDateTime.ofInstant(Instant.ofEpochMilli(dates.getEnd()), ZoneId.systemDefault());
+        long days = ChronoUnit.DAYS.between(dateTime1, dateTime2);
+        if (days < 2) {
+            return MINIMUM_WINDOW;
+        }
+        double portions = Math.ceil((double)caseCount / maxRowPerBatch);
+        return (int) Math.ceil((double)days / portions);
+    }
+
 
     private long count(ResultSet resultSet) throws SQLException {
         return resultSet.getLong("count");

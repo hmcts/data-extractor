@@ -2,14 +2,12 @@ package uk.gov.hmcts.reform.dataextractor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import uk.gov.hmcts.reform.dataextractor.config.ExtractionData;
 import uk.gov.hmcts.reform.dataextractor.config.Extractions;
 import uk.gov.hmcts.reform.dataextractor.exception.CaseTypeNotInitialisedException;
 import uk.gov.hmcts.reform.dataextractor.model.CaseDefinition;
-import uk.gov.hmcts.reform.dataextractor.model.ExtractionWindow;
 import uk.gov.hmcts.reform.dataextractor.model.Output;
 import uk.gov.hmcts.reform.dataextractor.service.CaseDataService;
 import uk.gov.hmcts.reform.dataextractor.service.Extractor;
@@ -17,12 +15,7 @@ import uk.gov.hmcts.reform.dataextractor.service.impl.BlobServiceImpl;
 import uk.gov.hmcts.reform.dataextractor.utils.BlobFileUtils;
 
 import java.sql.ResultSet;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -55,10 +48,8 @@ public class ExtractionComponent {
     @Autowired
     private CaseDataService caseDataService;
 
-    @Value("${extraction.max.batch.row:100_000}")
-    private int maxRowPerBatch;
-
     public void execute(boolean initialLoad) {
+
         LocalDate now = LocalDate.now();
         List<CaseDefinition> caseDefinitions = caseDataService.getCaseDefinitions();
         for (CaseDefinition caseDefinition : caseDefinitions) {
@@ -70,15 +61,15 @@ public class ExtractionComponent {
         }
     }
 
-    private int calculateExtractionWindow(String caseType) {
-        ExtractionWindow dates = caseDataService.getDates(caseType);
-        long caseCount = caseDataService.getCaseTypeRows(caseType);
-        LocalDateTime dateTime1 = LocalDateTime.ofInstant(Instant.ofEpochMilli(dates.getStart()), ZoneId.systemDefault());
-        LocalDateTime dateTime2 = LocalDateTime.ofInstant(Instant.ofEpochMilli(dates.getEnd()), ZoneId.systemDefault());
-        long days = ChronoUnit.DAYS.between(dateTime1, dateTime2);
-        double portions = Math.ceil(caseCount / maxRowPerBatch);
-        return (int) Math.ceil(days / portions);
-    }
+    //    private int calculateExtractionWindow(String caseType) {
+    //        ExtractionWindow dates = caseDataService.getDates(caseType);
+    //        long caseCount = caseDataService.getCaseTypeRows(caseType);
+    //        LocalDateTime dateTime1 = LocalDateTime.ofInstant(Instant.ofEpochMilli(dates.getStart()), ZoneId.systemDefault());
+    //        LocalDateTime dateTime2 = LocalDateTime.ofInstant(Instant.ofEpochMilli(dates.getEnd()), ZoneId.systemDefault());
+    //        long days = ChronoUnit.DAYS.between(dateTime1, dateTime2);
+    //        double portions = Math.ceil(caseCount / maxRowPerBatch);
+    //        return (int) Math.ceil(days / portions);
+    //    }
 
     private ExtractionData getExtractionData(CaseDefinition caseDefinition) {
         Map<String, ExtractionData> extractionConfig = getCaseTypesToExtractMap();
@@ -93,7 +84,7 @@ public class ExtractionComponent {
     }
 
     @SuppressWarnings("PMD.CloseResource")
-    private void processData(ExtractionData extractionData, LocalDate now, boolean initialLoad) {
+    private void processData(ExtractionData extractionData, LocalDate executionTime, boolean initialLoad) {
 
         LocalDate lastUpdated = null;
         try {
@@ -105,14 +96,15 @@ public class ExtractionComponent {
 
         LocalDate toDate;
         QueryExecutor executor = null;
-        BlobOutputWriter writer = null;
         Extractor extractor = extractorFactory.provide(extractionData.getType());
-        final int window = initialLoad ? calculateExtractionWindow(extractionData.getCaseType()) : DEFAULT_EXTRACTION_WINDOW;
+        final int extractionWindow = initialLoad ? caseDataService.calculateExtractionWindow(extractionData.getCaseType())
+            : DEFAULT_EXTRACTION_WINDOW;
         do {
-            long startTime = LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli();
+            long executionStartTime = System.currentTimeMillis();
 
             try {
-                toDate = getToDate(lastUpdated, now, window);
+                //TODO test if fails
+                toDate = getExtractionToDate(lastUpdated, executionTime, extractionWindow);
                 QueryBuilder queryBuilder = QueryBuilder
                     .builder()
                     .fromDate(lastUpdated)
@@ -121,22 +113,21 @@ public class ExtractionComponent {
                     .build();
                 log.info("Query to execute : {}", queryBuilder.getQuery());
                 executor = queryExecutorFactory.provide(queryBuilder.getQuery());
-                writer = blobOutputFactory.provide(extractionData);
+                BlobOutputWriter writer = blobOutputFactory.provide(extractionData);
                 ResultSet resultSet = executor.execute();
 
                 if (resultSet.isBeforeFirst()) {
                     String fileName = BlobFileUtils.getFileName(extractionData, toDate);
                     int extractedRows = applyExtraction(extractor, resultSet, fileName, extractionData, writer, toDate);
-                    long endTime = LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli();
-                    // log.info("Total data processed in current batch: {} for case type {} ", extractedRows, extractionData.getCaseType());
+
+                    long batchExecutionEndTime = System.currentTimeMillis();
                     log.info("Batch completed in {} ms extracting {} with number rows extracted {}",
-                        endTime - startTime, extractionData.getCaseType(), extractedRows);
+                        batchExecutionEndTime - executionStartTime, extractionData.getCaseType(), extractedRows);
                 } else {
-                    toDate = getToDate(lastUpdated, now, window);
+                    toDate = getExtractionToDate(lastUpdated, executionTime, extractionWindow);
                     log.info("There is no records for caseType {}", extractionData.getContainer());
                 }
                 lastUpdated = toDate;
-
 
             } catch (Exception e) {
                 log.error("Error processing case {}", extractionData.getContainer(), e);
@@ -145,7 +136,7 @@ public class ExtractionComponent {
                 closeQueryExecutor(executor);
                 executor = null;
             }
-        } while (toDate.isBefore(now));
+        } while (toDate.isBefore(executionTime));
     }
 
     private int applyExtraction(Extractor extractor, ResultSet resultSet, String fileName, ExtractionData extractionData,
@@ -166,7 +157,7 @@ public class ExtractionComponent {
         }
     }
 
-    private LocalDate getToDate(LocalDate lastUpdated, LocalDate currentDate, int window) {
+    private LocalDate getExtractionToDate(LocalDate lastUpdated, LocalDate currentDate, int window) {
         return lastUpdated.plusDays(window).isBefore(currentDate) ? lastUpdated.plusDays(window) : currentDate;
     }
 
