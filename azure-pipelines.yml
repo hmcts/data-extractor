@@ -66,6 +66,9 @@ stages:
       functionalTest: true
       preIntegrationTest: true
       azureSecreKeys: 'ccdro-user,ccdro-password,data-extractor-connection-string'
+      envMapping:
+        key: BUILD_VERSION
+        value: 'PR-$(System.PullRequest.PullRequestNumber)'
       azureKeyMapping: 
       - key: ETL_DB_USER
         value: 'ccdro-user'

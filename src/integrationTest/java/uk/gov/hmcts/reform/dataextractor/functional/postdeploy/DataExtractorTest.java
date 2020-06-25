@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -20,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Locale;
 import java.util.Map;
 
 import static java.time.ZoneOffset.UTC;
@@ -47,6 +49,9 @@ public class DataExtractorTest {
     @Autowired
     private BlobReader blobReader;
 
+    @Value("${container.name}")
+    public String testContainerName;
+
     private static final  String SQL_QUERY_BY_CASETYPE = "SELECT count(*) \n"
         + "FROM case_event CE\n"
         + "WHERE CE.case_type_id = '%s'\n"
@@ -59,7 +64,7 @@ public class DataExtractorTest {
     public void checkBlobAreCreated() throws SQLException {
         String expectedFileName = getFileName(BLOB_PREFIX, OUTPUT_TYPE);
 
-        BlobClient blobClient = blobReader.getBlobClient(TEST_CONTAINER, expectedFileName);
+        BlobClient blobClient = blobReader.getBlobClient(testContainerName.toLowerCase(Locale.UK), expectedFileName);
         assertTrue(blobClient.exists(), "Blob missing");
 
         String fileContent = blobReader.readFile(TEST_CONTAINER, expectedFileName);
@@ -77,7 +82,7 @@ public class DataExtractorTest {
         }
 
         blobClient.delete();
-        BlobContainerClient containerClient = blobReader.getBlobServiceClient().getBlobContainerClient(TEST_CONTAINER);
+        BlobContainerClient containerClient = blobReader.getBlobServiceClient().getBlobContainerClient(testContainerName.toLowerCase(Locale.UK));
         containerClient.setMetadata(Map.of(ContainerConstants.UPDATE_DATE_METADATA, StringUtils.EMPTY));
     }
 
