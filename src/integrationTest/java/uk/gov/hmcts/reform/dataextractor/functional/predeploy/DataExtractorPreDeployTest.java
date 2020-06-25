@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.dataextractor.functional.predeploy;
 
 import com.azure.storage.blob.BlobContainerClient;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,17 +36,21 @@ public class DataExtractorPreDeployTest {
 
     @Test
     public void prepareContainer() {
+        final String containerName = testContainerName.toLowerCase(Locale.UK);
+        try {
+            log.info(containerName);
+            BlobContainerClient containerClient = blobReader.getBlobServiceClient().getBlobContainerClient(containerName);
+            if (!containerClient.exists()) {
+                containerClient.create();
+            }
 
-        log.info(testContainerName);
-        BlobContainerClient containerClient = blobReader.getBlobServiceClient().getBlobContainerClient(testContainerName.toLowerCase(Locale.UK));
-        if (!containerClient.exists()) {
-            containerClient.create();
+            String metadataValue = DateTimeUtils.dateToString(LocalDate.now().minusDays(DATA_DAYS));
+            containerClient.setMetadata(Map.of(ContainerConstants.UPDATE_DATE_METADATA,
+                DateTimeUtils.dateToString(LocalDate.now().minusDays(DATA_DAYS))));
+            log.info("Set metadata value as {} for container {}", metadataValue, containerName);
+        } catch (Exception e) {
+            Assert.fail(containerName);
         }
-
-        String metadataValue = DateTimeUtils.dateToString(LocalDate.now().minusDays(DATA_DAYS));
-        containerClient.setMetadata(Map.of(ContainerConstants.UPDATE_DATE_METADATA,
-            DateTimeUtils.dateToString(LocalDate.now().minusDays(DATA_DAYS))));
-        log.info("Set metadata value as {} for container {}", metadataValue, testContainerName.toLowerCase(Locale.UK));
 
     }
 }
