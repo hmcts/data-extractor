@@ -24,7 +24,8 @@ mi-job:
     EXTRACTION_CASETYPES_0__CASETYPE: "Caveat"
     EXTRACTION_CASETYPES_0__TYPE: "jsonlines"
     EXTRACTION_CASETYPES_0__PREFIX: "CCD-TEST"
-
+    EXTRACTION_FILTER_JURISDICTION_IN: ["'DIVORCE'"]
+    EXTRACTION_INITIALISE: false
 global:
   enableKeyVaults: true
   environment: "sbox"
