@@ -17,16 +17,21 @@ etl:
 smoke.test.enabled: false
 
 extraction:
-  initialise: true
+  initialise: false
   max:
     batch:
       row: 100000
   filter:
     jurisdiction:
-      in: ["'DIVORCE'", "'PROBATE', 'ARCHIVED'"]
+      in:
+      - "'DIVORCE'"
+      - "'PROBATE'"
+      - "'CMC'"
+      - "'IA'"
+      - "'SSCS'"
       out:
-        - "'AUTOTEST1'"
-        - "'TEST'"
+      - "'AUTOTEST1'"
+      - "'TEST'"
   caseTypes:
   - container: "grantofrepresentation"
     caseType: "GrantOfRepresentation"

@@ -15,14 +15,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.dataextractor.QueryExecutor;
 import uk.gov.hmcts.reform.dataextractor.config.DbConfig;
 import uk.gov.hmcts.reform.dataextractor.model.Output;
-import uk.gov.hmcts.reform.dataextractor.service.ContainerConstants;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Locale;
-import java.util.Map;
 
 import static java.time.ZoneOffset.UTC;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -83,7 +81,9 @@ public class DataExtractorTest {
 
         blobClient.delete();
         BlobContainerClient containerClient = blobReader.getBlobServiceClient().getBlobContainerClient(testContainerName.toLowerCase(Locale.UK));
-        containerClient.setMetadata(Map.of(ContainerConstants.UPDATE_DATE_METADATA, StringUtils.EMPTY));
+        if (containerClient.exists()) {
+            containerClient.delete();
+        }
     }
 
     private int getFileLinesCount(String fileContent) {
