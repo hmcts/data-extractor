@@ -51,7 +51,7 @@ resources:
       type: github
       name: hmcts/mi-core-lib
       endpoint: hmcts
-      branch: helm-env
+      ref: helm-env
 
 stages:
   - template: pipeline-steps/templates/build-deploy-stage.yaml@mi-core
