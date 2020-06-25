@@ -47,7 +47,7 @@ public class DataExtractorApplicationTest {
     @Test
     public void testApplicationExecuted() throws Exception {
         classToTest.run(null);
-        verify(extractionComponent, times(1)).execute(true);
+        verify(extractionComponent, times(1)).execute(false);
         verify(healthCheck, never()).check();
         verify(client, times(1)).flush();
     }
@@ -70,7 +70,7 @@ public class DataExtractorApplicationTest {
                 "disabledExecutorMock", disabledExecutorMock));
         when(preExecutorMock.isEnabled()).thenReturn(true);
         classToTest.run(null);
-        verify(extractionComponent, times(1)).execute(true);
+        verify(extractionComponent, times(1)).execute(false);
         verify(healthCheck, never()).check();
         verify(client, times(1)).flush();
         verify(preExecutorMock, times(1)).execute();

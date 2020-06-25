@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.dataextractor.config.ExtractionData;
 import uk.gov.hmcts.reform.dataextractor.config.Extractions;
 import uk.gov.hmcts.reform.dataextractor.exception.CaseTypeNotInitialisedException;
+import uk.gov.hmcts.reform.dataextractor.exception.ExportCorruptedException;
 import uk.gov.hmcts.reform.dataextractor.model.CaseDefinition;
 import uk.gov.hmcts.reform.dataextractor.model.Output;
 import uk.gov.hmcts.reform.dataextractor.service.CaseDataService;
@@ -52,6 +53,7 @@ public class ExtractionComponent {
 
         LocalDate now = LocalDate.now();
         List<CaseDefinition> caseDefinitions = caseDataService.getCaseDefinitions();
+        log.info("Total case definitions loaded {}", caseDefinitions.size());
         for (CaseDefinition caseDefinition : caseDefinitions) {
             ExtractionData extractionData = getExtractionData(caseDefinition);
             log.info("Processing data for caseType {} with prefix {}", extractionData.getContainer(), extractionData.getPrefix());
@@ -60,16 +62,6 @@ public class ExtractionComponent {
 
         }
     }
-
-    //    private int calculateExtractionWindow(String caseType) {
-    //        ExtractionWindow dates = caseDataService.getDates(caseType);
-    //        long caseCount = caseDataService.getCaseTypeRows(caseType);
-    //        LocalDateTime dateTime1 = LocalDateTime.ofInstant(Instant.ofEpochMilli(dates.getStart()), ZoneId.systemDefault());
-    //        LocalDateTime dateTime2 = LocalDateTime.ofInstant(Instant.ofEpochMilli(dates.getEnd()), ZoneId.systemDefault());
-    //        long days = ChronoUnit.DAYS.between(dateTime1, dateTime2);
-    //        double portions = Math.ceil(caseCount / maxRowPerBatch);
-    //        return (int) Math.ceil(days / portions);
-    //    }
 
     private ExtractionData getExtractionData(CaseDefinition caseDefinition) {
         Map<String, ExtractionData> extractionConfig = getCaseTypesToExtractMap();
@@ -94,7 +86,7 @@ public class ExtractionComponent {
             return;
         }
 
-        LocalDate toDate;
+        LocalDate toDate = null;
         QueryExecutor executor = null;
         Extractor extractor = extractorFactory.provide(extractionData.getType());
         final int extractionWindow = initialLoad ? caseDataService.calculateExtractionWindow(extractionData.getCaseType())
@@ -128,7 +120,8 @@ public class ExtractionComponent {
                     log.info("There is no records for caseType {}", extractionData.getContainer());
                 }
                 lastUpdated = toDate;
-
+            } catch (ExportCorruptedException corruptedFile) {
+                log.error("Corrupted file has been discarded", corruptedFile);
             } catch (Exception e) {
                 log.error("Error processing case {}", extractionData.getContainer(), e);
                 break;
@@ -140,15 +133,16 @@ public class ExtractionComponent {
     }
 
     private int applyExtraction(Extractor extractor, ResultSet resultSet, String fileName, ExtractionData extractionData,
-                                BlobOutputWriter writer, LocalDate toDate) {
+                                BlobOutputWriter writer, LocalDate toDate) throws ExportCorruptedException {
         int extractedRows = extractor.apply(resultSet, writer.outputStream(fileName));
         if (!blobService.validateBlob(extractionData.getContainer(), fileName, extractionData.getType())) {
             blobService.deleteBlob(extractionData.getContainer(), fileName);
             log.warn("Corrupted blob {}  has been deleted", fileName);
+            throw new ExportCorruptedException("File corrupted");
         } else {
             blobService.setLastUpdated(extractionData.getContainer(), toDate);
+            return extractedRows;
         }
-        return extractedRows;
     }
 
     private void closeQueryExecutor(QueryExecutor queryExecutor) {
@@ -180,11 +174,4 @@ public class ExtractionComponent {
         return lastUpdated;
 
     }
-
-    //    private LocalDate getLastUpdateDate(ExtractionData extractionData) {
-    //        blobService.getContainerLastUpdated(extractionData.getContainer());
-    //        return Optional
-    //            .ofNullable(blobService.getContainerLastUpdated(extractionData.getContainer()))
-    //            .orElseGet(() -> caseDataService.getFirstEventDate(extractionData.getCaseType()));
-    //    }
 }

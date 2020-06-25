@@ -39,6 +39,9 @@ public class DataExtractorApplication implements ApplicationRunner {
     @Value("${smoke.test.enabled:false}")
     private boolean smokeTest;
 
+    @Value("${extraction.initialise:false}")
+    private boolean initialise;
+
     @Value("${telemetry.wait.period:10000}")
     private int waitPeriod;
 
@@ -49,7 +52,7 @@ public class DataExtractorApplication implements ApplicationRunner {
                 healthCheck.check();
             } else {
                 runPreExecutionTasks();
-                extractionComponent.execute(true);
+                extractionComponent.execute(initialise);
             }
         } catch (Exception e) {
             log.error("Error executing integration service", e);

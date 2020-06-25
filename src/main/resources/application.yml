@@ -17,6 +17,7 @@ etl:
 smoke.test.enabled: false
 
 extraction:
+  initialise: true
   max:
     batch:
       row: 100000
