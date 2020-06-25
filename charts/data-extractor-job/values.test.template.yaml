@@ -2,6 +2,13 @@ mi-job:
   image: ${IMAGE_NAME}
   environment:
     ETL_MSICLIENTID: 905cc792-3ecc-4c1e-ae18-40ed86ca6a8d
+    EXTRACTION_CASETYPES_0__CONTAINER: "test-container-${BUILD_VERSION}"
+    EXTRACTION_CASETYPES_0__CASETYPE: "DIVORCE"
+    EXTRACTION_CASETYPES_0__TYPE: "jsonlines"
+    EXTRACTION_CASETYPES_0__PREFIX: "CCD-TEST"
+    EXTRACTION_FILTER_JURISDICTION_IN: "'DIVORCE'"
+    EXTRACTION_INITIALISE: false
+
 global:
   subscriptionId: "3eec5bde-7feb-4566-bfb6-805df6e10b90"
   environment: test

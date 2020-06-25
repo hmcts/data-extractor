@@ -2,13 +2,17 @@ package uk.gov.hmcts.reform.dataextractor.config;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.boot.context.properties.ConstructorBinding;
 
 import uk.gov.hmcts.reform.dataextractor.model.Output;
 
+import java.util.Locale;
+
 @ConstructorBinding
 @Getter
 @Builder
+@ToString
 public class ExtractionData {
 
     private String container;
@@ -18,7 +22,7 @@ public class ExtractionData {
     private boolean disabled;
 
     public ExtractionData(String container, Output type, String caseType, String prefix, boolean disabled) {
-        this.container = container;
+        this.container = container.toLowerCase(Locale.UK);
         this.type = type;
         this.prefix = prefix;
         this.caseType = caseType;

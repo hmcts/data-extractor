@@ -60,9 +60,12 @@ public class ExtractionComponent {
         log.info("Total case definitions loaded {}", caseDefinitions.size());
         for (CaseDefinition caseDefinition : caseDefinitions) {
             ExtractionData extractionData = getExtractionData(caseDefinition);
-            log.info("Processing data for caseType {} with prefix {}", extractionData.getContainer(), extractionData.getPrefix());
+            log.info(extractionData.toString());
+            log.info("Processing data for caseType {} , container {} with prefix {}", extractionData.getCaseType(),
+                extractionData.getContainer(), extractionData.getPrefix());
             processData(extractionData, now, initialLoad);
-            log.info("Processing data for caseType {} with prefix {} completed", extractionData.getContainer(), extractionData.getPrefix());
+            log.info("Processing data for caseType {} , container {} with prefix {} completed",
+                extractionData.getCaseType(), extractionData.getContainer(), extractionData.getPrefix());
 
         }
     }
