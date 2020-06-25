@@ -9,10 +9,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -26,12 +25,15 @@ import uk.gov.hmcts.reform.dataextractor.utils.TestUtils;
 import uk.gov.hmcts.reform.mi.micore.factory.BlobServiceClientFactory;
 
 import java.io.ByteArrayOutputStream;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.dataextractor.service.ContainerConstants.UPDATE_DATE_METADATA;
 import static uk.gov.hmcts.reform.dataextractor.utils.TestConstants.AZURE_TEST_CONTAINER_IMAGE;
 import static uk.gov.hmcts.reform.dataextractor.utils.TestConstants.DEFAULT_COMMAND;
@@ -41,8 +43,6 @@ import static uk.gov.hmcts.reform.dataextractor.utils.TestConstants.DEFAULT_COMM
 @ActiveProfiles(profiles = "test")
 @SpringBootTest(classes = TestApplicationConfiguration.class)
 public class ExtractionComponentFTest extends DbTest {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ExtractionComponentFTest.class);
 
     private static final String TEST_CONTAINER_NAME = "test-container";
     private static final String DISABLED_TEST_CONTAINER_NAME = "disabled-container";
@@ -66,6 +66,9 @@ public class ExtractionComponentFTest extends DbTest {
     @Autowired
     private BlobServiceClientFactory blobServiceClientFactory;
 
+    @MockBean
+    private Clock mockClock;
+
     private BlobServiceClient testClient;
 
     @BeforeEach
@@ -84,6 +87,9 @@ public class ExtractionComponentFTest extends DbTest {
         ReflectionTestUtils.setField(dbConfig, "password", password);
         testClient = blobServiceClientFactory.getBlobClientWithConnectionString(connString);
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+        when(mockClock.instant()).thenReturn(Instant.parse("2020-02-01T18:35:24.00Z"));
+        when(mockClock.getZone()).thenReturn(TimeZone.getTimeZone("UTC").toZoneId());
+
     }
 
     @AfterEach

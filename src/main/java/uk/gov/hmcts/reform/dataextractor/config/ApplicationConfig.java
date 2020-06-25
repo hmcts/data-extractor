@@ -17,6 +17,8 @@ import uk.gov.hmcts.reform.dataextractor.service.impl.ExtractorJson;
 import uk.gov.hmcts.reform.dataextractor.service.impl.ExtractorJsonLines;
 import uk.gov.hmcts.reform.dataextractor.service.impl.JsonValidator;
 
+import java.time.Clock;
+
 import static uk.gov.hmcts.reform.dataextractor.model.Output.JSON_LINES;
 
 @Configuration
@@ -33,6 +35,11 @@ public class ApplicationConfig {
 
     @Autowired
     private DefaultBlobValidator defaultBlobValidator;
+
+    @Bean
+    public Clock clock() {
+        return Clock.systemDefaultZone();
+    }
 
     @Bean
     public Factory<ExtractionData, BlobOutputWriter> blobOutputFactory() {

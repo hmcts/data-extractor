@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import uk.gov.hmcts.reform.dataextractor.config.ExtractionData;
 import uk.gov.hmcts.reform.dataextractor.config.Extractions;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.reform.dataextractor.utils.BlobFileUtils;
 import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -74,9 +76,11 @@ public class ExtractionComponentTest {
     @Mock
     private CaseDataServiceImpl caseDataService;
 
+    private final Clock clock = Clock.systemDefaultZone();
+
     @BeforeEach
     public void setUp() {
-    //        ReflectionTestUtils.setField(classToTest, "maxRowPerBatch", 100000);
+        ReflectionTestUtils.setField(classToTest, "clock", clock);
     }
 
     @Test

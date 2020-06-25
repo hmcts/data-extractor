@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.dataextractor.service.impl.BlobServiceImpl;
 import uk.gov.hmcts.reform.dataextractor.utils.BlobFileUtils;
 
 import java.sql.ResultSet;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
@@ -49,9 +50,12 @@ public class ExtractionComponent {
     @Autowired
     private CaseDataService caseDataService;
 
+    @Autowired
+    private Clock clock;
+
     public void execute(boolean initialLoad) {
 
-        LocalDate now = LocalDate.now();
+        LocalDate now = LocalDate.now(clock);
         List<CaseDefinition> caseDefinitions = caseDataService.getCaseDefinitions();
         log.info("Total case definitions loaded {}", caseDefinitions.size());
         for (CaseDefinition caseDefinition : caseDefinitions) {
@@ -90,7 +94,7 @@ public class ExtractionComponent {
         QueryExecutor executor = null;
         Extractor extractor = extractorFactory.provide(extractionData.getType());
         final int extractionWindow = caseDataService.calculateExtractionWindow(extractionData.getCaseType(),
-            lastUpdated, LocalDate.now(), initialLoad);
+            lastUpdated, LocalDate.now(clock), initialLoad);
         do {
             long executionStartTime = System.currentTimeMillis();
 
