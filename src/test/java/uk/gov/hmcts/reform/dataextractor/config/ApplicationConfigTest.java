@@ -39,7 +39,7 @@ public class ApplicationConfigTest {
     @Test
     public void givenBlobOutputFactory_thenCreateBlobOutputWriter() {
         Factory<ExtractionData, BlobOutputWriter> blobOutput = classToTest.blobOutputFactory();
-        String containerName = "TestContainerName";
+        String containerName = "container";
         String prefix = "testPrefix";
         Output outputType = Output.CSV;
         ExtractionData extractionData = ExtractionData
