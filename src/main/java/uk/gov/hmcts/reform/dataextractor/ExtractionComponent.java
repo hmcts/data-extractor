@@ -29,7 +29,7 @@ public class ExtractionComponent {
 
     private static final Output DEFAULT_OUTPUT = Output.JSON_LINES;
     private static final Locale GB_LOCALE = Locale.ENGLISH;
-    private static final int DEFAULT_EXTRACTION_WINDOW = 7;
+    //    private static final int DEFAULT_EXTRACTION_WINDOW = 30;
 
     @Autowired
     private Factory<ExtractionData, BlobOutputWriter> blobOutputFactory;
@@ -89,8 +89,8 @@ public class ExtractionComponent {
         LocalDate toDate = null;
         QueryExecutor executor = null;
         Extractor extractor = extractorFactory.provide(extractionData.getType());
-        final int extractionWindow = initialLoad ? caseDataService.calculateExtractionWindow(extractionData.getCaseType())
-            : DEFAULT_EXTRACTION_WINDOW;
+        final int extractionWindow = caseDataService.calculateExtractionWindow(extractionData.getCaseType(),
+            lastUpdated, LocalDate.now(), initialLoad);
         do {
             long executionStartTime = System.currentTimeMillis();
 

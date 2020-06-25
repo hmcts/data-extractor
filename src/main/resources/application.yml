@@ -23,7 +23,7 @@ extraction:
       row: 100000
   filter:
     jurisdiction:
-      in:
+      in: ["'DIVORCE'", "'PROBATE', 'ARCHIVED'"]
       out:
         - "'AUTOTEST1'"
         - "'TEST'"

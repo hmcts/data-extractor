@@ -17,10 +17,7 @@ import uk.gov.hmcts.reform.dataextractor.service.CaseDataService;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -133,20 +130,20 @@ public class CaseDataServiceImpl implements CaseDataService {
         }
     }
 
-    public int calculateExtractionWindow(String caseType) {
+    public int calculateExtractionWindow(String caseType, LocalDate initialDate, LocalDate endDate, boolean initialLoad) {
+        if (!initialLoad) {
+            return MINIMUM_WINDOW;
+        }
         long caseCount = this.getCaseTypeRows(caseType);
         if (caseCount == 0) {
             return MINIMUM_WINDOW;
         }
-        ExtractionWindow dates = this.getDates(caseType);
-        LocalDateTime dateTime1 = LocalDateTime.ofInstant(Instant.ofEpochMilli(dates.getStart()), ZoneId.systemDefault());
-        LocalDateTime dateTime2 = LocalDateTime.ofInstant(Instant.ofEpochMilli(dates.getEnd()), ZoneId.systemDefault());
-        long days = ChronoUnit.DAYS.between(dateTime1, dateTime2);
+        long days = ChronoUnit.DAYS.between(initialDate, endDate);
         if (days < 2) {
             return MINIMUM_WINDOW;
         }
         double portions = Math.ceil((double)caseCount / maxRowPerBatch);
-        return (int) Math.ceil((double)days / portions);
+        return (int) Math.max(Math.ceil((double)days / portions), MINIMUM_WINDOW);
     }
 
 

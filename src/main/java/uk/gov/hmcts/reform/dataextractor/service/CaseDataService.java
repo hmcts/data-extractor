@@ -18,5 +18,5 @@ public interface CaseDataService {
 
     long getCaseTypeRows(String caseType);
 
-    int calculateExtractionWindow(String caseType);
+    int calculateExtractionWindow(String caseType, LocalDate initialDate, LocalDate endDate, boolean initialLoad);
 }
