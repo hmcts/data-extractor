@@ -57,7 +57,7 @@ extraction:
     caseType: "DIVORCE"
     type: "jsonlines"
     prefix: "CCD-DIV"
-    disabled: ${EXTRACTION_DIVORCE_DISABLED:true}
+    disabled: ${EXTRACTION_DIVORCE_DISABLED:false}
   - container: "finredmvp2"
     caseType: "FinancialRemedyMVP2"
     type: "jsonlines"
