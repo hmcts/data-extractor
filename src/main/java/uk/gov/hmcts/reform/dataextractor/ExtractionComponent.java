@@ -169,7 +169,7 @@ public class ExtractionComponent {
     }
 
     private LocalDate getLastUpdateFromContainer(ExtractionData extractionData, boolean initialLoad) throws CaseTypeNotInitialisedException {
-        LocalDate lastUpdated = blobService.getContainerLastUpdated(extractionData.getContainer());
+        LocalDate lastUpdated = blobService.getContainerLastUpdated(extractionData.getContainer(), initialLoad);
         if (lastUpdated == null) {
             if (initialLoad) {
                 return caseDataService.getFirstEventDate(extractionData.getCaseType());

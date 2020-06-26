@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.dataextractor.functional.postdeploy;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +16,8 @@ import uk.gov.hmcts.reform.dataextractor.QueryExecutor;
 import uk.gov.hmcts.reform.dataextractor.config.DbConfig;
 import uk.gov.hmcts.reform.dataextractor.model.Output;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -27,12 +29,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static uk.gov.hmcts.reform.dataextractor.functional.postdeploy.TestConstants.BLOB_PREFIX;
-import static uk.gov.hmcts.reform.dataextractor.functional.postdeploy.TestConstants.BREAK_LINE;
 import static uk.gov.hmcts.reform.dataextractor.functional.postdeploy.TestConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.dataextractor.functional.postdeploy.TestConstants.DATA_DAYS;
 import static uk.gov.hmcts.reform.dataextractor.functional.postdeploy.TestConstants.DATE_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.dataextractor.functional.postdeploy.TestConstants.OUTPUT_TYPE;
-import static uk.gov.hmcts.reform.dataextractor.functional.postdeploy.TestConstants.TEST_CONTAINER;
 
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:application_e2e.properties")
@@ -48,7 +48,8 @@ public class DataExtractorTest {
     private BlobReader blobReader;
 
     @Value("${container.name}")
-    public String testContainerName;
+    private String testContainerName;
+
 
     private static final  String SQL_QUERY_BY_CASETYPE = "SELECT count(*) \n"
         + "FROM case_event CE\n"
@@ -57,22 +58,29 @@ public class DataExtractorTest {
         + "AND created_date < (current_date + time '00:00')";
 
 
+    @BeforeEach
+    public void setUp() {
+        testContainerName = testContainerName.toLowerCase(Locale.UK);
+    }
+
     @Test
     @SuppressWarnings("PMD.CloseResource")
-    public void checkBlobAreCreated() throws SQLException {
+    public void checkBlobAreCreated() throws SQLException, IOException {
         String expectedFileName = getFileName(BLOB_PREFIX, OUTPUT_TYPE);
 
-        BlobClient blobClient = blobReader.getBlobClient(testContainerName.toLowerCase(Locale.UK), expectedFileName);
+        BlobClient blobClient = blobReader.getBlobClient(testContainerName, expectedFileName);
         assertTrue(blobClient.exists(), "Blob missing");
 
-        String fileContent = blobReader.readFile(TEST_CONTAINER, expectedFileName);
-
         String sqlQuery = getQueryByCaseType(CASE_TYPE);
-        final int fileLines = getFileLinesCount(fileContent);
+        long fileLines;
+        try (BufferedReader blobBufferReader = blobReader.getBufferReader(testContainerName, expectedFileName)) {
+            fileLines = blobBufferReader.lines().count();
+        }
+
         try (QueryExecutor queryExecutor = new QueryExecutor(dbConfig.getUrl(), dbConfig.getUser(), dbConfig.getPassword(), sqlQuery)) {
             ResultSet resultSet = queryExecutor.execute();
             if (resultSet.next()) {
-                int rows = resultSet.getInt(1);
+                long rows = resultSet.getLong(1);
                 assertEquals(fileLines, rows, "Number de lines expected");
             } else {
                 fail("Result not found");
@@ -84,10 +92,6 @@ public class DataExtractorTest {
         if (containerClient.exists()) {
             containerClient.delete();
         }
-    }
-
-    private int getFileLinesCount(String fileContent) {
-        return StringUtils.split(fileContent, BREAK_LINE).length;
     }
 
     private String getFileName(String prefix, Output extension) {

@@ -35,20 +35,12 @@ public class CaseDataServiceTest {
     private static final String JURISDICTION_COLUMN = "jurisdiction";
     private static final String CASE_TYPE_COLUMN = "case_type_id";
     public static final String COUNT_COLUMN = "count";
-    public static final String LAST_DATE_COLUMN = "last_date";
-    public static final String FIRST_DATE_COLUMN = "first_date";
 
     @Mock
     private Factory<String, QueryExecutor> queryExecutorFactory;
 
     @Mock
     private QueryExecutor queryExecutor;
-
-    @Mock
-    private QueryExecutor additionalQueryExecutor;
-
-    @Mock
-    private ResultSet additionalResultSet;
 
     @Mock
     private ResultSet resultSet;
@@ -64,6 +56,20 @@ public class CaseDataServiceTest {
     public void setUp() {
         ReflectionTestUtils.setField(classToTest, "maxRowPerBatch", 100);
     }
+
+    @Test
+    public void testNoFirstEvent_thenRaiseError() throws SQLException {
+        when(queryExecutorFactory.provide(anyString())).thenReturn(queryExecutor);
+        when(queryExecutor.execute()).thenReturn(resultSet);
+
+        when(resultSet.next()).thenReturn(false);
+
+        assertThrows(ExtractorException.class, () -> classToTest.getFirstEventDate(""),
+            "Expected ExtractorException");
+
+        verify(queryExecutor, times(1)).close();
+    }
+
 
     @Test
     public void givenSqlException_thenRaiseExtractionException() throws SQLException {
@@ -154,46 +160,55 @@ public class CaseDataServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource({ "'2000-01-01', '2000-01-01', 1000, 7", //one day data
-                 "'2000-01-01', '2001-01-31', 1000, 40", // normal flow
-                 //"'', '', 0, 7", // no data
-                 "'2000-01-01', '2000-01-31', 10, 30" }) // Less data than window
+    @CsvSource({"'2000-01-01', '2000-01-01', 1000, 7", //one day data
+        "'2000-01-01', '2001-01-31', 1000, 40", // normal flow
+        "'2000-01-01', '2000-01-31', 10, 30"}) // Less data than window
     public void testCalculateExtractionWindow(String initDate, String endDate, long totalCount, int expectedWindow) throws SQLException {
 
-        //final String expectedQuery = "select  max.created_date as last_date, min.created_date as first_date \n"
-        //    + "from (SELECT created_date FROM case_event CE where CE.case_type_id = 'TEST' order by created_date desc limit 1) as max,\n"
-        //   + "(SELECT created_date FROM case_event CE where CE.case_type_id = 'TEST' order by created_date asc limit 1) as min";
         final String countQuery = "select count(*) \n"
             + "FROM case_event \n"
             + "WHERE case_type_id = 'TEST';";
 
-        //if (totalCount > 0) {
-        //Date init = getDate(initDate);
-        //Date end = getDate(endDate);
-        //when(queryExecutorFactory.provide(expectedQuery)).thenReturn(queryExecutor);
-        //when(queryExecutor.execute()).thenReturn(resultSet);
-        //when(resultSet.getDate(FIRST_DATE_COLUMN)).thenReturn(init);
-        //when(resultSet.getDate(LAST_DATE_COLUMN)).thenReturn(end);
-        //when(resultSet.next()).thenReturn(true);
-        //}
-        when(queryExecutorFactory.provide(countQuery)).thenReturn(additionalQueryExecutor);
-        when(additionalQueryExecutor.execute()).thenReturn(additionalResultSet);
-        when(additionalResultSet.next()).thenReturn(true);
-        when(additionalResultSet.getLong(COUNT_COLUMN)).thenReturn(totalCount);
+        when(queryExecutorFactory.provide(countQuery)).thenReturn(queryExecutor);
+        when(queryExecutor.execute()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getLong(COUNT_COLUMN)).thenReturn(totalCount);
 
         assertEquals(expectedWindow, classToTest.calculateExtractionWindow(CASE_TYPE, LocalDate.parse(initDate), LocalDate.parse(endDate), true));
+
+        verify(queryExecutor, times(1)).close();
     }
 
+    @Test
+    public void givenError_whenCalculateExtractionWindow_thenRaiseError() throws SQLException {
+        final String countQuery = "select count(*) \n"
+            + "FROM case_event \n"
+            + "WHERE case_type_id = 'TEST';";
 
+        when(queryExecutorFactory.provide(countQuery)).thenReturn(queryExecutor);
+        when(queryExecutor.execute()).thenReturn(resultSet);
+        when(resultSet.next()).thenThrow(new SQLException());
 
-    //    private Date getDate(String dateValue) {
-    //        if (Strings.isNullOrEmpty(dateValue)) {
-    //            return null;
-    //        }
-    //        long millis = DateTimeUtils.stringToDate(dateValue)
-    //            .atStartOfDay()
-    //            .atZone(ZoneId.systemDefault())
-    //            .toInstant().toEpochMilli();
-    //        return  new Date(millis);
-    //    }
+        assertThrows(ExtractorException.class, () -> classToTest.calculateExtractionWindow(CASE_TYPE, LocalDate.now(), LocalDate.now(), true),
+            "Expected ExtractorException");
+
+        verify(queryExecutor, times(1)).close();
+    }
+
+    @Test
+    public void testCalculateRowCount() throws SQLException {
+
+        final String countQuery = "select count(*) \n"
+            + "FROM case_event \n"
+            + "WHERE case_type_id = 'TEST';";
+
+        when(queryExecutorFactory.provide(countQuery)).thenReturn(queryExecutor);
+        when(queryExecutor.execute()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(false);
+
+        assertEquals(0, classToTest.getCaseTypeRows(CASE_TYPE));
+
+        verify(queryExecutor, times(1)).close();
+    }
+
 }

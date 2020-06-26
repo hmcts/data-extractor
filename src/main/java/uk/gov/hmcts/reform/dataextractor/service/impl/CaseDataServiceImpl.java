@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.dataextractor.QueryExecutor;
 import uk.gov.hmcts.reform.dataextractor.config.ExtractionFilters;
 import uk.gov.hmcts.reform.dataextractor.exception.ExtractorException;
 import uk.gov.hmcts.reform.dataextractor.model.CaseDefinition;
-import uk.gov.hmcts.reform.dataextractor.model.ExtractionWindow;
 import uk.gov.hmcts.reform.dataextractor.service.CaseDataService;
 
 import java.sql.Date;
@@ -32,11 +31,6 @@ public class CaseDataServiceImpl implements CaseDataService {
 
     private static final String GET_CASE_TYPES = "select distinct jurisdiction, case_type_id from case_data "
         + "where";
-
-
-    private static final String INIT_END_DATA = "select  max.created_date as last_date, min.created_date as first_date \n"
-        + "from (SELECT created_date FROM case_event CE where CE.case_type_id = '%s' order by created_date desc limit 1) as max,\n"
-        + "(SELECT created_date FROM case_event CE where CE.case_type_id = '%s' order by created_date asc limit 1) as min";
 
     private static final String DATA_COUNT = "select count(*) \n"
         + "FROM case_event \n"
@@ -100,21 +94,6 @@ public class CaseDataServiceImpl implements CaseDataService {
         }
     }
 
-    public ExtractionWindow getDates(String caseType) {
-        String loadDataQuery = String.format(INIT_END_DATA, caseType, caseType);
-
-        try (QueryExecutor executor = queryExecutorFactory.provide(loadDataQuery)) {
-            ResultSet resultSet = executor.execute();
-
-            if (resultSet.next()) {
-                return loadDates(resultSet);
-            }
-            return null;
-        } catch (SQLException e) {
-            throw new ExtractorException(e);
-        }
-    }
-
     public long getCaseTypeRows(String caseType) {
         String loadDataQuery = String.format(DATA_COUNT, caseType);
 
@@ -149,12 +128,6 @@ public class CaseDataServiceImpl implements CaseDataService {
 
     private long count(ResultSet resultSet) throws SQLException {
         return resultSet.getLong("count");
-    }
-
-    private ExtractionWindow loadDates(ResultSet resultSet) throws SQLException {
-        Date initialDate = resultSet.getDate("first_date");
-        Date endDate = resultSet.getDate("last_date");
-        return new ExtractionWindow(initialDate.getTime(), endDate.getTime());
     }
 
     private CaseDefinition loadData(ResultSet resultSet) throws SQLException {

@@ -87,7 +87,7 @@ public class BlobServiceImplTest {
 
         when(blobServiceClientMock.getBlobContainerClient(TEST_CONTAINER_NAME)).thenReturn(blobContainerClientMock);
         when(blobContainerClientMock.exists()).thenReturn(false);
-        assertNull(classToTest.getContainerLastUpdated(TEST_CONTAINER_NAME), "Expected null");
+        assertNull(classToTest.getContainerLastUpdated(TEST_CONTAINER_NAME, true), "Expected null");
     }
 
     @Test
@@ -98,7 +98,7 @@ public class BlobServiceImplTest {
         when(blobServiceClientMock.getBlobContainerClient(TEST_CONTAINER_NAME)).thenReturn(blobContainerClientMock);
         when(blobContainerClientMock.exists()).thenReturn(true);
         when(blobContainerClientMock.getProperties()).thenReturn(createEmptyBlobContainerProperties());
-        assertNull(classToTest.getContainerLastUpdated(TEST_CONTAINER_NAME), "Expected null");
+        assertNull(classToTest.getContainerLastUpdated(TEST_CONTAINER_NAME, true), "Expected null");
     }
 
     @Test
@@ -112,7 +112,7 @@ public class BlobServiceImplTest {
         when(blobServiceClientMock.getBlobContainerClient(TEST_CONTAINER_NAME)).thenReturn(blobContainerClientMock);
         when(blobContainerClientMock.exists()).thenReturn(true);
         when(blobContainerClientMock.getProperties()).thenReturn(createBlobContainerPrWithMetadata(expectedDate.format(DATE_TIME_FORMATTER)));
-        assertEquals(classToTest.getContainerLastUpdated(TEST_CONTAINER_NAME), expectedDate, "Expected date");
+        assertEquals(classToTest.getContainerLastUpdated(TEST_CONTAINER_NAME, true), expectedDate, "Expected date");
     }
 
     @Test
