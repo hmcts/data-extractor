@@ -26,7 +26,7 @@ public class QueryBuilder {
         + ", cd.data AS cd_data\n"
         + ", cd.last_state_modified_date AS cd_last_state_modified_date\n"
         + ", cd.data_classification AS cd_data_classification\n"
-        + ", ce.id AS ce_id\n"
+        + ", ce.id AS case_metadata_event_id\n"
         + ", ce.created_date AS ce_created_date\n"
         + ", ce.event_id AS ce_event_id\n"
         + ", ce.summary AS ce_summary\n"
