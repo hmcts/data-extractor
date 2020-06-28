@@ -3,6 +3,9 @@ etl:
     url: ${DB_URL:"jdbc:postgresql://localhost:32878/test?loggerLevel=OFF"}
     user: "test"
     password: "test"
+    cloneUrl: ${DB_URL:"jdbc:postgresql://localhost:32878/test?loggerLevel=OFF"}
+    cloneUser: "test"
+    clonePassword: "test"
   account: "midataextractorsbox"
   connection-string: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:52189/devstoreaccount1;"
 

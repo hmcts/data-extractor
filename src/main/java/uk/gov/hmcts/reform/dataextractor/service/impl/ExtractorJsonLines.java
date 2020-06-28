@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.dataextractor.service.impl;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.MinimalPrettyPrinter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -11,6 +13,8 @@ import java.sql.SQLException;
 
 
 @Slf4j
+@Component
+@Qualifier("ExtractorJsonLines")
 public class ExtractorJsonLines extends ExtractorJson {
 
     @Override

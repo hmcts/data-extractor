@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.dataextractor.service.impl;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.springframework.stereotype.Component;
 
 import uk.gov.hmcts.reform.dataextractor.exception.ExtractorException;
 import uk.gov.hmcts.reform.dataextractor.service.Extractor;
@@ -14,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 
+@Component
 public class ExtractorCsv implements Extractor {
 
     public int apply(ResultSet resultSet, OutputStream outputStream) {

@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.dataextractor.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -36,6 +39,19 @@ public class ApplicationConfig {
     @Autowired
     private DefaultBlobValidator defaultBlobValidator;
 
+    @Autowired
+    private ExtractorJsonLines extractorJsonLines;
+
+    @Autowired
+    @Qualifier("ExtractorJson")
+    private ExtractorJson extractorJson;
+
+    @Autowired
+    private ExtractorCsv extractorCsv;
+
+    @Value("${extraction.initialise:false}")
+    private boolean initialise;
+
     @Bean
     public Clock clock() {
         return Clock.systemDefaultZone();
@@ -61,19 +77,27 @@ public class ApplicationConfig {
         return this::validator;
     }
 
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
+
     private BlobOutputWriter blobOutputWriter(ExtractionData config) {
         return new BlobOutputWriter(config.getContainer(), config.getFileName(), config.getType(), outputStreamProvider);
     }
 
     private QueryExecutor queryExecutor(String sqlQuery) {
+        if (initialise) {
+            return new QueryExecutor(dbConfig.getCloneUrl(), dbConfig.getCloneUser(), dbConfig.getClonePassword(), sqlQuery);
+        }
         return new QueryExecutor(dbConfig.getUrl(), dbConfig.getUser(), dbConfig.getPassword(), sqlQuery);
     }
 
     private Extractor extractor(Output outputType) {
         switch (outputType) {
-            case JSON_LINES: return new ExtractorJsonLines();
-            case JSON: return new ExtractorJson();
-            case CSV: return new ExtractorCsv();
+            case JSON_LINES: return extractorJsonLines;
+            case JSON: return extractorJson;
+            case CSV: return extractorCsv;
             default: return extractor(Output.defaultOutput());
         }
     }

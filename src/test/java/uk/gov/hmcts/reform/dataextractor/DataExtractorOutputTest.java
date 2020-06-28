@@ -2,6 +2,10 @@ package uk.gov.hmcts.reform.dataextractor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import uk.gov.hmcts.reform.dataextractor.config.ApplicationConfig;
 import uk.gov.hmcts.reform.dataextractor.model.Output;
@@ -12,13 +16,23 @@ import uk.gov.hmcts.reform.dataextractor.service.impl.ExtractorJsonLines;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ExtendWith(MockitoExtension.class)
 public class DataExtractorOutputTest {
 
     private Factory<Output, Extractor> extractorFactory;
 
+    @Mock
+    private ExtractorCsv extractorCsv;
+    @Mock
+    private ExtractorJson extractorJson;
+    @Mock
+    private ExtractorJsonLines extractorJsonLines;
+
+    @InjectMocks
+    private ApplicationConfig config;
+
     @BeforeEach
     public void setup() {
-        ApplicationConfig config = new ApplicationConfig();
         extractorFactory = config.extractorFactory();
     }
 
@@ -57,24 +71,24 @@ public class DataExtractorOutputTest {
     @Test
     public void whenFactoryOutputIsJson_thenExtractorJsonIsReturned() {
         assertEquals(
-            ExtractorJson.class,
-            extractorFactory.provide(Output.JSON).getClass()
+            extractorJson,
+            extractorFactory.provide(Output.JSON)
         );
     }
 
     @Test
     public void whenFactoryOutputIsCsv_thenExtractorCsvIsReturned() {
         assertEquals(
-            ExtractorCsv.class,
-            extractorFactory.provide(Output.CSV).getClass()
+            extractorCsv,
+            extractorFactory.provide(Output.CSV)
         );
     }
 
     @Test
     public void whenFactoryOutputIsJsonLines_thenExtractorJsonLinesIsReturned() {
         assertEquals(
-            ExtractorJsonLines.class,
-            extractorFactory.provide(Output.JSON_LINES).getClass()
+            extractorJsonLines,
+            extractorFactory.provide(Output.JSON_LINES)
         );
     }
 }

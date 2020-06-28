@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.dataextractor.service.impl;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,6 +19,8 @@ import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,10 +33,15 @@ public class ExtractorJsonLinesTest {
     @Mock
     private ResultSet resultSet;
 
+    @Spy
+    private ObjectMapper objectMapper;
+
     @Mock
     private ResultSetMetaData resultSetMetaData;
+
     @Mock
     private OutputStream outputStream;
+
     @Mock
     private JsonGenerator jsonGenerator;
 
@@ -41,6 +49,7 @@ public class ExtractorJsonLinesTest {
     public void givenSqlException_thenPropagateException() throws SQLException {
         when(resultSet.getMetaData()).thenThrow(new SQLException());
         assertThrows(ExtractorException.class, () -> classToTest.apply(resultSet, outputStream));
+        verify(objectMapper, times(1)).getFactory();
     }
 
     @Test
