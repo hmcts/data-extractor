@@ -49,7 +49,8 @@ public class DataExtractorPreDeployTest {
                 DateTimeUtils.dateToString(LocalDate.now().minusDays(DATA_DAYS))));
             log.info("Set metadata value as {} for container {}", metadataValue, containerName);
         } catch (Exception e) {
-            Assert.fail(containerName);
+            log.error("Error preparing container", e);
+            Assert.fail(containerName + e.getMessage());
         }
 
     }
