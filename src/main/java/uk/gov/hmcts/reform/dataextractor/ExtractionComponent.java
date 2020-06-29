@@ -30,7 +30,6 @@ public class ExtractionComponent {
 
     private static final Output DEFAULT_OUTPUT = Output.JSON_LINES;
     private static final Locale GB_LOCALE = Locale.ENGLISH;
-    //    private static final int DEFAULT_EXTRACTION_WINDOW = 30;
 
     @Autowired
     private Factory<ExtractionData, BlobOutputWriter> blobOutputFactory;
@@ -89,7 +88,7 @@ public class ExtractionComponent {
         try {
             lastUpdated = getLastUpdateFromContainer(extractionData, initialLoad);
         } catch (Exception e) {
-            log.error("Case type not initialised {}", extractionData.getCaseType());
+            log.warn("Case type not initialised {}", extractionData.getCaseType());
             return;
         }
 
@@ -102,7 +101,6 @@ public class ExtractionComponent {
             long executionStartTime = System.currentTimeMillis();
 
             try {
-                //TODO test if fails
                 toDate = getExtractionToDate(lastUpdated, executionTime, extractionWindow);
                 QueryBuilder queryBuilder = QueryBuilder
                     .builder()
