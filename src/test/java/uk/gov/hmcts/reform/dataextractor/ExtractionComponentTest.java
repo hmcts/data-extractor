@@ -300,4 +300,44 @@ public class ExtractionComponentTest {
         verify(blobService, times(1)).getContainerLastUpdated(CONTAINER_NAME2, true);
         verify(queryExecutor, times(2)).close();
     }
+
+    @Test
+    public void givenNotInitilised_whenExtractData_thenProcessOthers() throws SQLException {
+        ExtractionData testExtractorData = ExtractionData
+            .builder()
+            .container(CONTAINER_NAME)
+            .prefix(PREFIX)
+            .caseType(CASE_TYPE1)
+            .type(Output.JSON_LINES)
+            .build();
+
+        ExtractionData testExtractorData2 = ExtractionData
+            .builder()
+            .caseType(CASE_TYPE2)
+            .container(CONTAINER_NAME2)
+            .prefix(PREFIX)
+            .type(Output.JSON_LINES)
+            .build();
+
+
+        List<ExtractionData> extractionData = Arrays.asList(testExtractorData, testExtractorData2);
+        LocalDate updatedDate = LocalDate.now(clock);
+
+        when(blobOutputFactory.provide(any(ExtractionData.class))).thenReturn(writer);
+        when(queryExecutorFactory.provide(anyString())).thenReturn(queryExecutor);
+
+        when(extractorFactory.provide(testExtractorData.getType())).thenReturn(extractor);
+        when(extractorFactory.provide(testExtractorData2.getType())).thenReturn(extractor);
+
+        when(extractions.getCaseTypes()).thenReturn(extractionData);
+        when(queryExecutor.execute()).thenReturn(resultSet);
+        when(resultSet.isBeforeFirst()).thenReturn(true);
+        when(blobService.getContainerLastUpdated(CONTAINER_NAME, false)).thenReturn(updatedDate);
+
+        when(caseDataService.getCaseDefinitions()).thenReturn(Arrays.asList(new CaseDefinition("", CASE_TYPE1), new CaseDefinition("", CASE_TYPE2)));
+
+        classToTest.execute(false);
+
+        verify(writer, times(1)).outputStream(BlobFileUtils.getFileName(testExtractorData, updatedDate));
+    }
 }

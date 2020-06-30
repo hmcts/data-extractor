@@ -35,6 +35,7 @@ public class CaseDataServiceTest {
     private static final String JURISDICTION_COLUMN = "jurisdiction";
     private static final String CASE_TYPE_COLUMN = "case_type_id";
     public static final String COUNT_COLUMN = "count";
+    private static final String CASE_TYPE = "TEST";
 
     @Mock
     private Factory<String, QueryExecutor> queryExecutorFactory;
@@ -50,7 +51,6 @@ public class CaseDataServiceTest {
 
     @InjectMocks
     private CaseDataServiceImpl classToTest;
-    public static final String CASE_TYPE = "TEST";
 
     @BeforeEach
     public void setUp() {
@@ -58,7 +58,7 @@ public class CaseDataServiceTest {
     }
 
     @Test
-    public void testNoFirstEvent_thenRaiseError() throws SQLException {
+    void testNoFirstEvent_thenRaiseError() throws SQLException {
         when(queryExecutorFactory.provide(anyString())).thenReturn(queryExecutor);
         when(queryExecutor.execute()).thenReturn(resultSet);
 
@@ -72,7 +72,7 @@ public class CaseDataServiceTest {
 
 
     @Test
-    public void givenSqlException_thenRaiseExtractionException() throws SQLException {
+    void givenSqlException_thenRaiseExtractionException() throws SQLException {
         when(queryExecutorFactory.provide(anyString())).thenReturn(queryExecutor);
         when(queryExecutor.execute()).thenReturn(resultSet);
 
@@ -85,7 +85,7 @@ public class CaseDataServiceTest {
     }
 
     @Test
-    public void testCheckConnection() throws SQLException {
+    void testCheckConnection() throws SQLException {
         when(queryExecutorFactory.provide(anyString())).thenReturn(queryExecutor);
         when(queryExecutor.execute()).thenReturn(resultSet);
         classToTest.checkConnection();
@@ -95,7 +95,7 @@ public class CaseDataServiceTest {
     }
 
     @Test
-    public void givenSqlException_whenCheckConnection_thenRaiseExtractionException() throws SQLException {
+    void givenSqlException_whenCheckConnection_thenRaiseExtractionException() throws SQLException {
         when(queryExecutorFactory.provide(anyString())).thenReturn(queryExecutor);
         when(queryExecutor.execute()).thenReturn(resultSet);
 
@@ -108,7 +108,7 @@ public class CaseDataServiceTest {
     }
 
     @Test
-    public void givenOutFilter_whenGetCaseDefinition_thenReturnCaseDefinitions() throws SQLException {
+    void givenOutFilter_whenGetCaseDefinition_thenReturnCaseDefinitions() throws SQLException {
         String expectedQuery = "select distinct jurisdiction, case_type_id from case_data where jurisdiction not in ('exclusion1', 'exclusion2')";
 
         when(filters.getOut()).thenReturn(Arrays.asList("'exclusion1', 'exclusion2'"));
@@ -126,7 +126,7 @@ public class CaseDataServiceTest {
     }
 
     @Test
-    public void givenInFilter_whenGetCaseDefinition_thenReturnCaseDefinitions() throws SQLException {
+    void givenInFilter_whenGetCaseDefinition_thenReturnCaseDefinitions() throws SQLException {
         String expectedQuery = "select distinct jurisdiction, case_type_id from case_data where jurisdiction in ('inclusion1', 'inclusion2')";
 
         when(filters.getIn()).thenReturn(Arrays.asList("'inclusion1', 'inclusion2'"));
@@ -145,7 +145,7 @@ public class CaseDataServiceTest {
     }
 
     @Test
-    public void givenError_whenGetCaseDefinition_thenRaiseError() throws SQLException {
+    void givenError_whenGetCaseDefinition_thenRaiseError() throws SQLException {
         String expectedQuery = "select distinct jurisdiction, case_type_id from case_data where jurisdiction in ('inclusion1', 'inclusion2')";
 
         when(filters.getIn()).thenReturn(Arrays.asList("'inclusion1', 'inclusion2'"));
@@ -163,7 +163,7 @@ public class CaseDataServiceTest {
     @CsvSource({"'2000-01-01', '2000-01-01', 1000, 7", //one day data
         "'2000-01-01', '2001-01-31', 1000, 40", // normal flow
         "'2000-01-01', '2000-01-31', 10, 30"}) // Less data than window
-    public void testCalculateExtractionWindow(String initDate, String endDate, long totalCount, int expectedWindow) throws SQLException {
+    void testCalculateExtractionWindow(String initDate, String endDate, long totalCount, int expectedWindow) throws SQLException {
 
         final String countQuery = "select count(*) \n"
             + "FROM case_event \n"
@@ -180,7 +180,7 @@ public class CaseDataServiceTest {
     }
 
     @Test
-    public void givenError_whenCalculateExtractionWindow_thenRaiseError() throws SQLException {
+    void givenError_whenCalculateExtractionWindow_thenRaiseError() throws SQLException {
         final String countQuery = "select count(*) \n"
             + "FROM case_event \n"
             + "WHERE case_type_id = 'TEST';";
@@ -188,15 +188,15 @@ public class CaseDataServiceTest {
         when(queryExecutorFactory.provide(countQuery)).thenReturn(queryExecutor);
         when(queryExecutor.execute()).thenReturn(resultSet);
         when(resultSet.next()).thenThrow(new SQLException());
-
-        assertThrows(ExtractorException.class, () -> classToTest.calculateExtractionWindow(CASE_TYPE, LocalDate.now(), LocalDate.now(), true),
+        LocalDate executionTime = LocalDate.now();
+        assertThrows(ExtractorException.class, () -> classToTest.calculateExtractionWindow(CASE_TYPE, executionTime, executionTime, true),
             "Expected ExtractorException");
 
         verify(queryExecutor, times(1)).close();
     }
 
     @Test
-    public void testCalculateRowCount() throws SQLException {
+    void testCalculateRowCount() throws SQLException {
 
         final String countQuery = "select count(*) \n"
             + "FROM case_event \n"
