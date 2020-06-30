@@ -41,7 +41,7 @@ public class ApplicationConfigTest {
     private ApplicationConfig classToTest;
 
     @Test
-    public void givenBlobOutputFactory_thenCreateBlobOutputWriter() {
+    void givenBlobOutputFactory_thenCreateBlobOutputWriter() {
         Factory<ExtractionData, BlobOutputWriter> blobOutput = classToTest.blobOutputFactory();
         String containerName = "container";
         String prefix = "testPrefix";
@@ -59,7 +59,7 @@ public class ApplicationConfigTest {
     }
 
     @Test
-    public void givenBlobOutputFactory_thenCreateQueryExecutor() {
+    void givenBlobOutputFactory_thenCreateQueryExecutor() {
         dbConfig.setBaseDir("BaseDir");
         dbConfig.setPassword("password");
         dbConfig.setUrl("ulr");
@@ -71,18 +71,18 @@ public class ApplicationConfigTest {
     }
 
     @Test
-    public void testJsonValidator() {
+    void testJsonValidator() {
         assertThat(classToTest.blobOutputValidator().provide(Output.JSON_LINES)).isEqualTo(jsonValidator);
     }
 
     @Test
-    public void testDefaultValidator() {
+    void testDefaultValidator() {
 
         assertThat(classToTest.blobOutputValidator().provide(mockOutput)).isEqualTo(defaultBlobValidator);
     }
 
     @Test
-    public void givenInitialization_whenBlobOutputFactory_thenCreateQueryExecutor() {
+    void givenInitialization_whenBlobOutputFactory_thenCreateQueryExecutor() {
         dbConfig.setBaseDir("BaseDir");
         dbConfig.setClonePassword("password");
         dbConfig.setCloneUrl("ulr");
