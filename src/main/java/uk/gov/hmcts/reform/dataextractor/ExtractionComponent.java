@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.dataextractor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import uk.gov.hmcts.reform.dataextractor.config.ExtractionData;
@@ -14,6 +16,7 @@ import uk.gov.hmcts.reform.dataextractor.service.CaseDataService;
 import uk.gov.hmcts.reform.dataextractor.service.Extractor;
 import uk.gov.hmcts.reform.dataextractor.service.impl.BlobServiceImpl;
 import uk.gov.hmcts.reform.dataextractor.utils.BlobFileUtils;
+import uk.gov.hmcts.reform.mi.micore.utils.DateTimeUtils;
 
 import java.sql.ResultSet;
 import java.time.Clock;
@@ -52,9 +55,12 @@ public class ExtractionComponent {
     @Autowired
     private Clock clock;
 
+    @Value("${extraction.toDate:}")
+    private String toDate;
+
     public void execute(boolean initialLoad) {
 
-        LocalDate now = LocalDate.now(clock);
+        LocalDate now = getEndDate(initialLoad);
         List<CaseDefinition> caseDefinitions = caseDataService.getCaseDefinitions();
         log.info("Total case definitions loaded {}", caseDefinitions.size());
         for (CaseDefinition caseDefinition : caseDefinitions) {
@@ -66,6 +72,14 @@ public class ExtractionComponent {
             log.info("Processing data for caseType {} , container {} with prefix {} completed",
                 extractionData.getCaseType(), extractionData.getContainer(), extractionData.getPrefix());
 
+        }
+    }
+
+    private LocalDate getEndDate(boolean initialLoad) {
+        if (initialLoad && StringUtils.isNotBlank(toDate)) {
+            return DateTimeUtils.stringToLocalDate(toDate);
+        } else {
+            return LocalDate.now(clock);
         }
     }
 
@@ -96,7 +110,7 @@ public class ExtractionComponent {
         QueryExecutor executor = null;
         Extractor extractor = extractorFactory.provide(extractionData.getType());
         final int extractionWindow = caseDataService.calculateExtractionWindow(extractionData.getCaseType(),
-            lastUpdated, LocalDate.now(clock), initialLoad);
+            lastUpdated, executionTime, initialLoad);
         do {
             long executionStartTime = System.currentTimeMillis();
 
