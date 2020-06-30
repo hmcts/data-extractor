@@ -11,6 +11,9 @@ etl:
     url: "jdbc:postgresql://localhost:5432/ccd_data_store?sslmode=require"
     user: "dumyUser"
     password: "cdummyPassword"
+    cloneUrl: "jdbc:postgresql://localhost:5432/ccd_data_store?sslmode=require"
+    cloneUser: "cloneUser"
+    clonePassword: "clonePassword"
   account: "midatastgsbox"
   connection-string: "dummyConnectionString"
 

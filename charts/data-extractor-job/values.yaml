@@ -6,6 +6,8 @@ mi-job:
       secrets:
         - ccdro-user
         - ccdro-password
+        - ccdro-clone-user
+        - ccdro-clone-password
         - appinsights-instrumentationkey
         - data-extractor-connection-string
   memoryLimits: '2048Mi'
@@ -19,6 +21,7 @@ mi-job:
     app.kubernetes.io/name: data-extractor-job
   environment:
     ETL_DB_URL: jdbc:postgresql://ccd-data-store-api-postgres-db-{{ .Values.global.ccd_environment }}.postgres.database.azure.com:5432/ccd_data_store
+    ETL_DB_CLONE_URL: jdbc:postgresql://ccd-data-store-api-postgres-db-{{ .Values.global.ccd_environment }}.postgres.database.azure.com:5432/ccd_data_store
     ETL_ACCOUNT: midataextractor{{ .Values.global.environment }}
     EXTRACTION_CASETYPES_0__CONTAINER: "test-container-${BUILD_VERSION}"
     EXTRACTION_CASETYPES_0__CASETYPE: "Asylum"

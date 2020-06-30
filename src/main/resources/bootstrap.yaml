@@ -10,3 +10,5 @@ spring:
         ccdro-password: etl.db.password
         appinsights-instrumentationkey: azure.application-insights.instrumentation-key
         data-extractor-connection-string: etl.connection-string
+        ccdro-clone-user: etl.db.cloneUser
+        ccdro-clone-password: etl.db.clonePassword
