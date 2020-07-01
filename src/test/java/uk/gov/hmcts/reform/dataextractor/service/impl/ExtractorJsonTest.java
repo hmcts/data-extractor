@@ -51,14 +51,14 @@ public class ExtractorJsonTest {
     private JsonFactory jsonFactory;
 
     @Test
-    public void givenSqlException_thenPropagateException() throws SQLException {
+    void givenSqlException_thenPropagateException() throws SQLException {
         when(objectMapper.getFactory()).thenReturn(jsonFactory);
         when(resultSet.getMetaData()).thenThrow(new SQLException());
         assertThrows(ExtractorException.class, () -> classToTest.apply(resultSet, outputStream));
     }
 
     @Test
-    public void whenWriteResult_thenReturnRowsWritten() throws SQLException, IOException {
+    void whenWriteResult_thenReturnRowsWritten() throws SQLException, IOException {
         when(resultSet.getMetaData()).thenReturn(resultSetMetaData);
 
         when(resultSet.next())
@@ -70,7 +70,7 @@ public class ExtractorJsonTest {
     }
 
     @Test
-    public void testJsonGenerator() throws SQLException, IOException {
+    void testJsonGenerator() throws SQLException, IOException {
         when(resultSet.getMetaData()).thenReturn(resultSetMetaData);
         when(resultSet.next())
             .thenReturn(true)
