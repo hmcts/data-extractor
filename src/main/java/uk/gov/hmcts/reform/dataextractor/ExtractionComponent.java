@@ -56,7 +56,7 @@ public class ExtractionComponent {
     private Clock clock;
 
     @Value("${extraction.toDate:}")
-    private String toDate;
+    private String limitDate;
 
     public void execute(boolean initialLoad) {
 
@@ -76,8 +76,8 @@ public class ExtractionComponent {
     }
 
     private LocalDate getEndDate(boolean initialLoad) {
-        if (initialLoad && StringUtils.isNotBlank(toDate)) {
-            return DateTimeUtils.stringToLocalDate(toDate);
+        if (initialLoad && StringUtils.isNotBlank(limitDate)) {
+            return DateTimeUtils.stringToLocalDate(limitDate);
         } else {
             return LocalDate.now(clock);
         }

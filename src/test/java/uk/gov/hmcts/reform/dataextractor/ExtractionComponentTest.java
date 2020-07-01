@@ -100,7 +100,7 @@ public class ExtractionComponentTest {
 
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         when(clock.instant()).thenReturn(Instant.parse("2020-02-01T18:35:24.00Z"));
         when(clock.getZone()).thenReturn(TimeZone.getTimeZone("UTC").toZoneId());
@@ -162,7 +162,7 @@ public class ExtractionComponentTest {
     }
 
     @Test
-    public void givenErrorProcessingOneExtractor_thenProcessAll() throws NoSuchAlgorithmException {
+    void givenErrorProcessingOneExtractor_thenProcessAll() throws NoSuchAlgorithmException {
 
         LocalDate fromDate = LocalDate.now(clock).minusMonths(6);
 
@@ -183,7 +183,7 @@ public class ExtractionComponentTest {
     }
 
     @Test
-    public void givenErrorOnLastUpdateProcessingOneExtractor_thenProcessAll() {
+    void givenErrorOnLastUpdateProcessingOneExtractor_thenProcessAll() {
         List<ExtractionData> extractionData = Arrays.asList(TEST_EXTRACTOR_DATA, TEST_EXTRACTOR_DATA2);
         when(extractions.getCaseTypes()).thenReturn(extractionData);
         when(blobService.getContainerLastUpdated(CONTAINER_NAME, true)).thenThrow(new RuntimeException("Any error"));
@@ -199,7 +199,7 @@ public class ExtractionComponentTest {
     }
 
     @Test
-    public void givenCorruptedFile_thenDeleteFile() throws SQLException {
+    void givenCorruptedFile_thenDeleteFile() throws SQLException {
 
         List<ExtractionData> extractionData = Arrays.asList(TEST_EXTRACTOR_DATA, TEST_EXTRACTOR_DATA2);
         LocalDate updatedDate = LocalDate.now(clock);
@@ -232,7 +232,7 @@ public class ExtractionComponentTest {
     }
 
     @Test
-    public void givenErrorOnOneExtractor_thenProcessAll() {
+    void givenErrorOnOneExtractor_thenProcessAll() {
         LocalDate updatedDate = LocalDate.now(clock);
         List<ExtractionData> extractionData = Arrays.asList(TEST_EXTRACTOR_DATA, TEST_EXTRACTOR_DATA2);
         when(extractions.getCaseTypes()).thenReturn(extractionData);
@@ -252,7 +252,7 @@ public class ExtractionComponentTest {
     }
 
     @Test
-    public void givenNotInitialised_whenExtractData_thenProcessOthers() throws SQLException {
+    void givenNotInitialised_whenExtractData_thenProcessOthers() throws SQLException {
 
         List<ExtractionData> extractionData = Arrays.asList(TEST_EXTRACTOR_DATA, TEST_EXTRACTOR_DATA2);
         LocalDate updatedDate = LocalDate.now(clock);
@@ -276,8 +276,8 @@ public class ExtractionComponentTest {
     }
 
     @Test
-    void givenToDate_whenExtract_thenProcessAllCases2() throws SQLException {
-        ReflectionTestUtils.setField(classToTest, "toDate", "20200303");
+    void givenToDate_whenExtract_thenProcessAllCases() throws SQLException {
+        ReflectionTestUtils.setField(classToTest, "limitDate", "20200303");
 
         List<ExtractionData> extractionData = Arrays.asList(TEST_EXTRACTOR_DATA);
         LocalDate updatedDate = LocalDate.now(clock);
