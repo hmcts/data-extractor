@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.dataextractor.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +22,9 @@ import uk.gov.hmcts.reform.dataextractor.service.impl.ExtractorCsv;
 import uk.gov.hmcts.reform.dataextractor.service.impl.ExtractorJson;
 import uk.gov.hmcts.reform.dataextractor.service.impl.ExtractorJsonLines;
 import uk.gov.hmcts.reform.dataextractor.service.impl.JsonValidator;
+import uk.gov.hmcts.reform.dataextractor.utils.MiTimestampSerializer;
 
+import java.sql.Timestamp;
 import java.time.Clock;
 
 import static uk.gov.hmcts.reform.dataextractor.model.Output.JSON_LINES;
@@ -78,8 +83,13 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper();
+    public ObjectMapper objectMapper(MiTimestampSerializer serializer) {
+        SimpleModule module = new SimpleModule("Data serializer");
+        module.addSerializer(Timestamp.class, serializer);
+        return new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .registerModule(module)
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
     private BlobOutputWriter blobOutputWriter(ExtractionData config) {

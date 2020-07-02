@@ -24,6 +24,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -162,6 +163,7 @@ public class CaseDataServiceTest {
     @ParameterizedTest
     @CsvSource({"'2000-01-01', '2000-01-01', 1000, 7", //one day data
         "'2000-01-01', '2001-01-31', 1000, 40", // normal flow
+        "'2000-01-01', '2001-01-31', 0, 7", // normal flow
         "'2000-01-01', '2000-01-31', 10, 30"}) // Less data than window
     void testCalculateExtractionWindow(String initDate, String endDate, long totalCount, int expectedWindow) throws SQLException {
 
@@ -207,6 +209,17 @@ public class CaseDataServiceTest {
         when(resultSet.next()).thenReturn(false);
 
         assertEquals(0, classToTest.getCaseTypeRows(CASE_TYPE));
+
+        verify(queryExecutor, times(1)).close();
+    }
+
+    @Test
+    void testCalculateRowCountException() throws SQLException {
+
+        when(queryExecutorFactory.provide(any())).thenReturn(queryExecutor);
+        when(queryExecutor.execute()).thenReturn(resultSet);
+        when(resultSet.next()).thenThrow(new SQLException());
+        assertThrows(ExtractorException.class,() -> classToTest.getCaseTypeRows(CASE_TYPE));
 
         verify(queryExecutor, times(1)).close();
     }
