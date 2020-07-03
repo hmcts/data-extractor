@@ -14,7 +14,7 @@ import java.util.Optional;
 public class QueryBuilder {
     static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 
-    private static final String REBUILD_QUERY = "SELECT to_char(current_timestamp, 'YYYYMMDD-HH24MI') AS extraction_date,\n"
+    private static final String REBUILD_QUERY = "SELECT current_timestamp AS extraction_date,\n"
         + "  ce.case_data_id AS ce_case_data_id\n"
         + ", cd.created_date AS cd_created_date\n"
         + ", cd.last_modified AS cd_last_modified\n"
