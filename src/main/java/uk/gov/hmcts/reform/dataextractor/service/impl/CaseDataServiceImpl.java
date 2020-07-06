@@ -33,8 +33,7 @@ public class CaseDataServiceImpl implements CaseDataService {
         + "where";
 
     private static final String DATA_COUNT = "select count(*) \n"
-        + "FROM case_event \n"
-        + "WHERE case_type_id = '%s';";
+        + "FROM case_event; \n";
 
     private static final int MINIMUM_WINDOW = 7;
 

@@ -42,7 +42,7 @@ public class QueryBuilder {
         + ", ce.security_classification AS ce_security_classification\n"
         + "FROM case_data cd\n"
         + "JOIN case_event ce\n"
-        + "ON ce.case_data_id = cd.id '\n";
+        + "ON ce.case_data_id = cd.id\n";
 
     static final String QUERY_ORDER = "ORDER BY ce.created_date ASC;";
 
