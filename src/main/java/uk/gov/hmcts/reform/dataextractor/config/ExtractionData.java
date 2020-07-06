@@ -22,7 +22,7 @@ public class ExtractionData {
     private boolean disabled;
 
     public ExtractionData(String container, Output type, String caseType, String prefix, boolean disabled) {
-        this.container = container != null ? container.toLowerCase(Locale.UK) : null;
+        this.container = container != null ? "loadtest-" + container.toLowerCase(Locale.UK) : null;
         this.type = type;
         this.prefix = prefix;
         this.caseType = caseType;

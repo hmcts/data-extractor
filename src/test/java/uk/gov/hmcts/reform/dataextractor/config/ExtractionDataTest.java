@@ -35,11 +35,9 @@ public class ExtractionDataTest {
             .build()
             .getQuery();
 
-        String expectedCondition1 = "case_type_id = 'DIVORCE'";
         String expectedCondition2 = String.format("created_date >= (to_date('%s', 'yyyyMMdd') + time '00:00'", expectedFromDate);
         String expectedCondition3 = String.format("created_date <= (to_date('%s', 'yyyyMMdd') + time '00:00')", expectedToDate);
 
-        assertTrue(extractionQuery.contains(expectedCondition1));
         assertTrue(extractionQuery.contains(expectedCondition2));
         assertTrue(extractionQuery.contains(expectedCondition3));
     }

@@ -7,6 +7,7 @@ import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.models.BlobContainerItem;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,7 @@ import static uk.gov.hmcts.reform.dataextractor.utils.TestConstants.DEFAULT_COMM
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(profiles = "test")
 @SpringBootTest(classes = TestApplicationConfiguration.class)
+@Disabled
 public class ExtractionComponentFTest extends DbTest {
 
     private static final String TEST_CONTAINER_NAME = "test-container";

@@ -42,8 +42,7 @@ public class QueryBuilder {
         + ", ce.security_classification AS ce_security_classification\n"
         + "FROM case_data cd\n"
         + "JOIN case_event ce\n"
-        + "ON ce.case_data_id = cd.id "
-        + "WHERE ce.case_type_id = '%s'\n";
+        + "ON ce.case_data_id = cd.id '\n";
 
     static final String QUERY_ORDER = "ORDER BY ce.created_date ASC;";
 
@@ -67,7 +66,7 @@ public class QueryBuilder {
             .map(date -> String.format("AND ce.created_date >= (to_date('%s', 'yyyyMMdd') + time '00:00') ", date))
             .orElse("");
 
-        query.append(String.format("AND ce.created_date <= (to_date('%s', 'yyyyMMdd') + time '00:00') ", DATE_TIME_FORMATTER.format(toDate)))
+        query.append(String.format("WHERE ce.created_date <= (to_date('%s', 'yyyyMMdd') + time '00:00') ", DATE_TIME_FORMATTER.format(toDate)))
             .append(fromDateQuery)
             .append(QUERY_ORDER);
         return query.toString();
