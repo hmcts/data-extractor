@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.dataextractor.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -24,6 +25,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @SuppressWarnings("PMD.CloseResource") //Resource closed with QueryExecutor
+@Slf4j
 public class CaseDataServiceImpl implements CaseDataService {
 
     private static final String FIRST_CREATED_QUERY = "select CE.created_date from case_event CE "
@@ -113,6 +115,7 @@ public class CaseDataServiceImpl implements CaseDataService {
             return MINIMUM_WINDOW;
         }
         long caseCount = this.getCaseTypeRows(caseType);
+        log.info("Total events for case type {} : {}", caseType, caseCount);
         if (caseCount == 0) {
             return MINIMUM_WINDOW;
         }
