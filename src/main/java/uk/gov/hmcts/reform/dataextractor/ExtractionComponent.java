@@ -1,26 +1,38 @@
 package uk.gov.hmcts.reform.dataextractor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import uk.gov.hmcts.reform.dataextractor.config.ExtractionData;
 import uk.gov.hmcts.reform.dataextractor.config.Extractions;
+import uk.gov.hmcts.reform.dataextractor.exception.CaseTypeNotInitialisedException;
+import uk.gov.hmcts.reform.dataextractor.exception.ExportCorruptedException;
+import uk.gov.hmcts.reform.dataextractor.model.CaseDefinition;
 import uk.gov.hmcts.reform.dataextractor.model.Output;
 import uk.gov.hmcts.reform.dataextractor.service.CaseDataService;
 import uk.gov.hmcts.reform.dataextractor.service.Extractor;
 import uk.gov.hmcts.reform.dataextractor.service.impl.BlobServiceImpl;
 import uk.gov.hmcts.reform.dataextractor.utils.BlobFileUtils;
+import uk.gov.hmcts.reform.mi.micore.utils.DateTimeUtils;
 
 import java.sql.ResultSet;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
+import java.util.Locale;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
 @Slf4j
 public class ExtractionComponent {
+
+    private static final Output DEFAULT_OUTPUT = Output.JSON_LINES;
+    private static final Locale GB_LOCALE = Locale.ENGLISH;
 
     @Autowired
     private Factory<ExtractionData, BlobOutputWriter> blobOutputFactory;
@@ -40,61 +52,117 @@ public class ExtractionComponent {
     @Autowired
     private CaseDataService caseDataService;
 
-    @SuppressWarnings("PMD.CloseResource")
-    public void execute() {
-        LocalDate now = LocalDate.now();
+    @Autowired
+    private Clock clock;
 
-        for (ExtractionData extractionData : getCaseTypesToExtract()) {
-            log.info("Processing data for caseType {} with prefix {}", extractionData.getContainer(), extractionData.getPrefix());
-            LocalDate toDate = null;
-            QueryExecutor executor = null;
-            BlobOutputWriter writer = null;
+    @Value("${extraction.toDate:}")
+    private String limitDate;
 
-            do {
-                try {
-                    LocalDate lastUpdated = getLastUpdateDate(extractionData);
-                    toDate = getToDate(lastUpdated, now);
-                    QueryBuilder queryBuilder = QueryBuilder
-                        .builder()
-                        .fromDate(lastUpdated)
-                        .toDate(toDate)
-                        .extractionData(extractionData)
-                        .build();
-                    log.info("Query to execute : {}", queryBuilder.getQuery());
-                    executor = queryExecutorFactory.provide(queryBuilder.getQuery());
-                    writer = blobOutputFactory.provide(extractionData);
-                    Extractor extractor = extractorFactory.provide(extractionData.getType());
-                    ResultSet resultSet = executor.execute();
-                    String fileName = BlobFileUtils.getFileName(extractionData, toDate);
+    public void execute(boolean initialLoad) {
 
-                    if (resultSet.isBeforeFirst()) {
-                        extractor.apply(resultSet, writer.outputStream(fileName));
-                        if (!blobService.validateBlob(extractionData.getContainer(), fileName, extractionData.getType())) {
-                            blobService.deleteBlob(extractionData.getContainer(), fileName);
-                            log.warn("Corrupted blob {}  has been deleted", fileName);
-                        } else {
-                            blobService.setLastUpdated(extractionData.getContainer(), toDate);
-                        }
+        LocalDate now = getEndDate(initialLoad);
+        List<CaseDefinition> caseDefinitions = caseDataService.getCaseDefinitions();
+        log.info("Total case definitions loaded {}", caseDefinitions.size());
+        for (CaseDefinition caseDefinition : caseDefinitions) {
+            ExtractionData extractionData = getExtractionData(caseDefinition);
+            log.info(extractionData.toString());
+            log.info("Processing data for caseType {} , container {} with prefix {}", extractionData.getCaseType(),
+                extractionData.getContainer(), extractionData.getPrefix());
+            processData(extractionData, now, initialLoad);
+            log.info("Processing data for caseType {} , container {} with prefix {} completed",
+                extractionData.getCaseType(), extractionData.getContainer(), extractionData.getPrefix());
 
-                        log.info("Completed processing data for caseType {} with prefix {} with end date {}",
-                            extractionData.getContainer(), extractionData.getPrefix(), queryBuilder.getToDate());
-                    } else {
-                        toDate = now;
-                        log.info("There is no records for caseType {}", extractionData.getContainer());
-                    }
-
-                } catch (Exception e) {
-                    log.error("Error processing case {}", extractionData.getContainer(), e);
-                    break;
-                } finally {
-                    closeQueryExecutor(executor);
-                    executor = null;
-                }
-            } while (toDate.isBefore(now));
         }
-
     }
 
+    private LocalDate getEndDate(boolean initialLoad) {
+        if (initialLoad && StringUtils.isNotBlank(limitDate)) {
+            return DateTimeUtils.stringToLocalDate(limitDate);
+        } else {
+            return LocalDate.now(clock);
+        }
+    }
+
+    private ExtractionData getExtractionData(CaseDefinition caseDefinition) {
+        Map<String, ExtractionData> extractionConfig = getCaseTypesToExtractMap();
+        return extractionConfig.getOrDefault(caseDefinition.getCaseType(), ExtractionData.builder()
+            .container(String.format("%s-%s", caseDefinition.getJurisdiction(), caseDefinition.getCaseType())
+                .toLowerCase(GB_LOCALE).replace('_', '-'))
+            .caseType(caseDefinition.getCaseType())
+            .prefix(String.format("ccd-%s-%s", caseDefinition.getJurisdiction(), caseDefinition.getCaseType())
+                .toLowerCase(GB_LOCALE).replace('_', '-'))
+            .type(DEFAULT_OUTPUT)
+            .build());
+    }
+
+    @SuppressWarnings("PMD.CloseResource")
+    private void processData(ExtractionData extractionData, LocalDate executionTime, boolean initialLoad) {
+
+        LocalDate lastUpdated = null;
+        try {
+            lastUpdated = getLastUpdateFromContainer(extractionData, initialLoad);
+        } catch (Exception e) {
+            log.warn("Case type not initialised {}", extractionData.getCaseType());
+            return;
+        }
+
+        LocalDate toDate = null;
+        QueryExecutor executor = null;
+        Extractor extractor = extractorFactory.provide(extractionData.getType());
+        final int extractionWindow = caseDataService.calculateExtractionWindow(extractionData.getCaseType(),
+            lastUpdated, executionTime, initialLoad);
+        do {
+            long executionStartTime = System.currentTimeMillis();
+
+            try {
+                toDate = getExtractionToDate(lastUpdated, executionTime, extractionWindow);
+                QueryBuilder queryBuilder = QueryBuilder
+                    .builder()
+                    .fromDate(lastUpdated)
+                    .toDate(toDate)
+                    .extractionData(extractionData)
+                    .build();
+                log.info("Query to execute : {}", queryBuilder.getQuery());
+                executor = queryExecutorFactory.provide(queryBuilder.getQuery());
+                BlobOutputWriter writer = blobOutputFactory.provide(extractionData);
+                ResultSet resultSet = executor.execute();
+
+                if (resultSet.isBeforeFirst()) {
+                    String fileName = BlobFileUtils.getFileName(extractionData, toDate);
+                    int extractedRows = applyExtraction(extractor, resultSet, fileName, extractionData, writer, toDate);
+
+                    long batchExecutionEndTime = System.currentTimeMillis();
+                    log.info("Batch completed in {} ms extracting {} with number rows extracted {}",
+                        batchExecutionEndTime - executionStartTime, extractionData.getCaseType(), extractedRows);
+                } else {
+                    toDate = getExtractionToDate(lastUpdated, executionTime, extractionWindow);
+                    log.info("There is no records for caseType {}", extractionData.getContainer());
+                }
+                lastUpdated = toDate;
+            } catch (ExportCorruptedException corruptedFile) {
+                log.error("Corrupted file has been discarded", corruptedFile);
+            } catch (Exception e) {
+                log.error("Error processing case {}", extractionData.getContainer(), e);
+                break;
+            } finally {
+                closeQueryExecutor(executor);
+                executor = null;
+            }
+        } while (toDate.isBefore(executionTime));
+    }
+
+    private int applyExtraction(Extractor extractor, ResultSet resultSet, String fileName, ExtractionData extractionData,
+                                BlobOutputWriter writer, LocalDate toDate) throws ExportCorruptedException {
+        int extractedRows = extractor.apply(resultSet, writer.outputStream(fileName));
+        if (!blobService.validateBlob(extractionData.getContainer(), fileName, extractionData.getType())) {
+            blobService.deleteBlob(extractionData.getContainer(), fileName);
+            log.warn("Corrupted blob {}  has been deleted", fileName);
+            throw new ExportCorruptedException("File corrupted");
+        } else {
+            blobService.setLastUpdated(extractionData.getContainer(), toDate);
+            return extractedRows;
+        }
+    }
 
     private void closeQueryExecutor(QueryExecutor queryExecutor) {
         if (queryExecutor != null) {
@@ -102,19 +170,27 @@ public class ExtractionComponent {
         }
     }
 
-    private LocalDate getToDate(LocalDate lastUpdated, LocalDate currentDate) {
-        return lastUpdated.plusMonths(1).isBefore(currentDate) ? lastUpdated.plusMonths(1) : currentDate;
+    private LocalDate getExtractionToDate(LocalDate lastUpdated, LocalDate currentDate, int window) {
+        return lastUpdated.plusDays(window).isBefore(currentDate) ? lastUpdated.plusDays(window) : currentDate;
     }
 
-    private List<ExtractionData> getCaseTypesToExtract() {
+    private Map<String, ExtractionData> getCaseTypesToExtractMap() {
         return extractions.getCaseTypes().stream()
             .filter(extractionData -> !extractionData.isDisabled())
-            .collect(Collectors.toList());
+            .collect(Collectors.toMap(ExtractionData::getCaseType, Function.identity()));
     }
 
-    private LocalDate getLastUpdateDate(ExtractionData extractionData) {
-        return Optional
-            .ofNullable(blobService.getContainerLastUpdated(extractionData.getContainer()))
-            .orElseGet(() -> caseDataService.getFirstEventDate(extractionData.getCaseType()));
+    private LocalDate getLastUpdateFromContainer(ExtractionData extractionData, boolean initialLoad) throws CaseTypeNotInitialisedException {
+        LocalDate lastUpdated = blobService.getContainerLastUpdated(extractionData.getContainer(), initialLoad);
+        if (lastUpdated == null) {
+            if (initialLoad) {
+                return caseDataService.getFirstEventDate(extractionData.getCaseType());
+            } else {
+                throw new CaseTypeNotInitialisedException(String.format("Case type %s not initialised", extractionData.getCaseType()));
+            }
+        }
+
+        return lastUpdated;
+
     }
 }

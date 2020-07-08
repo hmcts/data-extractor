@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -24,11 +25,15 @@ import uk.gov.hmcts.reform.dataextractor.utils.TestUtils;
 import uk.gov.hmcts.reform.mi.micore.factory.BlobServiceClientFactory;
 
 import java.io.ByteArrayOutputStream;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.dataextractor.service.ContainerConstants.UPDATE_DATE_METADATA;
 import static uk.gov.hmcts.reform.dataextractor.utils.TestConstants.AZURE_TEST_CONTAINER_IMAGE;
 import static uk.gov.hmcts.reform.dataextractor.utils.TestConstants.DEFAULT_COMMAND;
@@ -61,6 +66,9 @@ public class ExtractionComponentFTest extends DbTest {
     @Autowired
     private BlobServiceClientFactory blobServiceClientFactory;
 
+    @MockBean
+    private Clock mockClock;
+
     private BlobServiceClient testClient;
 
     @BeforeEach
@@ -78,6 +86,10 @@ public class ExtractionComponentFTest extends DbTest {
         ReflectionTestUtils.setField(dbConfig, "user", username);
         ReflectionTestUtils.setField(dbConfig, "password", password);
         testClient = blobServiceClientFactory.getBlobClientWithConnectionString(connString);
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+        when(mockClock.instant()).thenReturn(Instant.parse("2020-02-01T18:35:24.00Z"));
+        when(mockClock.getZone()).thenReturn(TimeZone.getTimeZone("UTC").toZoneId());
+
     }
 
     @AfterEach
@@ -90,7 +102,7 @@ public class ExtractionComponentFTest extends DbTest {
         BlobContainerClient containerClient = testClient.createBlobContainer(TEST_CONTAINER_NAME);
         containerClient.setMetadata(Map.of(UPDATE_DATE_METADATA, "20200101"));
 
-        extractionComponent.execute();
+        extractionComponent.execute(false);
 
         PagedIterable<BlobContainerItem> containers = testClient.listBlobContainers();
         testClient.getBlobContainerClient(TEST_CONTAINER_NAME);
@@ -101,16 +113,14 @@ public class ExtractionComponentFTest extends DbTest {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         blob.download(outputStream);
-
         assertTrue(Pattern.compile(TestUtils.getDataFromFile("filtered-data.jsonl"))
             .matcher(outputStream.toString())
-            .matches(), "Expected output");
+            .matches(), String.format("Expected output :[%s] \n with timezone %s", outputStream.toString(), TimeZone.getDefault().getID()));
     }
 
     @Test
     public void givenInitialExecution_thenExtractAllData() {
-
-        extractionComponent.execute();
+        extractionComponent.execute(true);
         BlobContainerClient containerClient = testClient.getBlobContainerClient(TEST_CONTAINER_NAME);
 
         assertTrue(containerClient.exists());
@@ -131,7 +141,7 @@ public class ExtractionComponentFTest extends DbTest {
         blob.download(outputStream);
         assertTrue(Pattern.compile(TestUtils.getDataFromFile("data/all-data-part2.jsonl"))
             .matcher(outputStream.toString())
-            .matches(), "Expected output");
+            .matches(), "Expected output ");
 
         BlobContainerClient disabledContainerName = testClient.getBlobContainerClient(DISABLED_TEST_CONTAINER_NAME);
         assertFalse(disabledContainerName.exists(), "Expected container not exist");

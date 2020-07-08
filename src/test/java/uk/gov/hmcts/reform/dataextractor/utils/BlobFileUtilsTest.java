@@ -19,6 +19,7 @@ class BlobFileUtilsTest {
                     .builder()
                     .prefix("Test")
                     .type(Output.JSON_LINES)
+                    .container("container")
                     .build(),
                 LocalDate
                     .now()
@@ -40,6 +41,7 @@ class BlobFileUtilsTest {
         assertThrows(IllegalArgumentException.class, () -> {
             BlobFileUtils.getFileName(ExtractionData
                 .builder()
+                .container("container")
                 .prefix("Test")
                 .type(Output.JSON_LINES)
                 .build(), null);

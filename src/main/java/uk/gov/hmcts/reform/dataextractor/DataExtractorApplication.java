@@ -15,10 +15,14 @@ import uk.gov.hmcts.reform.dataextractor.task.PreExecutor;
 import uk.gov.hmcts.reform.mi.micore.component.HealthCheck;
 
 import java.util.Map;
+import java.util.TimeZone;
+import javax.annotation.PostConstruct;
 
 @Slf4j
 @SpringBootApplication(scanBasePackages = "uk.gov.hmcts.reform", exclude = {DataSourceAutoConfiguration.class})
 public class DataExtractorApplication implements ApplicationRunner {
+
+    private static final String DEFAULT_TIME_ZONE = "UTC";
 
     @Autowired
     private ApplicationContext context;
@@ -35,6 +39,9 @@ public class DataExtractorApplication implements ApplicationRunner {
     @Value("${smoke.test.enabled:false}")
     private boolean smokeTest;
 
+    @Value("${extraction.initialise:false}")
+    private boolean initialise;
+
     @Value("${telemetry.wait.period:10000}")
     private int waitPeriod;
 
@@ -45,7 +52,7 @@ public class DataExtractorApplication implements ApplicationRunner {
                 healthCheck.check();
             } else {
                 runPreExecutionTasks();
-                extractionComponent.execute();
+                extractionComponent.execute(initialise);
             }
         } catch (Exception e) {
             log.error("Error executing integration service", e);
@@ -55,6 +62,12 @@ public class DataExtractorApplication implements ApplicationRunner {
             waitTelemetryGracefulPeriod();
         }
         log.info("CCD Data extractor process completed");
+    }
+
+    @PostConstruct
+    void started() {
+        log.info("Set default timezone to {}", DEFAULT_TIME_ZONE);
+        TimeZone.setDefault(TimeZone.getTimeZone(DEFAULT_TIME_ZONE));
     }
 
     private void runPreExecutionTasks() {

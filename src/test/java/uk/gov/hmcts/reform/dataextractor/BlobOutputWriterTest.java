@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.dataextractor.service.OutputStreamProvider;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -42,7 +43,7 @@ public class BlobOutputWriterTest {
     @Test
     public void testStreamClose() throws IOException {
         when(outputStreamProviderMock.getOutputStream(eq(CONTAINER_NAME), anyString(), eq(OUTPUT_TYPE))).thenReturn(outputStreamMock);
-        classToTest.outputStream();
+        assertEquals(outputStreamMock, classToTest.outputStream());
         classToTest.close();
         verify(outputStreamMock,times(1)).close();
     }

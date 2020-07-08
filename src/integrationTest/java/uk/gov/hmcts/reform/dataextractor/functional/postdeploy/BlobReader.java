@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 
 import uk.gov.hmcts.reform.dataextractor.exception.WriterException;
 
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 @Component
 public class BlobReader {
@@ -28,13 +28,10 @@ public class BlobReader {
         }
     }
 
-    public String  readFile(String container, String fileName) {
-        OutputStream output = new ByteArrayOutputStream();
+    public BufferedReader getBufferReader(String container, String fileName) {
+        BlobClient client = getBlobClient(container, fileName);
+        return new BufferedReader(new InputStreamReader(client.openInputStream()));
 
-        BlobServiceClient blobContainer = getBlobServiceClient();
-        BlobClient blobClient = blobContainer.getBlobContainerClient(container).getBlobClient(fileName);
-        blobClient.download(output);
-        return output.toString();
     }
 
     public BlobClient  getBlobClient(String container, String fileName) {

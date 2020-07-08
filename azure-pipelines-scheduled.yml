@@ -54,6 +54,9 @@ stages:
       mutationTest: True
       functionalTest: true
       preIntegrationTest: true
+      envMapping:
+      - key: BUILD_VERSION
+        value: Build.BuildId
       azureSecreKeys: 'ccdro-user,ccdro-password,data-extractor-connection-string'
       azureKeyMapping:
       - key: ETL_DB_USER

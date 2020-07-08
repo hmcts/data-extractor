@@ -2,6 +2,12 @@ mi-job:
   image: ${IMAGE_NAME}
   environment:
     ETL_MSICLIENTID: 8dbd1e5c-15b7-42ea-b32c-4a360c79210a
+    EXTRACTION_CASETYPES_0__CONTAINER: "test-container-${BUILD_VERSION}"
+    EXTRACTION_CASETYPES_0__CASETYPE: "Asylum"
+    EXTRACTION_CASETYPES_0__TYPE: "jsonlines"
+    EXTRACTION_CASETYPES_0__PREFIX: "CCD-TEST"
+    EXTRACTION_FILTER_JURISDICTION_IN: "'IA'"
+    EXTRACTION_INITIALISE: false
 global:
   subscriptionId: "a8140a9e-f1b0-481f-a4de-09e2ee23f7ab"
   environment: "sbox"

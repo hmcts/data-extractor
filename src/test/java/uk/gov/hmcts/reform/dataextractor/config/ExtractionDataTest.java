@@ -21,6 +21,7 @@ public class ExtractionDataTest {
         LocalDate fromDate = LocalDate.now().minusDays(10);
         ExtractionData extractionData = ExtractionData
             .builder()
+            .container(caseType)
             .caseType(caseType)
             .build();
         String expectedToDate = DATE_FORMATTER.format(LocalDate.now());

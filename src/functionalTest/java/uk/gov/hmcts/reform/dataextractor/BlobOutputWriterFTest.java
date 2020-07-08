@@ -84,7 +84,7 @@ public class BlobOutputWriterFTest {
     @Test
     public void whenBlobOutputWriterCreated_thenBufferedOutputAvailable() throws Exception {
         testClient.createBlobContainer(CONTAINER);
-        miStreamProvider.getContainerLastUpdated(CONTAINER);
+        miStreamProvider.getContainerLastUpdated(CONTAINER, true);
         try (BlobOutputWriter writer = new BlobOutputWriter(CONTAINER, BLOB_PREFIX,
             Output.JSON_LINES, miStreamProvider)) {
             OutputStream outputStream = writer.outputStream();

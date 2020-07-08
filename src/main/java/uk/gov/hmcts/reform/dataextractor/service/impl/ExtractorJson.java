@@ -3,8 +3,11 @@ package uk.gov.hmcts.reform.dataextractor.service.impl;
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+
 import uk.gov.hmcts.reform.dataextractor.exception.ExtractorException;
 import uk.gov.hmcts.reform.dataextractor.service.Extractor;
 
@@ -16,20 +19,25 @@ import java.sql.SQLException;
 
 
 @Slf4j
+@Component
+@Qualifier("ExtractorJson")
 public class ExtractorJson implements Extractor {
 
-    public void apply(ResultSet resultSet, OutputStream outputStream) {
-        final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    public int apply(ResultSet resultSet, OutputStream outputStream) {
+        int processedData = 0;
         try (JsonGenerator jsonGenerator =
-            objectMapper.getFactory()
-            .createGenerator(outputStream, JsonEncoding.UTF8)
+                 objectMapper.getFactory()
+                     .createGenerator(outputStream, JsonEncoding.UTF8)
         ) {
-            int processedData = writeResultSetToJson(resultSet, jsonGenerator);
+            processedData = writeResultSetToJson(resultSet, jsonGenerator);
             jsonGenerator.flush();
-            log.info("Total data processed in current batch: {}", processedData);
         } catch (IOException | SQLException e) {
             throw new ExtractorException(e);
         }
+        return processedData;
     }
 
     protected int  writeResultSetToJson(ResultSet resultSet, JsonGenerator jsonGenerator)

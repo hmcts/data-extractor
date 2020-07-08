@@ -223,7 +223,8 @@ def versions = [
         pitest          : '1.4.10',
         gradlePitest    : '1.4.5',
         sonarPitest     : '0.5',
-        miCoreLib       : '3.0.8'
+        miCoreLib       : '3.4.4',
+        guava           : '29.0-jre'
 ]
 
 dependencies {
@@ -261,7 +262,8 @@ dependencies {
 
   compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
   compile group: 'org.apache.commons', name: 'commons-csv', version: '1.8'
-  compile group: 'com.google.guava', name: 'guava', version: '28.2-jre'
+  compile group: 'com.google.guava', name: 'guava', version: versions.guava
+
   compile group: 'com.typesafe', name: 'config', version: '1.4.0'
 
   compileOnly 'org.projectlombok:lombok'
@@ -302,8 +304,8 @@ dependencies {
   }
 
 
-  functionalTestCompile 'org.testcontainers:postgresql:1.13.0'
-  functionalTestCompile 'org.testcontainers:junit-jupiter:1.13.0'
+  functionalTestCompile 'org.testcontainers:postgresql:1.14.3'
+  functionalTestCompile 'org.testcontainers:junit-jupiter:1.14.3'
   functionalTestCompile 'com.ninja-squad:DbSetup:2.1.0'
   functionalTestCompile group: 'uk.gov.hmcts.reform.mi', name: 'mi-core-lib', version: versions.miCoreLib
   functionalTestCompile group: 'com.azure', name: 'azure-storage-blob', version: versions.azureStorage
