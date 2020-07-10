@@ -19,7 +19,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class HealthServiceTest {
+class HealthServiceTest {
 
     @InjectMocks
     private HealthService classToTest;
@@ -31,7 +31,7 @@ public class HealthServiceTest {
     private BlobContainerItem containerItem;
 
     @Test
-    public void testCheckAllDependencies() throws ServiceNotAvailableException {
+    void testCheckAllDependencies() throws ServiceNotAvailableException {
         when(blobService.listContainers()).thenReturn(new PagedIterableStub<>(containerItem));
 
         classToTest.check();
@@ -40,7 +40,7 @@ public class HealthServiceTest {
     }
 
     @Test
-    public void testExceptionOnDependencyFail() {
+    void testExceptionOnDependencyFail() {
         doThrow(new RuntimeException()).when(blobService).listContainers();
         assertThrows(ServiceNotAvailableException.class, () -> classToTest.check());
     }

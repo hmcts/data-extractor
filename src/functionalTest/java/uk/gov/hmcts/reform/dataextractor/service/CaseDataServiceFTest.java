@@ -33,7 +33,7 @@ public class CaseDataServiceFTest extends DbTest {
     private DbConfig dbConfig;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         // Config created by test containers
         ReflectionTestUtils.setField(dbConfig, "url", jdbcUrl);
         ReflectionTestUtils.setField(dbConfig, "user", username);
@@ -41,13 +41,13 @@ public class CaseDataServiceFTest extends DbTest {
     }
 
     @Test
-    public void givenValidCaseType_theReturnFirstRecordDate() {
+    void givenValidCaseType_theReturnFirstRecordDate() {
         assertEquals(DateTimeUtils.stringToDate("2019-12-10"),
             caseDataService.getFirstEventDate("test"), "Expected first record date");
     }
 
     @Test
-    public void givenCaseTypeWithoutData_thenThrowNoDataException() {
+    void givenCaseTypeWithoutData_thenThrowNoDataException() {
         assertThrows(ExtractorException.class, () ->
             caseDataService.getFirstEventDate("nonExistingCase"), "Expected Extractor exception");
     }

@@ -23,7 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class QueryExecutorTest {
+class QueryExecutorTest {
 
     private static final String JDBC_URL = "http://localhost:1234";
     private static final String USER = "test";
@@ -41,7 +41,7 @@ public class QueryExecutorTest {
     private ResultSet resultSet;
 
     @Test
-    public void givenConnectionSqlException_thenSwallowException() throws SQLException {
+    void givenConnectionSqlException_thenSwallowException() throws SQLException {
         setConnectionInfo();
         doThrow(new SQLException()).when(connection).close();
         classToTest.close();
@@ -50,7 +50,7 @@ public class QueryExecutorTest {
     }
 
     @Test
-    public void givenStatementSqlException_thenSwallowException() throws SQLException {
+    void givenStatementSqlException_thenSwallowException() throws SQLException {
         setConnectionInfo();
         doThrow(new SQLException()).when(statement).close();
         classToTest.close();
@@ -58,7 +58,7 @@ public class QueryExecutorTest {
     }
 
     @Test
-    public void givenResultSetSqlException_thenSwallowException() throws SQLException {
+    void givenResultSetSqlException_thenSwallowException() throws SQLException {
         setConnectionInfo();
         doThrow(new SQLException()).when(resultSet).close();
         classToTest.close();
@@ -66,7 +66,7 @@ public class QueryExecutorTest {
     }
 
     @Test
-    public void givenEmptyConnectionInfo_thenDoNothing() throws SQLException {
+    void givenEmptyConnectionInfo_thenDoNothing() throws SQLException {
         classToTest.close();
         verify(connection, never()).close();
         verify(statement, never()).close();
@@ -74,7 +74,7 @@ public class QueryExecutorTest {
     }
 
     @Test
-    public void whenExecuteQuery_thenReturnDbResultSet() throws SQLException {
+    void whenExecuteQuery_thenReturnDbResultSet() throws SQLException {
         classToTest = Mockito.spy(new QueryExecutor(JDBC_URL, USER, PASSWORD, SQL));
         doReturn(connection).when(classToTest).connect();
         when(connection.createStatement()).thenReturn(statement);

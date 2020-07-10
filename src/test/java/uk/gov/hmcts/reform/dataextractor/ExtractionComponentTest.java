@@ -38,7 +38,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class ExtractionComponentTest {
+class ExtractionComponentTest {
 
     private static final String CONTAINER_NAME = "testcontainer";
     private static final String CONTAINER_NAME2 = "testcontainer2";

@@ -31,7 +31,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class CaseDataServiceTest {
+class CaseDataServiceTest {
 
     private static final String JURISDICTION_COLUMN = "jurisdiction";
     private static final String CASE_TYPE_COLUMN = "case_type_id";
@@ -54,7 +54,7 @@ public class CaseDataServiceTest {
     private CaseDataServiceImpl classToTest;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         ReflectionTestUtils.setField(classToTest, "maxRowPerBatch", 100);
     }
 

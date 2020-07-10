@@ -29,7 +29,7 @@ public class ExtractorJsonLinesFTest extends DbTest {
     private ExtractorJsonLines extractor;
 
     @Test
-    public void whenSimpleSelectQueryExecuted_thenJsonLinesReturned() throws Exception {
+    void whenSimpleSelectQueryExecuted_thenJsonLinesReturned() throws Exception {
         try (Connection conn = DriverManager.getConnection(jdbcUrl, username, password);
              ResultSet resultSet = conn.createStatement()
                      .executeQuery("SELECT ID, NAME FROM case_data WHERE ID IN (1, 2)")) {
@@ -41,7 +41,7 @@ public class ExtractorJsonLinesFTest extends DbTest {
     }
 
     @Test
-    public void whenJoinSelectQueryWithRawJsonExecuted_thenJsonLinesResultsReturned() throws Exception {
+    void whenJoinSelectQueryWithRawJsonExecuted_thenJsonLinesResultsReturned() throws Exception {
 
         try (Connection conn = DriverManager.getConnection(jdbcUrl, username, password);
              ResultSet resultSet =

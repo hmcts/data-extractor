@@ -20,7 +20,7 @@ public class ExtractorCsvFTest extends DbTest {
 
 
     @Test
-    public void whenSimpleSelectQueryExecuted_thenCsvResultsReturned() throws Exception {
+    void whenSimpleSelectQueryExecuted_thenCsvResultsReturned() throws Exception {
         try (Connection conn = DriverManager.getConnection(jdbcUrl, username, password);
             ResultSet resultSet = conn.createStatement().executeQuery(DB_CONNECTION_QUERY)) {
 
@@ -32,7 +32,7 @@ public class ExtractorCsvFTest extends DbTest {
     }
 
     @Test
-    public void whenJoinSelectQueryExecuted_thenCsvResultsReturned() throws Exception {
+    void whenJoinSelectQueryExecuted_thenCsvResultsReturned() throws Exception {
         try (Connection conn = DriverManager.getConnection(jdbcUrl, username, password);
             ResultSet resultSet =
                 conn.createStatement().executeQuery(DB_DATA_QUERY)) {

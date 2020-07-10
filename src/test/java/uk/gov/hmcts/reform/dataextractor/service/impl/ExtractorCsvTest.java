@@ -21,7 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class ExtractorCsvTest {
+class ExtractorCsvTest {
 
     @InjectMocks
     public ExtractorCsv classToTest;
@@ -36,7 +36,7 @@ public class ExtractorCsvTest {
     private ResultSetMetaData resultSetMetaData;
 
     @Test
-    public void givenSqlException_thenPropagateException() throws SQLException, IOException {
+    void givenSqlException_thenPropagateException() throws SQLException, IOException {
         when(resultSet.getMetaData()).thenReturn(resultSetMetaData);
         when(resultSet.next()).thenThrow(new SQLException());
         assertThrows(ExtractorException.class, () -> classToTest.apply(resultSet, outputStream));
@@ -44,7 +44,7 @@ public class ExtractorCsvTest {
     }
 
     @Test
-    public void givenSqlException_AndCloseException_thenPropagateException() throws SQLException, IOException {
+    void givenSqlException_AndCloseException_thenPropagateException() throws SQLException, IOException {
         when(resultSet.getMetaData()).thenReturn(resultSetMetaData);
         when(resultSet.next()).thenThrow(new SQLException());
         doThrow(new IOException("Test exception")).when(outputStream).close();
