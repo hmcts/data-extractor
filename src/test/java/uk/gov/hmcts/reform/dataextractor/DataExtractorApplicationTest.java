@@ -24,7 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class DataExtractorApplicationTest {
+class DataExtractorApplicationTest {
 
     @InjectMocks
     private DataExtractorApplication classToTest;
@@ -45,7 +45,7 @@ public class DataExtractorApplicationTest {
     private PreExecutor preExecutorMock;
 
     @Test
-    public void testApplicationExecuted() throws Exception {
+    void testApplicationExecuted() throws Exception {
         classToTest.run(null);
         verify(extractionComponent, times(1)).execute(false);
         verify(healthCheck, never()).check();
@@ -53,7 +53,7 @@ public class DataExtractorApplicationTest {
     }
 
     @Test
-    public void testSmokeCheckExecuted() throws Exception {
+    void testSmokeCheckExecuted() throws Exception {
         ReflectionTestUtils.setField(classToTest, "smokeTest", true);
         classToTest.run(null);
         verify(healthCheck, times(1)).check();
@@ -62,7 +62,7 @@ public class DataExtractorApplicationTest {
     }
 
     @Test
-    public void testPreExecutionApplicationExecuted() throws Exception {
+    void testPreExecutionApplicationExecuted() throws Exception {
         SetLastUpdateMetadataTask disabledExecutorMock = spy(new SetLastUpdateMetadataTask());
 
         when(contextMock.getBeansOfType(PreExecutor.class)).thenReturn(ImmutableMap
@@ -78,7 +78,7 @@ public class DataExtractorApplicationTest {
     }
 
     @Test
-    public void testSmokeCheckExceptionPropagated() throws Exception {
+    void testSmokeCheckExceptionPropagated() throws Exception {
         ReflectionTestUtils.setField(classToTest, "smokeTest", true);
         doThrow(new ServiceNotAvailableException("Not available")).when(healthCheck).check();
         assertThrows(ServiceNotAvailableException.class, () -> classToTest.run(null));

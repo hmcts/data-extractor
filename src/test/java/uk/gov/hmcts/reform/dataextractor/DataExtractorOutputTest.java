@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.dataextractor.service.impl.ExtractorJsonLines;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
-public class DataExtractorOutputTest {
+class DataExtractorOutputTest {
 
     private Factory<Output, Extractor> extractorFactory;
 
@@ -32,44 +32,44 @@ public class DataExtractorOutputTest {
     private ApplicationConfig config;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         extractorFactory = config.extractorFactory();
     }
 
     @Test
-    public void whenDefaultOutputRequested_thenJsonLinesReturned() {
+    void whenDefaultOutputRequested_thenJsonLinesReturned() {
         assertEquals(Output.JSON_LINES, Output.defaultOutput());
     }
 
     @Test
-    public void whenFromIsCsv_thenCsvOutputIsReturned() {
+    void whenFromIsCsv_thenCsvOutputIsReturned() {
         assertEquals(Output.CSV, Output.from("Csv"));
     }
 
     @Test
-    public void whenFromIsJson_thenJsonOutputIsReturned() {
+    void whenFromIsJson_thenJsonOutputIsReturned() {
         assertEquals(Output.JSON, Output.from("jSon"));
         assertEquals(Output.JSON, Output.from("JSON"));
     }
 
     @Test
-    public void whenFromIsJsonLines_thenJsonLinesOutputIsReturned() {
+    void whenFromIsJsonLines_thenJsonLinesOutputIsReturned() {
         assertEquals(Output.JSON_LINES, Output.from("jSonLiNes"));
         assertEquals(Output.JSON_LINES, Output.from("JSONLINES"));
     }
 
     @Test
-    public void whenFromIsNotSpecified_thenJsonLinesOutputIsReturned() {
+    void whenFromIsNotSpecified_thenJsonLinesOutputIsReturned() {
         assertEquals(Output.JSON_LINES, Output.from(null));
     }
 
     @Test
-    public void whenFromNotValid_thenJsonLinesOutputIsReturned() {
+    void whenFromNotValid_thenJsonLinesOutputIsReturned() {
         assertEquals(Output.JSON_LINES, Output.from("notValid"));
     }
 
     @Test
-    public void whenFactoryOutputIsJson_thenExtractorJsonIsReturned() {
+    void whenFactoryOutputIsJson_thenExtractorJsonIsReturned() {
         assertEquals(
             extractorJson,
             extractorFactory.provide(Output.JSON)
@@ -77,7 +77,7 @@ public class DataExtractorOutputTest {
     }
 
     @Test
-    public void whenFactoryOutputIsCsv_thenExtractorCsvIsReturned() {
+    void whenFactoryOutputIsCsv_thenExtractorCsvIsReturned() {
         assertEquals(
             extractorCsv,
             extractorFactory.provide(Output.CSV)
@@ -85,7 +85,7 @@ public class DataExtractorOutputTest {
     }
 
     @Test
-    public void whenFactoryOutputIsJsonLines_thenExtractorJsonLinesIsReturned() {
+    void whenFactoryOutputIsJsonLines_thenExtractorJsonLinesIsReturned() {
         assertEquals(
             extractorJsonLines,
             extractorFactory.provide(Output.JSON_LINES)

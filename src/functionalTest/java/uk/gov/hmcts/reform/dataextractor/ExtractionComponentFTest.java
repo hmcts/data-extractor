@@ -72,7 +72,7 @@ public class ExtractionComponentFTest extends DbTest {
     private BlobServiceClient testClient;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         blobStorageContainer.start();
         Integer blobMappedPort = blobStorageContainer.getMappedPort(10000);
 
@@ -93,12 +93,12 @@ public class ExtractionComponentFTest extends DbTest {
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         blobStorageContainer.stop();
     }
 
     @Test
-    public void givenContainerWithMetadataExecution_thenExtractFilteredData() {
+    void givenContainerWithMetadataExecution_thenExtractFilteredData() {
         BlobContainerClient containerClient = testClient.createBlobContainer(TEST_CONTAINER_NAME);
         containerClient.setMetadata(Map.of(UPDATE_DATE_METADATA, "20200101"));
 
@@ -119,7 +119,7 @@ public class ExtractionComponentFTest extends DbTest {
     }
 
     @Test
-    public void givenInitialExecution_thenExtractAllData() {
+    void givenInitialExecution_thenExtractAllData() {
         extractionComponent.execute(true);
         BlobContainerClient containerClient = testClient.getBlobContainerClient(TEST_CONTAINER_NAME);
 

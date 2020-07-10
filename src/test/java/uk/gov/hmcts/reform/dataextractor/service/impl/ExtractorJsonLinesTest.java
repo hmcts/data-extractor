@@ -24,7 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class ExtractorJsonLinesTest {
+class ExtractorJsonLinesTest {
 
     @InjectMocks
     @Spy
@@ -46,14 +46,14 @@ public class ExtractorJsonLinesTest {
     private JsonGenerator jsonGenerator;
 
     @Test
-    public void givenSqlException_thenPropagateException() throws SQLException {
+    void givenSqlException_thenPropagateException() throws SQLException {
         when(resultSet.getMetaData()).thenThrow(new SQLException());
         assertThrows(ExtractorException.class, () -> classToTest.apply(resultSet, outputStream));
         verify(objectMapper, times(1)).getFactory();
     }
 
     @Test
-    public void whenWriteResult_thenReturnRowsWritten() throws SQLException, IOException {
+    void whenWriteResult_thenReturnRowsWritten() throws SQLException, IOException {
         when(resultSet.getMetaData()).thenReturn(resultSetMetaData);
 
         when(resultSet.next())

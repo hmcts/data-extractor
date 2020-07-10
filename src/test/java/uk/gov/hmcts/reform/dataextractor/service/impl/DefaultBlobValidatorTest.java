@@ -24,4 +24,9 @@ class DefaultBlobValidatorTest {
     void testNotValid() {
         assertFalse(classToTest.isNotValid("anyString"));
     }
+
+    @Test
+    void testNotValidOnNullValue() {
+        assertFalse(classToTest.isNotValid(null));
+    }
 }

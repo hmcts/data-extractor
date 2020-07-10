@@ -65,7 +65,7 @@ public class BlobOutputWriterFTest {
     private BlobServiceClient testClient;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         blobStorageContainer.start();
         Integer blobMappedPort = blobStorageContainer.getMappedPort(10000);
         String connString = "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;"
@@ -77,12 +77,12 @@ public class BlobOutputWriterFTest {
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         blobStorageContainer.stop();
     }
 
     @Test
-    public void whenBlobOutputWriterCreated_thenBufferedOutputAvailable() throws Exception {
+    void whenBlobOutputWriterCreated_thenBufferedOutputAvailable() throws Exception {
         testClient.createBlobContainer(CONTAINER);
         miStreamProvider.getContainerLastUpdated(CONTAINER, true);
         try (BlobOutputWriter writer = new BlobOutputWriter(CONTAINER, BLOB_PREFIX,
@@ -94,7 +94,7 @@ public class BlobOutputWriterFTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"dataA1.json", "dataA1.csv"})
-    public void whenFileUploaded_thenAvailableInBlobStorage(String filePath) throws Exception {
+    void whenFileUploaded_thenAvailableInBlobStorage(String filePath) throws Exception {
         testClient.createBlobContainer(CONTAINER);
         try (BlobOutputWriter writer = new BlobOutputWriter(CONTAINER, BLOB_PREFIX,
             Output.JSON_LINES, miStreamProvider)) {
@@ -115,7 +115,7 @@ public class BlobOutputWriterFTest {
     }
 
     @Test
-    public void whenOutputStreamExists_thenSameInstanceIsReturned() {
+    void whenOutputStreamExists_thenSameInstanceIsReturned() {
         testClient.createBlobContainer(CONTAINER);
 
         try (BlobOutputWriter writer = new BlobOutputWriter(CONTAINER, BLOB_PREFIX,

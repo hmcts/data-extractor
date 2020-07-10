@@ -12,11 +12,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ExtractionDataTest {
+class ExtractionDataTest {
     static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     @Test
-    public void testQueryHasRightFilter() {
+    void testQueryHasRightFilter() {
         String caseType = "DIVORCE";
         LocalDate fromDate = LocalDate.now().minusDays(10);
         ExtractionData extractionData = ExtractionData
@@ -45,7 +45,7 @@ public class ExtractionDataTest {
     }
 
     @Test
-    public void testWithDefaultDateGetValidFileName() {
+    void testWithDefaultDateGetValidFileName() {
         String caseType = "Test";
         String expectedFileName = "Test.jsonl";
         ExtractionData extractionData = ExtractionData

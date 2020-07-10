@@ -25,7 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class SetLastUpdateMetadataTaskTest {
+class SetLastUpdateMetadataTaskTest {
     private static final String CONTAINER_1_NAME = "container1";
     private static final String CONTAINER_2_NAME = "container2";
 
@@ -36,7 +36,7 @@ public class SetLastUpdateMetadataTaskTest {
     private SetLastUpdateMetadataTask classToTest;
 
     @Test
-    public void testDateContainerDateSet() {
+    void testDateContainerDateSet() {
 
         BlobContainerItem containerItem1 = new BlobContainerItem()
             .setName(CONTAINER_1_NAME);
@@ -68,7 +68,7 @@ public class SetLastUpdateMetadataTaskTest {
     }
 
     @Test
-    public void givenEmptyContainer_thenUpdateSkipped() {
+    void givenEmptyContainer_thenUpdateSkipped() {
 
         BlobContainerItem containerItem1 = new BlobContainerItem()
             .setName(CONTAINER_1_NAME);

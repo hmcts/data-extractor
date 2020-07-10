@@ -31,20 +31,22 @@ class BlobFileUtilsTest {
 
     @Test
     void testEmptyData() {
+        final LocalDate executionDate = LocalDate.now();
         assertThrows(IllegalArgumentException.class, () -> {
-            BlobFileUtils.getFileName(null, LocalDate.now());
+            BlobFileUtils.getFileName(null, executionDate);
         });
     }
 
     @Test
     void testEmptyDate() {
+        final ExtractionData  extractionData = ExtractionData
+            .builder()
+            .container("container")
+            .prefix("Test")
+            .type(Output.JSON_LINES)
+            .build();
         assertThrows(IllegalArgumentException.class, () -> {
-            BlobFileUtils.getFileName(ExtractionData
-                .builder()
-                .container("container")
-                .prefix("Test")
-                .type(Output.JSON_LINES)
-                .build(), null);
+            BlobFileUtils.getFileName(extractionData, null);
         });
     }
 

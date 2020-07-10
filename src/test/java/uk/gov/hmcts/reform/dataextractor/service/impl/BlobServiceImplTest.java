@@ -42,6 +42,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -50,7 +51,7 @@ import static uk.gov.hmcts.reform.dataextractor.service.ContainerConstants.UPDAT
 import static uk.gov.hmcts.reform.dataextractor.service.impl.BlobServiceImpl.DATE_TIME_FORMATTER;
 
 @ExtendWith(MockitoExtension.class)
-public class BlobServiceImplTest {
+class BlobServiceImplTest {
 
     private static final String STORAGE_ACCOUNT = "testStorageAccount";
     private static final String CLIENT_ID = "testClientId";
@@ -80,7 +81,7 @@ public class BlobServiceImplTest {
     private Factory<Output, BlobOutputValidator> blobOutputValidatorFactory;
 
     @Test
-    public void givenNonExistingContainer_whenGetLastUpdated_thenReturnNull() {
+    void givenNonExistingContainer_whenGetLastUpdated_thenReturnNull() {
         classToTest = new BlobServiceImpl(CLIENT_ID, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory, blobOutputValidatorFactory);
         when(blobServiceClientFactory.getBlobClientWithManagedIdentity(CLIENT_ID, STORAGE_ACCOUNT)).thenReturn(
             blobServiceClientMock);
@@ -91,7 +92,7 @@ public class BlobServiceImplTest {
     }
 
     @Test
-    public void givenNullMetadata_whenGetLastUpdated_thenReturnNull() {
+    void givenNullMetadata_whenGetLastUpdated_thenReturnNull() {
         classToTest = new BlobServiceImpl(CLIENT_ID, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory, blobOutputValidatorFactory);
         when(blobServiceClientFactory.getBlobClientWithManagedIdentity(CLIENT_ID, STORAGE_ACCOUNT)).thenReturn(
             blobServiceClientMock);
@@ -102,7 +103,7 @@ public class BlobServiceImplTest {
     }
 
     @Test
-    public void givenValidMetadata_whenGetLastUpdated_thenReturnMetadataDate() {
+    void givenValidMetadata_whenGetLastUpdated_thenReturnMetadataDate() {
         classToTest = new BlobServiceImpl(CLIENT_ID, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory, blobOutputValidatorFactory);
 
         final LocalDate expectedDate = LocalDate.now();
@@ -116,7 +117,7 @@ public class BlobServiceImplTest {
     }
 
     @Test
-    public void whenSetLastUpdated_thenApiIsCalled() {
+    void whenSetLastUpdated_thenApiIsCalled() {
         classToTest = new BlobServiceImpl(CLIENT_ID, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory, blobOutputValidatorFactory);
 
         final String dateMetadata = DATE_TIME_FORMATTER.format(LocalDate.now());
@@ -128,7 +129,7 @@ public class BlobServiceImplTest {
     }
 
     @Test
-    public void whenHasClientId_thenUseManageIdentityClient() throws Exception {
+    void whenHasClientId_thenUseManageIdentityClient() throws Exception {
         classToTest = new BlobServiceImpl(CLIENT_ID, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory, blobOutputValidatorFactory);
 
         when(blobServiceClientFactory.getBlobClientWithManagedIdentity(CLIENT_ID, STORAGE_ACCOUNT)).thenReturn(
@@ -139,7 +140,7 @@ public class BlobServiceImplTest {
     }
 
     @Test
-    public void whenEmptyClientId_thenUseConnectionStringClient() throws Exception {
+    void whenEmptyClientId_thenUseConnectionStringClient() throws Exception {
         classToTest = new BlobServiceImpl(StringUtils.EMPTY, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory,
             blobOutputValidatorFactory);
         when(blobServiceClientFactory.getBlobClientWithConnectionString(CONNECTION_STRING)).thenReturn(
@@ -150,7 +151,7 @@ public class BlobServiceImplTest {
     }
 
     @Test
-    public void createBlobWithContentType() {
+    void createBlobWithContentType() {
         classToTest = new BlobServiceImpl(StringUtils.EMPTY, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory,
             blobOutputValidatorFactory);
         String fileName = "testFileName.jsonline";
@@ -172,7 +173,7 @@ public class BlobServiceImplTest {
     }
 
     @Test
-    public void testListContainers() {
+    void testListContainers() {
         classToTest = new BlobServiceImpl(StringUtils.EMPTY, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory,
             blobOutputValidatorFactory);
         when(blobServiceClientFactory.getBlobClientWithConnectionString(CONNECTION_STRING)).thenReturn(
@@ -183,7 +184,7 @@ public class BlobServiceImplTest {
     }
 
     @Test
-    public void testListBlobs() {
+    void testListBlobs() {
         classToTest = new BlobServiceImpl(StringUtils.EMPTY, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory,
             blobOutputValidatorFactory);
         when(blobServiceClientFactory.getBlobClientWithConnectionString(CONNECTION_STRING)).thenReturn(
@@ -195,7 +196,7 @@ public class BlobServiceImplTest {
     }
 
     @Test
-    public void givenException_whenValidateBlob_thenReturnFalse() throws IOException {
+    void givenException_whenValidateBlob_thenReturnFalse() throws IOException {
         classToTest = spy(new BlobServiceImpl(StringUtils.EMPTY, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory,
             blobOutputValidatorFactory));
         when(blobOutputValidatorFactory.provide(Output.JSON_LINES)).thenReturn(blobOutputValidator);
@@ -211,7 +212,7 @@ public class BlobServiceImplTest {
     }
 
     @Test
-    public void givenValidBlob_whenValidateBlob_thenReturnTrue() throws IOException {
+    void givenValidBlob_whenValidateBlob_thenReturnTrue() throws IOException {
         classToTest = spy(new BlobServiceImpl(StringUtils.EMPTY, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory,
             blobOutputValidatorFactory));
         InputStream inputStream = spy(new ByteArrayInputStream("{}\n{}".getBytes()));
@@ -223,7 +224,7 @@ public class BlobServiceImplTest {
     }
 
     @Test
-    public void givenInvalidBlob_whenValidateBlob_thenReturnFalse() throws IOException {
+    void givenInvalidBlob_whenValidateBlob_thenReturnFalse() throws IOException {
         classToTest = spy(new BlobServiceImpl(StringUtils.EMPTY, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory,
             blobOutputValidatorFactory));
         InputStream inputStream = spy(new ByteArrayInputStream("{}\n{}".getBytes()));
@@ -236,7 +237,7 @@ public class BlobServiceImplTest {
     }
 
     @Test
-    public void testDeleteBlob() {
+    void testDeleteBlob() {
         classToTest = new BlobServiceImpl(StringUtils.EMPTY, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory,
             blobOutputValidatorFactory);
         when(blobServiceClientFactory.getBlobClientWithConnectionString(CONNECTION_STRING)).thenReturn(
@@ -246,6 +247,19 @@ public class BlobServiceImplTest {
         classToTest.deleteBlob(TEST_CONTAINER_NAME, BLOB_NAME);
         verify(blobClientMock, times(1)).delete();
     }
+
+    @Test
+    void givenInitialiseFlagFalse_whenGetContainerLastUpdate_thenContainerNotCreated() {
+        classToTest = new BlobServiceImpl(StringUtils.EMPTY, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory,
+            blobOutputValidatorFactory);
+        when(blobServiceClientFactory.getBlobClientWithConnectionString(CONNECTION_STRING)).thenReturn(
+            blobServiceClientMock);
+        when(blobServiceClientMock.getBlobContainerClient(TEST_CONTAINER_NAME)).thenReturn(blobContainerClientMock);
+        when(blobContainerClientMock.exists()).thenReturn(false);
+        assertNull(classToTest.getContainerLastUpdated(TEST_CONTAINER_NAME, false));
+        verify(blobContainerClientMock, never()).create();
+    }
+
 
     private BlobContainerProperties createEmptyBlobContainerProperties() {
         return new BlobContainerProperties(null, null, null, null,

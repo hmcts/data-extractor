@@ -30,7 +30,7 @@ public class ExtractorJsonFTest extends DbTest {
     ExtractorJson extractorJson;
 
     @Test
-    public void whenSimpleSelectQueryExecuted_thenJsonReturned() throws Exception {
+    void whenSimpleSelectQueryExecuted_thenJsonReturned() throws Exception {
         try (Connection conn = DriverManager.getConnection(jdbcUrl, username, password);
             ResultSet resultSet = conn.createStatement().executeQuery(DB_CONNECTION_QUERY)) {
 
@@ -41,7 +41,7 @@ public class ExtractorJsonFTest extends DbTest {
     }
 
     @Test
-    public void whenJoinSelectQueryExecuted_thenJsonResultsReturned() throws Exception {
+    void whenJoinSelectQueryExecuted_thenJsonResultsReturned() throws Exception {
         try (Connection conn = DriverManager.getConnection(jdbcUrl, username, password);
             ResultSet resultSet =
                 conn.createStatement().executeQuery(DB_DATA_QUERY)) {
