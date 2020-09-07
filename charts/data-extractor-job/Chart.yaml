@@ -1,7 +1,7 @@
 apiVersion: v1
 name: data-extractor-job
 home: https://github.com/hmcts/data-extractor
-version: 0.0.8
+version: 0.0.9
 description: HMCTS data extractor
 maintainers:
   - name: HMCTS Platform engineering team
