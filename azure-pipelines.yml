@@ -44,6 +44,7 @@ variables:
   product: 'mi'
   vault: 'mi-vault-$(env)'
   azure.prom.acr: 'ssprivate$(env.prom)'
+  helm.repo: 'ssprivate$(env)'
   
 resources:
   repositories:
@@ -64,6 +65,7 @@ stages:
       mutationTest: False
       functionalTest: true
       preIntegrationTest: true
+      helmRepo: $(helm.repo)
       azureSecreKeys: 'ccdro-user,ccdro-password,data-extractor-connection-string'
       envMapping:
       - key: BUILD_VERSION

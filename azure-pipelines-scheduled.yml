@@ -35,7 +35,7 @@ variables:
   product: 'mi'
   vault: 'mi-vault-$(env)'
   azure.prom.acr: 'ssprivate$(env.prom)'
-  helmRepo: 'ssprivate-$(env)'
+  helm.repo: 'ssprivate$(env)'
 resources:
   repositories:
     - repository: mi-core
@@ -54,6 +54,7 @@ stages:
       mutationTest: True
       functionalTest: true
       preIntegrationTest: true
+      helmRepo: $(helm.repo)
       envMapping:
       - key: BUILD_VERSION
         value: Build.BuildId
