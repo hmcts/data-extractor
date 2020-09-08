@@ -1,5 +1,6 @@
 mi-job:
   image: ${IMAGE_NAME}
+  keyVaultsUsepodidentity: false
   environment:
 #    ETL_MSICLIENTID: e7251f8f-268e-4d5f-98d1-8eb777ef71c3
     ETL_DB_URL: jdbc:postgresql://ccd-data-store-api-postgres-db-{{ .Values.global.ccd_environment }}.postgres.database.azure.com:5432/ccd_data_store
