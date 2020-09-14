@@ -2,6 +2,7 @@ mi-job:
   image: ${IMAGE_NAME}
   keyVaults:
     "mi-vault":
+      excludeEnvironmentSuffix: false
       resourceGroup: mi-{{ .Values.global.environment }}-rg
       secrets:
         - ccdro-user
@@ -15,6 +16,7 @@ mi-job:
   kind: Job
   ttlSecondsAfterFinished: 30
   aadIdentityName: mi-data-extractor-job
+  keyVaultsUsepodidentity: true
   activeDeadlineSeconds: 600
   labels:
     app.kubernetes.io/instance : data-extractor-job-001
