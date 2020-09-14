@@ -4,7 +4,7 @@
     <notes><![CDATA[
      Suppressing as it's a false positive (see: https://pivotal.io/security/cve-2018-1258)
    ]]></notes>
-    <gav regex="true">org\.springframework\.security:spring-security-\w+:5.2.[0-1].RELEASE</gav>
+    <gav regex="true">org\.springframework\.security:spring-security-\w+:5.[0-3].[0-9].RELEASE</gav>
     <cpe>cpe:/a:pivotal_software:spring_security</cpe>
     <cve>CVE-2018-1258</cve>
   </suppress>
@@ -21,5 +21,19 @@
       Checkstyle library not part of production.
    ]]></notes>
     <cve>CVE-2019-10782</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+            CVE is a json vulnerability that applies only to Ruby or Node projects
+        ]]></notes>
+    <cve>CVE-2020-10663</cve>
+    <cve>CVE-2020-7712</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+            CVE an openid vulnerability. We do not use openid.
+        ]]></notes>
+    <cve>CVE-2007-1651</cve>
+    <cve>CVE-2007-1652</cve>
   </suppress>
 </suppressions>
