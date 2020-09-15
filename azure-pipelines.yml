@@ -66,6 +66,7 @@ stages:
       functionalTest: true
       preIntegrationTest: true
       helmRepo: $(helm.repo)
+      dependencyCheck: false
       azureSecreKeys: 'ccdro-user,ccdro-password,data-extractor-connection-string'
       envMapping:
       - key: BUILD_VERSION
