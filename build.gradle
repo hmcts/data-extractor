@@ -211,7 +211,7 @@ def versions = [
         azureStorage    : '12.3.0',
         azureSpringBoot : '2.2.0',
         springBoot      : '2.2.5.RELEASE',
-        postgresql      : '42.2.16',
+        postgresql      : '42.2.5',
         pitest          : '1.4.10',
         gradlePitest    : '1.4.5',
         sonarPitest     : '0.5',
