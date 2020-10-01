@@ -48,10 +48,10 @@ public class DataExtractorApplication implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         try {
+            runPreExecutionTasks();
             if (smokeTest) {
                 healthCheck.check();
             } else {
-                runPreExecutionTasks();
                 extractionComponent.execute(initialise);
             }
         } catch (Exception e) {
