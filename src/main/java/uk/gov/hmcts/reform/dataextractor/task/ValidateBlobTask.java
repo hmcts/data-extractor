@@ -28,7 +28,7 @@ public class ValidateBlobTask implements PreExecutor {
                 PagedIterable<BlobItem> blobs = blobService.listContainerBlobs(containerItem.getName());
                 blobs.stream()
                     .forEach(blobItem -> {
-                        if (blobService.validateBlob(containerItem.getName(), blobItem.getName(), Output.JSON)) {
+                        if (blobService.validateBlob(containerItem.getName(), blobItem.getName(), Output.JSON_LINES)) {
                             log.info("Blob in {} with name {} is correct", containerItem.getName(), blobItem.getName());
                         } else {
                             log.warn("Blob in {} with name {} not valid", containerItem.getName(), blobItem.getName());

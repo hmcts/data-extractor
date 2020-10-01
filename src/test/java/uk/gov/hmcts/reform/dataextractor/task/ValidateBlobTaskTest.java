@@ -93,7 +93,7 @@ class ValidateBlobTaskTest {
         when(blobService.listContainers()).thenReturn(stub);
         when(blobService.listContainerBlobs(anyString())).thenReturn(blobs);
 
-        when(blobService.validateBlob(CONTAINER_1_NAME, blobItem1.getName(), Output.JSON)).thenReturn(true);
+        when(blobService.validateBlob(CONTAINER_1_NAME, blobItem1.getName(), Output.JSON_LINES)).thenReturn(true);
         classToTest = new ValidateBlobTask(blobService, true);
         classToTest.execute();
         verify(testRecorder, times(1)).append("[WARN] Blob in container2 with name blobItem2 not valid");
