@@ -256,7 +256,7 @@ dependencies {
   compile group: 'org.apache.commons', name: 'commons-csv', version: '1.8'
   compile group: 'com.google.guava', name: 'guava', version: versions.guava
 
-  compile group: 'com.typesafe', name: 'config', version: '1.4.0'
+  compile group: 'com.typesafe', name: 'config', version: '1.4.1'
 
   compileOnly 'org.projectlombok:lombok'
   annotationProcessor 'org.projectlombok:lombok'
