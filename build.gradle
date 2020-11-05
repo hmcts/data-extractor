@@ -4,11 +4,11 @@ plugins {
   id 'checkstyle'
   id 'jacoco'
   id 'pmd'
-  id 'org.owasp.dependencycheck' version '6.0.1'
-  id 'com.github.ben-manes.versions' version '0.33.0'
+  id 'org.owasp.dependencycheck' version '6.0.3'
+  id 'com.github.ben-manes.versions' version '0.34.0'
   id 'org.sonarqube' version '3.0'
   id "net.java.openjdk.shinyafox.jshell.gradle.plugin" version "1.0.5"
-  id 'org.springframework.boot' version '2.3.4.RELEASE'
+  id 'org.springframework.boot' version '2.3.5.RELEASE'
   id 'io.spring.dependency-management' version '1.0.10.RELEASE'
   id 'info.solidsoft.pitest' version '1.5.2'
 }
@@ -256,7 +256,7 @@ dependencies {
   compile group: 'org.apache.commons', name: 'commons-csv', version: '1.8'
   compile group: 'com.google.guava', name: 'guava', version: versions.guava
 
-  compile group: 'com.typesafe', name: 'config', version: '1.4.0'
+  compile group: 'com.typesafe', name: 'config', version: '1.4.1'
 
   compileOnly 'org.projectlombok:lombok'
   annotationProcessor 'org.projectlombok:lombok'
@@ -285,7 +285,7 @@ dependencies {
   testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
   testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
   testRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: versions.junit
-  testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.5.10'
+  testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.6.0'
   testCompile group: 'com.microsoft.azure', name: 'azure-spring-boot-starter', version: versions.azureSpringBoot
 
   testCompileOnly 'org.projectlombok:lombok'
