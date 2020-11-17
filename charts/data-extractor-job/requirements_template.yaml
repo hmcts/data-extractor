@@ -1,0 +1,4 @@
+dependencies:
+  - name: mi-job
+    version: 0.6.0
+    repository:  '@${HELM_REPO}'

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.dataextractor;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
+import com.azure.storage.blob.specialized.BlobOutputStream;
 import com.microsoft.applicationinsights.core.dependencies.apachecommons.io.IOUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +25,6 @@ import uk.gov.hmcts.reform.dataextractor.service.impl.BlobServiceImpl;
 import uk.gov.hmcts.reform.dataextractor.utils.TestUtils;
 import uk.gov.hmcts.reform.mi.micore.factory.BlobServiceClientFactory;
 
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -65,7 +65,7 @@ public class BlobOutputWriterFTest {
     private BlobServiceClient testClient;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         blobStorageContainer.start();
         Integer blobMappedPort = blobStorageContainer.getMappedPort(10000);
         String connString = "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;"
@@ -77,24 +77,24 @@ public class BlobOutputWriterFTest {
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         blobStorageContainer.stop();
     }
 
     @Test
-    public void whenBlobOutputWriterCreated_thenBufferedOutputAvailable() throws Exception {
+    void whenBlobOutputWriterCreated_thenBufferedOutputAvailable() throws Exception {
         testClient.createBlobContainer(CONTAINER);
-        miStreamProvider.getContainerLastUpdated(CONTAINER);
+        miStreamProvider.getContainerLastUpdated(CONTAINER, true);
         try (BlobOutputWriter writer = new BlobOutputWriter(CONTAINER, BLOB_PREFIX,
             Output.JSON_LINES, miStreamProvider)) {
             OutputStream outputStream = writer.outputStream();
-            assertThat(outputStream, instanceOf(BufferedOutputStream.class));
+            assertThat(outputStream, instanceOf(BlobOutputStream.class));
         }
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"dataA1.json", "dataA1.csv"})
-    public void whenFileUploaded_thenAvailableInBlobStorage(String filePath) throws Exception {
+    void whenFileUploaded_thenAvailableInBlobStorage(String filePath) throws Exception {
         testClient.createBlobContainer(CONTAINER);
         try (BlobOutputWriter writer = new BlobOutputWriter(CONTAINER, BLOB_PREFIX,
             Output.JSON_LINES, miStreamProvider)) {
@@ -115,7 +115,7 @@ public class BlobOutputWriterFTest {
     }
 
     @Test
-    public void whenOutputStreamExists_thenSameInstanceIsReturned() {
+    void whenOutputStreamExists_thenSameInstanceIsReturned() {
         testClient.createBlobContainer(CONTAINER);
 
         try (BlobOutputWriter writer = new BlobOutputWriter(CONTAINER, BLOB_PREFIX,

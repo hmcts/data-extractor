@@ -5,13 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.dataextractor.model.Output;
 import uk.gov.hmcts.reform.dataextractor.service.OutputStreamProvider;
 
-import java.io.BufferedOutputStream;
 import java.io.OutputStream;
 
 @Slf4j
 public class BlobOutputWriter implements AutoCloseable {
-
-    static final int OUTPUT_BUFFER_SIZE = 100_000_000;
 
     private final String containerName;
 
@@ -37,7 +34,7 @@ public class BlobOutputWriter implements AutoCloseable {
         if (outputStream != null) {
             return outputStream;
         }
-        outputStream = new BufferedOutputStream(getOutputStreamProvider().getOutputStream(containerName, fileName, outputType), OUTPUT_BUFFER_SIZE);
+        outputStream = getOutputStreamProvider().getOutputStream(containerName, fileName, outputType);
         return outputStream;
     }
 
@@ -45,16 +42,16 @@ public class BlobOutputWriter implements AutoCloseable {
         if (outputStream != null) {
             return outputStream;
         }
-        outputStream = new BufferedOutputStream(getOutputStreamProvider().getOutputStream(containerName,
-            namePrefix, outputType), OUTPUT_BUFFER_SIZE);
+        outputStream =  getOutputStreamProvider().getOutputStream(containerName, namePrefix, outputType);
         return outputStream;
     }
 
     public void close() {
         try {
             if (outputStream != null) {
-                outputStream.flush();
                 outputStream.close();
+                outputStream = null;
+                log.info("Closed output stream form buffer name {}", this.fileName);
             }
         } catch (Exception e) {
             // Blob storage client has already closed the stream. This exception cannot be

@@ -1,24 +1,16 @@
-buildscript {
-  configurations.maybeCreate("pitest")
-  dependencies {
-    classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.4.7'
-    pitest 'org.pitest:pitest-junit5-plugin:0.10'
-  }
-}
-
 plugins {
   id 'application'
   id 'java'
   id 'checkstyle'
   id 'jacoco'
   id 'pmd'
-  id 'org.owasp.dependencycheck' version '5.3.0'
-  id 'com.github.ben-manes.versions' version '0.28.0'
-  id 'org.sonarqube' version '2.7'
-  id "net.java.openjdk.shinyafox.jshell.gradle.plugin" version "1.0.4"
-  id 'org.springframework.boot' version '2.2.4.RELEASE'
-  id 'io.spring.dependency-management' version '1.0.8.RELEASE'
-  id 'info.solidsoft.pitest' version '1.4.6'
+  id 'org.owasp.dependencycheck' version '6.0.3'
+  id 'com.github.ben-manes.versions' version '0.34.0'
+  id 'org.sonarqube' version '3.0'
+  id "net.java.openjdk.shinyafox.jshell.gradle.plugin" version "1.0.5"
+  id 'org.springframework.boot' version '2.3.5.RELEASE'
+  id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+  id 'info.solidsoft.pitest' version '1.5.2'
 }
 
 group 'uk.gov.hmcts.reform'
@@ -162,6 +154,12 @@ sonarqube {
   }
 }
 
+dependencyManagement {
+  dependencies {
+    dependency group: 'com.squareup.retrofit2', name: 'adapter-rxjava', version: '2.9.0'
+  }
+}
+
 dependencyUpdates.resolutionStrategy = {
   componentSelection { rules ->
     rules.all { ComponentSelection selection ->
@@ -212,12 +210,13 @@ def versions = [
         commonsBeanUtils: '1.9.4',
         azureStorage    : '12.3.0',
         azureSpringBoot : '2.2.0',
-        springBoot      : '2.2.4.RELEASE',
-        postgresql      : '42.2.5',
+        springBoot      : '2.2.5.RELEASE',
+        postgresql      : '42.2.13',
         pitest          : '1.4.10',
         gradlePitest    : '1.4.5',
         sonarPitest     : '0.5',
-        miCoreLib       : '3.0.8'
+        miCoreLib       : '3.4.4',
+        guava           : '29.0-jre'
 ]
 
 dependencies {
@@ -255,8 +254,9 @@ dependencies {
 
   compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
   compile group: 'org.apache.commons', name: 'commons-csv', version: '1.8'
-  compile group: 'com.google.guava', name: 'guava', version: '28.2-jre'
-  compile group: 'com.typesafe', name: 'config', version: '1.4.0'
+  compile group: 'com.google.guava', name: 'guava', version: versions.guava
+
+  compile group: 'com.typesafe', name: 'config', version: '1.4.1'
 
   compileOnly 'org.projectlombok:lombok'
   annotationProcessor 'org.projectlombok:lombok'
@@ -267,7 +267,7 @@ dependencies {
   
   compile group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.logging
   compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.logging
-  compile('uk.gov.hmcts.reform:properties-volume-spring-boot-starter:0.0.4') {
+  compile('uk.gov.hmcts.reform:properties-volume-spring-boot-starter:0.1.0') {
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
   }
 
@@ -285,7 +285,7 @@ dependencies {
   testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
   testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
   testRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: versions.junit
-  testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.3.1'
+  testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.6.0'
   testCompile group: 'com.microsoft.azure', name: 'azure-spring-boot-starter', version: versions.azureSpringBoot
 
   testCompileOnly 'org.projectlombok:lombok'
@@ -296,8 +296,8 @@ dependencies {
   }
 
 
-  functionalTestCompile 'org.testcontainers:postgresql:1.12.5'
-  functionalTestCompile 'org.testcontainers:junit-jupiter:1.12.5'
+  functionalTestCompile 'org.testcontainers:postgresql:1.14.3'
+  functionalTestCompile 'org.testcontainers:junit-jupiter:1.14.3'
   functionalTestCompile 'com.ninja-squad:DbSetup:2.1.0'
   functionalTestCompile group: 'uk.gov.hmcts.reform.mi', name: 'mi-core-lib', version: versions.miCoreLib
   functionalTestCompile group: 'com.azure', name: 'azure-storage-blob', version: versions.azureStorage
@@ -315,6 +315,7 @@ dependencies {
 }
 
 pitest {
+  pitestVersion = '1.5.2'
   targetClasses = ['uk.gov.hmcts.reform.dataextractor.*']
   excludedClasses = ['uk.gov.hmcts.reform.dataextractor.DataExtractorApplication']
   testSourceSets = [sourceSets.test, sourceSets.functionalTest]
@@ -323,7 +324,7 @@ pitest {
   timestampedReports = false
   mutationThreshold = 80
   verbose = true
-  testPlugin = "junit5" //or another test plugin
+  junit5PluginVersion = '0.12'
 }
 
 mainClassName = 'uk.gov.hmcts.reform.dataextractor.DataExtractorApplication'

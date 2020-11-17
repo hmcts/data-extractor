@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.dataextractor.service.OutputStreamProvider;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -20,7 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class BlobOutputWriterTest {
+class BlobOutputWriterTest {
 
     private static final String CONTAINER_NAME = "testContainer";
     private static final String FILE_PREFIX_NAME = "filePrefix";
@@ -35,20 +36,20 @@ public class BlobOutputWriterTest {
     OutputStream outputStreamMock;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         classToTest = new BlobOutputWriter(CONTAINER_NAME, FILE_PREFIX_NAME, OUTPUT_TYPE, outputStreamProviderMock);
     }
 
     @Test
-    public void testStreamClose() throws IOException {
+    void testStreamClose() throws IOException {
         when(outputStreamProviderMock.getOutputStream(eq(CONTAINER_NAME), anyString(), eq(OUTPUT_TYPE))).thenReturn(outputStreamMock);
-        classToTest.outputStream();
+        assertEquals(outputStreamMock, classToTest.outputStream());
         classToTest.close();
         verify(outputStreamMock,times(1)).close();
     }
 
     @Test
-    public void whenStreamCloseError_thenErrorIsNotPropagated() throws IOException {
+    void whenStreamCloseError_thenErrorIsNotPropagated() throws IOException {
         when(outputStreamProviderMock.getOutputStream(eq(CONTAINER_NAME), anyString(), eq(OUTPUT_TYPE))).thenReturn(outputStreamMock);
         doThrow(new RuntimeException("Error")).when(outputStreamMock).close();
         classToTest.outputStream();

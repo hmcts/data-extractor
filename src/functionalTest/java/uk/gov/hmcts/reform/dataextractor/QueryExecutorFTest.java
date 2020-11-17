@@ -16,7 +16,7 @@ import static uk.gov.hmcts.reform.dataextractor.utils.TestConstants.DB_CONNECTIO
 public class QueryExecutorFTest extends DbTest {
 
     @Test
-    public void whenSimpleSelectQueryExecuted_thenResultSetReturned() throws Exception {
+    void whenSimpleSelectQueryExecuted_thenResultSetReturned() throws Exception {
         String sql = DB_CONNECTION_QUERY;
         try (QueryExecutor executor = new QueryExecutor(jdbcUrl, username, password, sql);
              ResultSet resultSet = executor.execute()) {
@@ -28,7 +28,7 @@ public class QueryExecutorFTest extends DbTest {
     }
 
     @Test
-    public void whenBadSelectQueryExecuted_thenExceptionThrown() throws Exception {
+    void whenBadSelectQueryExecuted_thenExceptionThrown() throws Exception {
         String sql = "SELECT ID, NAME FROM parent WHERE PID = 1";
         Assertions.assertThrows(ExecutorException.class, () -> {
             try (QueryExecutor executor = new QueryExecutor(jdbcUrl, username, password, sql);

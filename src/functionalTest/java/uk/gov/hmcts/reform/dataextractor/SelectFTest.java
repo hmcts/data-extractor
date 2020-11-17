@@ -15,7 +15,7 @@ import static uk.gov.hmcts.reform.dataextractor.utils.TestConstants.DB_CONNECTIO
 public class SelectFTest extends DbTest {
 
     @Test
-    public void whenSelectQueryExecuted_thenResultsReturned() throws Exception {
+    void whenSelectQueryExecuted_thenResultsReturned() throws Exception {
         try (Connection conn = DriverManager.getConnection(jdbcUrl, username, password);
             ResultSet resultSet = conn.createStatement().executeQuery(DB_CONNECTION_QUERY)) {
 

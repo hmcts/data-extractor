@@ -11,53 +11,26 @@ etl:
     url: "jdbc:postgresql://localhost:5432/ccd_data_store?sslmode=require"
     user: "dumyUser"
     password: "cdummyPassword"
+    cloneUrl: "jdbc:postgresql://localhost:5432/ccd_data_store?sslmode=require"
+    cloneUser: "cloneUser"
+    clonePassword: "clonePassword"
   account: "midatastgsbox"
   connection-string: "dummyConnectionString"
 
 smoke.test.enabled: false
 
 extraction:
-  caseTypes:
-    - container: "grantofrepresentation"
-      caseType: "GrantOfRepresentation"
-      type: "jsonlines"
-      prefix: "CCD-PROB-GOR"
-    - container: "caveat"
-      caseType: "Caveat"
-      type: "jsonlines"
-      prefix: "CCD-PROB-CAVEAT"
-    - container: "willlodgement"
-      caseType: "WillLodgement"
-      type: "jsonlines"
-      prefix: "CCD-PROB-WL"
-    - container: "standingsearch"
-      caseType: "StandingSearch"
-      type: "jsonlines"
-      prefix: "CCD-PROB-SS"
-    - container: "divorce"
-      caseType: "DIVORCE"
-      type: "jsonlines"
-      prefix: "CCD-DIV"
-    - container: "finredmvp2"
-      caseType: "FinancialRemedyMVP2"
-      type: "jsonlines"
-      prefix: "FINRED-MVP2"
-    - container: "finredcontested"
-      caseType: "FinancialRemedyContested"
-      type: "jsonlines"
-      prefix: "FINRED-CONTESTED"
-    - container: "cmc"
-      caseType: "MoneyClaimCase"
-      type: "jsonlines"
-      prefix: "CMC"
-    - container: "asylum"
-      caseType: "Asylum"
-      type: "jsonlines"
-      prefix: "ASYLUM"
-    - container: "sscs"
-      caseType: "Benefit"
-      type: "jsonlines"
-      prefix: "SSCS"
+  initialise: false
+  max:
+    batch:
+      row: 100000
+  filter:
+    jurisdiction:
+      in:
+      out:
+      - "'AUTOTEST1'"
+      - "'TEST'"
+
 application-insights:
   default:
     modules:
@@ -67,3 +40,7 @@ application-insights:
 azure:
   application-insights:
     instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:""}
+
+task:
+  SetLastUpdateMetadata: ${TASK_SET_LAST_UPDATE:false}
+  validateBlob: ${TASK_VALIDATE_BLOB:false}
