@@ -156,7 +156,6 @@ sonarqube {
 dependencyManagement {
   dependencies {
     dependency group: 'com.squareup.retrofit2', name: 'adapter-rxjava', version: '2.9.0'
-    dependency group: 'junit', name: 'junit', version: '4.13.1'
   }
 }
 
