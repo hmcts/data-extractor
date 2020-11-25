@@ -243,7 +243,6 @@ configurations.all {
       }
     }
   }
-  exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 }
 
 dependencies {
@@ -284,7 +283,7 @@ dependencies {
   testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
   testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
   testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
-  testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.6.0'
+  testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.6.28'
   testCompile group: 'com.microsoft.azure', name: 'azure-spring-boot-starter', version: versions.azureSpringBoot
 
   testCompileOnly 'org.projectlombok:lombok'
