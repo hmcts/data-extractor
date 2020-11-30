@@ -13,6 +13,7 @@ public class JsonValidator implements BlobOutputValidator {
     @Autowired
     private ObjectMapper jsonMapper;
 
+    @Override
     public boolean isValid(String input) {
         try {
             jsonMapper.reader().readTree(input);
@@ -22,6 +23,7 @@ public class JsonValidator implements BlobOutputValidator {
         }
     }
 
+    @Override
     public boolean isNotValid(String input) {
         return !isValid(input);
     }
