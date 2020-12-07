@@ -6,9 +6,7 @@ import com.azure.core.http.rest.PagedIterable;
 import com.azure.storage.blob.models.BlobContainerItem;
 import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.BlobItemProperties;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,39 +34,31 @@ class ValidateBlobTaskTest {
     private static final String CONTAINER_2_NAME = "container2";
 
     private ValidateBlobTask classToTest;
-    static TestAppender logAppender = new TestAppender();
+    private TestAppender logAppender;
 
     @Mock
     private BlobServiceImpl blobService;
     @Mock
     private TestRecorder testRecorder;
 
-    @BeforeAll
-    public static void loggerConfig() {
+
+    @BeforeEach
+    public void setUp() {
+        logAppender = new TestAppender();
+
+        logAppender.setRecorder(testRecorder);
         LoggerContext logCtx = (LoggerContext) LoggerFactory.getILoggerFactory();
         Logger log = logCtx.getLogger(ValidateBlobTask.class.getName());
         log.addAppender(logAppender);
     }
 
-
-    @AfterAll
-    public static void tearDownLogger() {
-        logAppender.stop();
-    }
-
-    @BeforeEach
-    public void setUp() {
-        logAppender.setRecorder(testRecorder);
-    }
-
     @AfterEach
     public void tearDown() {
-        logAppender.clean();
+        logAppender.stop();
     }
 
     @Test
     void executeWhenEnabled() {
-
 
         BlobContainerItem containerItem1 = new BlobContainerItem()
             .setName(CONTAINER_1_NAME);

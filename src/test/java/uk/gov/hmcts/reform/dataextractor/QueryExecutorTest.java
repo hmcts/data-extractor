@@ -79,7 +79,7 @@ class QueryExecutorTest {
         doReturn(connection).when(classToTest).connect();
         when(connection.createStatement()).thenReturn(statement);
         when(statement.executeQuery(SQL)).thenReturn(resultSet);
-        assertThat(classToTest.execute(), is(resultSet));
+        assertThat("Expected valid result set", classToTest.execute(), is(resultSet));
     }
 
     private void verifyAllResourcesClosed() throws SQLException {
