@@ -52,6 +52,7 @@ resources:
       type: github
       name: hmcts/mi-core-lib
       endpoint: hmcts
+      ref: set-java-sh-agents
 
 stages:
   - template: pipeline-steps/templates/build-deploy-stage.yaml@mi-core
@@ -66,6 +67,7 @@ stages:
       functionalTest: true
       preIntegrationTest: true
       helmRepo: $(helm.repo)
+      agentPool: hmcts-ss-$(environment)
       azureSecreKeys: 'ccdro-user,ccdro-password,data-extractor-connection-string'
       envMapping:
       - key: BUILD_VERSION
