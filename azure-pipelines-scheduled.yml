@@ -55,6 +55,7 @@ stages:
       functionalTest: true
       preIntegrationTest: true
       helmRepo: $(helm.repo)
+      agentPool: hmcts-ss-$(environment)
       envMapping:
       - key: BUILD_VERSION
         value: Build.BuildId
