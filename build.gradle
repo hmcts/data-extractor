@@ -205,7 +205,7 @@ jar {
 def versions = [
     junit           : '5.5.0',
     logging         : '5.1.1',
-    jackson         : '2.10.0',
+    jackson         : '2.12.0',
     commonsBeanUtils: '1.9.4',
     azureStorage    : '12.3.0',
     azureSpringBoot : '2.2.0',
