@@ -35,7 +35,7 @@ variables:
   product: 'mi'
   vault: 'mi-vault-$(env)'
   azure.prom.acr: 'ssprivate$(env.prom)'
-  helm.repo: 'ssprivate$(env)'
+  helm.repo: 'sdshmctspublic'
 resources:
   repositories:
     - repository: mi-core
