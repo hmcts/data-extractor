@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.dataextractor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import uk.gov.hmcts.reform.dataextractor.exception.ExecutorException;
 
 import java.sql.Connection;
@@ -11,7 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-
+@SuppressWarnings("PMD.NullAssignment")
 public class QueryExecutor implements AutoCloseable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QueryExecutor.class);
@@ -57,6 +56,7 @@ public class QueryExecutor implements AutoCloseable {
         return this.resultSet;
     }
 
+    @Override
     public void close() {
         try {
             if (resultSet != null) {

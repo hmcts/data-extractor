@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.dataextractor;
 
 import lombok.extern.slf4j.Slf4j;
-
 import uk.gov.hmcts.reform.dataextractor.model.Output;
 import uk.gov.hmcts.reform.dataextractor.service.OutputStreamProvider;
 
@@ -16,7 +15,7 @@ public class BlobOutputWriter implements AutoCloseable {
 
     private final Output outputType;
 
-    private final OutputStreamProvider getOutputStreamProvider;
+    private final OutputStreamProvider outputStreamProvider;
 
     private OutputStream outputStream;
 
@@ -27,10 +26,10 @@ public class BlobOutputWriter implements AutoCloseable {
         this.containerName = containerName;
         this.fileName = fileName;
         this.outputType = outputType;
-        this.getOutputStreamProvider = outputStreamProvider;
+        this.outputStreamProvider = outputStreamProvider;
     }
 
-    public OutputStream outputStream() {
+    public OutputStream getOutputStream() {
         if (outputStream != null) {
             return outputStream;
         }
@@ -38,7 +37,7 @@ public class BlobOutputWriter implements AutoCloseable {
         return outputStream;
     }
 
-    public OutputStream outputStream(String namePrefix) {
+    public OutputStream getOutputStream(String namePrefix) {
         if (outputStream != null) {
             return outputStream;
         }
@@ -46,6 +45,8 @@ public class BlobOutputWriter implements AutoCloseable {
         return outputStream;
     }
 
+    @SuppressWarnings("PMD.NullAssignment") // For performance
+    @Override
     public void close() {
         try {
             if (outputStream != null) {
@@ -62,6 +63,6 @@ public class BlobOutputWriter implements AutoCloseable {
     }
 
     protected OutputStreamProvider getOutputStreamProvider() {
-        return getOutputStreamProvider;
+        return outputStreamProvider;
     }
 }

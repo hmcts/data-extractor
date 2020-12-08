@@ -18,6 +18,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class JsonValidatorTest {
 
+    private static final String INVALID_ASSERT_MESSAGE = "Expected validation false";
+    private static final String VALID_ASSERT_MESSAGE = "Expected validation true";
+
     private static final String VALID_JSON = "{\"key\": true}";
     private static final String INVALID_JSON = "{\"key\": true";
 
@@ -33,23 +36,23 @@ class JsonValidatorTest {
 
     @Test
     void isValid() {
-        assertFalse(classToTest.isValid(INVALID_JSON));
+        assertFalse(classToTest.isValid(INVALID_JSON), VALID_ASSERT_MESSAGE);
     }
 
     @Test
     void givenInvalidJson_whenIsNotValid_returnTrue() {
-        assertTrue(classToTest.isNotValid(INVALID_JSON));
+        assertTrue(classToTest.isNotValid(INVALID_JSON), VALID_ASSERT_MESSAGE);
     }
 
     @Test
     void givenValidJson_whenIsNotValid_returnFalse() {
-        assertFalse(classToTest.isNotValid(VALID_JSON));
+        assertFalse(classToTest.isNotValid(VALID_JSON), INVALID_ASSERT_MESSAGE);
     }
 
     @Test
     void givenJsonException_whenIsNotValid_returnTrue() throws JsonProcessingException {
         when(objectMapper.reader()).thenReturn(objectReader);
         when(objectReader.readTree(VALID_JSON)).thenThrow(new JsonGenerationException(new Exception(), null));
-        assertTrue(classToTest.isNotValid(VALID_JSON));
+        assertTrue(classToTest.isNotValid(VALID_JSON), INVALID_ASSERT_MESSAGE);
     }
 }

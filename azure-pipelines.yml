@@ -24,21 +24,19 @@ pr:
 
 variables:
 #  group: pipeline-env-variables
-  ${{ if eq( variables['Build.Reason'], 'PullRequest') }}:
+  ${{ if startsWith( variables['Build.SourceBranch'], 'refs/pull/') }}:
     environment: 'test'
     env.upper: 'TEST'
-    azure.aks.resourcegroup: 'ss-$(env)-00-rg'
-    azure.aks.cluster: 'ss-$(env)-00-aks'
-  ${{ if ne( variables['Build.Reason'], 'PullRequest') }}: 
+  ${{ if not(startsWith(variables['Build.SourceBranch'], 'refs/pull/')) }}:
     environment: 'stg' #Uset test and promoting to stg until prod is ready
     env.upper: 'STG'
-    azure.aks.resourcegroup: 'ss_$(env)_kubernetes_resource_group'
-    azure.aks.cluster: 'ss_aks_$(env)'
   env.prom: 'prod'
   env.prom.upper: 'PROD'
   application.name: 'data-extractor-job'
   azure.container.registry: 'ssprivate$(env).azurecr.io'
   azure.subscription.endpoint: 'DTS-SHAREDSERVICES-$(env.upper)'
+  azure.aks.resourcegroup: 'ss-$(env)-00-rg'
+  azure.aks.cluster: 'ss-$(env)-00-aks'
   azure.prom.subscription.endpoint: 'DTS-SHAREDSERVICES-$(env.prom.upper)'
   azure.prom.aks.resourcegroup: 'ss_$(env.prom)_kubernetes_resource_group'
   azure.prom.aks.cluster: 'ss_aks_$(env.prom)'
@@ -68,6 +66,7 @@ stages:
       functionalTest: true
       preIntegrationTest: true
       helmRepo: $(helm.repo)
+      agentPool: hmcts-ss-$(environment)
       azureSecreKeys: 'ccdro-user,ccdro-password,data-extractor-connection-string'
       envMapping:
       - key: BUILD_VERSION

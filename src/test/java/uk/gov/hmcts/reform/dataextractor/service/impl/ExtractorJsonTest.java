@@ -77,11 +77,12 @@ class ExtractorJsonTest {
             .thenReturn(true)
             .thenReturn(false);
         OutputStream stream = new ByteArrayOutputStream();
-        JsonGenerator generator = spy(new ObjectMapper().getFactory().createGenerator(stream, JsonEncoding.UTF8));
-        when(objectMapper.getFactory()).thenReturn(jsonFactory);
-        when(jsonFactory.createGenerator(stream, JsonEncoding.UTF8)).thenReturn(generator);
-        assertEquals(2, classToTest.apply(resultSet, stream),  "Expected extractions");
-        assertEquals("[{},{}]", stream.toString(),  "Expected stream output");
-        verify(generator, times(1)).flush();
+        try (JsonGenerator generator = spy(new ObjectMapper().getFactory().createGenerator(stream, JsonEncoding.UTF8))) {
+            when(objectMapper.getFactory()).thenReturn(jsonFactory);
+            when(jsonFactory.createGenerator(stream, JsonEncoding.UTF8)).thenReturn(generator);
+            assertEquals(2, classToTest.apply(resultSet, stream), "Expected extractions");
+            assertEquals("[{},{}]", stream.toString(), "Expected stream output");
+            verify(generator, times(1)).flush();
+        }
     }
 }
