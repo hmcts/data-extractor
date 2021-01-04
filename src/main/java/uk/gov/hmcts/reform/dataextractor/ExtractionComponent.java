@@ -95,7 +95,7 @@ public class ExtractionComponent {
             .build());
     }
 
-    @SuppressWarnings("PMD.CloseResource")
+    @SuppressWarnings({"PMD.CloseResource","PMD.NullAssignment"})
     private void processData(ExtractionData extractionData, LocalDate executionTime, boolean initialLoad) {
 
         LocalDate lastUpdated = null;
@@ -153,14 +153,14 @@ public class ExtractionComponent {
 
     private int applyExtraction(Extractor extractor, ResultSet resultSet, String fileName, ExtractionData extractionData,
                                 BlobOutputWriter writer, LocalDate toDate) throws ExportCorruptedException {
-        int extractedRows = extractor.apply(resultSet, writer.outputStream(fileName));
-        if (!blobService.validateBlob(extractionData.getContainer(), fileName, extractionData.getType())) {
+        int extractedRows = extractor.apply(resultSet, writer.getOutputStream(fileName));
+        if (blobService.validateBlob(extractionData.getContainer(), fileName, extractionData.getType())) {
+            blobService.setLastUpdated(extractionData.getContainer(), toDate);
+            return extractedRows;
+        } else {
             blobService.deleteBlob(extractionData.getContainer(), fileName);
             log.warn("Corrupted blob {}  has been deleted", fileName);
             throw new ExportCorruptedException("File corrupted");
-        } else {
-            blobService.setLastUpdated(extractionData.getContainer(), toDate);
-            return extractedRows;
         }
     }
 

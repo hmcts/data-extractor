@@ -13,6 +13,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ExtractionDataTest {
+    static final String EXPECTED_CONDITION_MESSAGE = "Expected query condition";
     static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     @Test
@@ -39,9 +40,9 @@ class ExtractionDataTest {
         String expectedCondition2 = String.format("created_date >= (to_date('%s', 'yyyyMMdd') + time '00:00'", expectedFromDate);
         String expectedCondition3 = String.format("created_date <= (to_date('%s', 'yyyyMMdd') + time '00:00')", expectedToDate);
 
-        assertTrue(extractionQuery.contains(expectedCondition1));
-        assertTrue(extractionQuery.contains(expectedCondition2));
-        assertTrue(extractionQuery.contains(expectedCondition3));
+        assertTrue(extractionQuery.contains(expectedCondition1), EXPECTED_CONDITION_MESSAGE);
+        assertTrue(extractionQuery.contains(expectedCondition2), EXPECTED_CONDITION_MESSAGE);
+        assertTrue(extractionQuery.contains(expectedCondition3), EXPECTED_CONDITION_MESSAGE);
     }
 
     @Test
@@ -55,6 +56,6 @@ class ExtractionDataTest {
             .type(Output.JSON_LINES)
             .build();
         String fileName = extractionData.getFileName();
-        assertThat(expectedFileName, is(fileName));
+        assertThat("Expected file name", expectedFileName, is(fileName));
     }
 }

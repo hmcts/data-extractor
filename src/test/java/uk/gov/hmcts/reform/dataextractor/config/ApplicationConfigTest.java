@@ -22,6 +22,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(MockitoExtension.class)
 class ApplicationConfigTest {
 
+    static final String SQL_QUERY = "sqlQuery";
+
     @Mock
     private OutputStreamProvider outputStreamProvider;
 
@@ -40,6 +42,7 @@ class ApplicationConfigTest {
     @InjectMocks
     private ApplicationConfig classToTest;
 
+    @SuppressWarnings("PMD.JUnitAssertionsShouldIncludeMessage")
     @Test
     void givenBlobOutputFactory_thenCreateBlobOutputWriter() {
         Factory<ExtractionData, BlobOutputWriter> blobOutput = classToTest.blobOutputFactory();
@@ -52,10 +55,10 @@ class ApplicationConfigTest {
             .prefix(prefix)
             .container(containerName)
             .build();
-        BlobOutputWriter result = blobOutput.provide(extractionData);
-        BlobOutputWriter expected = new BlobOutputWriter(containerName, extractionData.getFileName(), outputType, outputStreamProvider);
-
-        assertThat(result).isEqualToIgnoringGivenFields(expected, "outputStream");
+        try (BlobOutputWriter result = blobOutput.provide(extractionData);
+             BlobOutputWriter expected = new BlobOutputWriter(containerName, extractionData.getFileName(), outputType, outputStreamProvider)) {
+            assertThat(result).isEqualToIgnoringGivenFields(expected, "outputStream");
+        }
     }
 
     @Test
@@ -65,9 +68,11 @@ class ApplicationConfigTest {
         dbConfig.setUrl("ulr");
         dbConfig.setUser("user");
         Factory<String, QueryExecutor> queryExecutorFactory = classToTest.queryExecutorFactory();
-        QueryExecutor result = queryExecutorFactory.provide("sqlQuery");
-        QueryExecutor expected = new QueryExecutor(dbConfig.getUrl(), dbConfig.getUser(), dbConfig.getPassword(), "sqlQuery");
-        assertThat(result).isEqualToComparingFieldByField(expected);
+
+        try (QueryExecutor result = queryExecutorFactory.provide("sqlQuery");
+            QueryExecutor expected = new QueryExecutor(dbConfig.getUrl(), dbConfig.getUser(), dbConfig.getPassword(), "sqlQuery")) {
+            assertThat(result).isEqualToComparingFieldByField(expected);
+        }
     }
 
     @Test
@@ -89,8 +94,9 @@ class ApplicationConfigTest {
         dbConfig.setCloneUser("user");
         ReflectionTestUtils.setField(classToTest, "initialise", true);
         Factory<String, QueryExecutor> queryExecutorFactory = classToTest.queryExecutorFactory();
-        QueryExecutor result = queryExecutorFactory.provide("sqlQuery");
-        QueryExecutor expected = new QueryExecutor(dbConfig.getCloneUrl(), dbConfig.getCloneUser(), dbConfig.getClonePassword(), "sqlQuery");
-        assertThat(result).isEqualToComparingFieldByField(expected);
+        try (QueryExecutor result = queryExecutorFactory.provide(SQL_QUERY);
+            QueryExecutor expected = new QueryExecutor(dbConfig.getCloneUrl(), dbConfig.getCloneUser(), dbConfig.getClonePassword(), SQL_QUERY)) {
+            assertThat(result).isEqualToComparingFieldByField(expected);
+        }
     }
 }

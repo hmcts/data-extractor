@@ -37,6 +37,8 @@ public class CaseDataServiceImpl implements CaseDataService {
         + "WHERE case_type_id = '%s';";
 
     private static final int MINIMUM_WINDOW = 7;
+    private static final int NO_CASE_COUNT = 0;
+    private static final int TWO_DAYS_COUNT = 2;
 
     @Value("${extraction.max.batch.row:100_000}")
     private int maxRowPerBatch;
@@ -47,6 +49,7 @@ public class CaseDataServiceImpl implements CaseDataService {
     @Autowired
     private final ExtractionFilters filters;
 
+    @Override
     public LocalDate getFirstEventDate(String caseType) {
         String query = String.format(FIRST_CREATED_QUERY, caseType);
         try (QueryExecutor executor = queryExecutorFactory.provide(query)) {
@@ -76,10 +79,10 @@ public class CaseDataServiceImpl implements CaseDataService {
     public List<CaseDefinition> getCaseDefinitions() {
         String loadDataQuery;
 
-        if (!CollectionUtils.isEmpty(filters.getIn())) {
-            loadDataQuery = GET_CASE_TYPES + String.format(" jurisdiction in (%s)", String.join(", ", filters.getIn()));
-        } else {
+        if (CollectionUtils.isEmpty(filters.getIn())) {
             loadDataQuery = GET_CASE_TYPES + String.format(" jurisdiction not in (%s)", String.join(", ", filters.getOut()));
+        } else {
+            loadDataQuery = GET_CASE_TYPES + String.format(" jurisdiction in (%s)", String.join(", ", filters.getIn()));
         }
 
         try (QueryExecutor executor = queryExecutorFactory.provide(loadDataQuery)) {
@@ -94,6 +97,7 @@ public class CaseDataServiceImpl implements CaseDataService {
         }
     }
 
+    @Override
     public long getCaseTypeRows(String caseType) {
         String loadDataQuery = String.format(DATA_COUNT, caseType);
 
@@ -109,16 +113,18 @@ public class CaseDataServiceImpl implements CaseDataService {
         }
     }
 
+    @SuppressWarnings("PMD.LawOfDemeter")
+    @Override
     public int calculateExtractionWindow(String caseType, LocalDate initialDate, LocalDate endDate, boolean initialLoad) {
         if (!initialLoad) {
             return MINIMUM_WINDOW;
         }
         long caseCount = this.getCaseTypeRows(caseType);
-        if (caseCount == 0) {
+        if (caseCount == NO_CASE_COUNT) {
             return MINIMUM_WINDOW;
         }
         long days = ChronoUnit.DAYS.between(initialDate, endDate);
-        if (days < 2) {
+        if (days < TWO_DAYS_COUNT) {
             return MINIMUM_WINDOW;
         }
         double portions = Math.ceil((double)caseCount / maxRowPerBatch);

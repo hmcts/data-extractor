@@ -17,16 +17,16 @@ class DefaultBlobValidatorTest {
 
     @Test
     void testIsValid() {
-        assertTrue(classToTest.isValid("anyString"));
+        assertTrue(classToTest.isValid("anyString"), "Expected valid string");
     }
 
     @Test
     void testNotValid() {
-        assertFalse(classToTest.isNotValid("anyString"));
+        assertFalse(classToTest.isNotValid("anyString"), "Expected false");
     }
 
     @Test
     void testNotValidOnNullValue() {
-        assertFalse(classToTest.isNotValid(null));
+        assertFalse(classToTest.isNotValid(null), "Expected false");
     }
 }

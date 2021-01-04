@@ -13,6 +13,8 @@ import java.time.format.DateTimeFormatter;
 @Component
 public class MiTimestampSerializer extends StdSerializer<Timestamp> {
 
+    public static final long serialVersionUID = 234567L;
+
     public MiTimestampSerializer() {
         super(Timestamp.class);
     }

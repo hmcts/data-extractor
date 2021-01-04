@@ -36,14 +36,14 @@ class BlobOutputWriterTest {
     OutputStream outputStreamMock;
 
     @BeforeEach
-    void setup() {
+    void setUp() {
         classToTest = new BlobOutputWriter(CONTAINER_NAME, FILE_PREFIX_NAME, OUTPUT_TYPE, outputStreamProviderMock);
     }
 
     @Test
     void testStreamClose() throws IOException {
         when(outputStreamProviderMock.getOutputStream(eq(CONTAINER_NAME), anyString(), eq(OUTPUT_TYPE))).thenReturn(outputStreamMock);
-        assertEquals(outputStreamMock, classToTest.outputStream());
+        assertEquals(outputStreamMock, classToTest.getOutputStream(), "Expected output");
         classToTest.close();
         verify(outputStreamMock,times(1)).close();
     }
@@ -52,7 +52,7 @@ class BlobOutputWriterTest {
     void whenStreamCloseError_thenErrorIsNotPropagated() throws IOException {
         when(outputStreamProviderMock.getOutputStream(eq(CONTAINER_NAME), anyString(), eq(OUTPUT_TYPE))).thenReturn(outputStreamMock);
         doThrow(new RuntimeException("Error")).when(outputStreamMock).close();
-        classToTest.outputStream();
+        classToTest.getOutputStream();
         classToTest.close();
         verify(outputStreamMock,times(1)).close();
     }

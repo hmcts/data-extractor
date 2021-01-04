@@ -87,7 +87,7 @@ public class BlobOutputWriterFTest {
         miStreamProvider.getContainerLastUpdated(CONTAINER, true);
         try (BlobOutputWriter writer = new BlobOutputWriter(CONTAINER, BLOB_PREFIX,
             Output.JSON_LINES, miStreamProvider)) {
-            OutputStream outputStream = writer.outputStream();
+            OutputStream outputStream = writer.getOutputStream();
             assertThat(outputStream, instanceOf(BlobOutputStream.class));
         }
     }
@@ -99,7 +99,7 @@ public class BlobOutputWriterFTest {
         try (BlobOutputWriter writer = new BlobOutputWriter(CONTAINER, BLOB_PREFIX,
             Output.JSON_LINES, miStreamProvider)) {
 
-            OutputStream outputStream = writer.outputStream();
+            OutputStream outputStream = writer.getOutputStream();
             assertNotNull(outputStream);
             InputStream inputStream = TestUtils.getStreamFromFile(filePath);
             IOUtils.copy(inputStream, outputStream);
@@ -121,9 +121,9 @@ public class BlobOutputWriterFTest {
         try (BlobOutputWriter writer = new BlobOutputWriter(CONTAINER, BLOB_PREFIX,
             Output.JSON_LINES, miStreamProvider)) {
 
-            OutputStream outputStream = writer.outputStream();
+            OutputStream outputStream = writer.getOutputStream();
             assertNotNull(outputStream);
-            OutputStream newOutputStream = writer.outputStream();
+            OutputStream newOutputStream = writer.getOutputStream();
             assertSame(outputStream, newOutputStream);
         }
     }

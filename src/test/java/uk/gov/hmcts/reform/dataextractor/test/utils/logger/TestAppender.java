@@ -8,22 +8,19 @@ public class TestAppender extends AppenderBase<ILoggingEvent> {
     private TestRecorder recorder;
 
     public TestAppender() {
+        super();
         this.setName("Test appender");
         this.start();
     }
 
     @Override
-    protected void append(ILoggingEvent o) {
+    protected void append(ILoggingEvent eventObject) {
         if (recorder != null) {
-            recorder.append(o.toString());
+            recorder.append(eventObject.toString());
         }
     }
 
     public void setRecorder(TestRecorder recorder) {
         this.recorder = recorder;
-    }
-
-    public void clean() {
-        this.recorder = null;
     }
 }

@@ -26,6 +26,7 @@ public class ExtractorJson implements Extractor {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Override
     public int apply(ResultSet resultSet, OutputStream outputStream) {
         int processedData = 0;
         try (JsonGenerator jsonGenerator =

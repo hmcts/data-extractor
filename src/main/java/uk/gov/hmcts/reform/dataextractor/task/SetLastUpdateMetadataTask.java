@@ -23,6 +23,7 @@ public class SetLastUpdateMetadataTask implements PreExecutor {
     @Value("${task.SetLastUpdateMetadata:false}")
     private boolean enabled;
 
+    @Override
     public void execute() {
         for (BlobContainerItem containerItem: blobService.listContainers()) {
             PagedIterable<BlobItem> blobs = blobService.listContainerBlobs(containerItem.getName());
@@ -40,6 +41,7 @@ public class SetLastUpdateMetadataTask implements PreExecutor {
         }
     }
 
+    @Override
     public boolean isEnabled() {
         return enabled;
     }

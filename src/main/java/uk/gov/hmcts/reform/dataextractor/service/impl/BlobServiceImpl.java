@@ -78,10 +78,11 @@ public class BlobServiceImpl implements OutputStreamProvider {
         containerClient.setMetadata(Map.of(UPDATE_DATE_METADATA, DATE_TIME_FORMATTER.format(lastUpdateDate)));
     }
 
+    @Override
     public OutputStream getOutputStream(String containerName, String fileName, Output outputType) {
         BlobContainerClient client = getContainerClient(containerName);
         BlobHttpHeaders headers = new BlobHttpHeaders().setContentType(outputType.getApplicationContent());
-        Integer blockSize = 204800;
+        Integer blockSize = 204_800;
         int bufferNumbers = 10;
 
         ParallelTransferOptions transferOptions = new ParallelTransferOptions(blockSize, bufferNumbers, new BlobProgressReceiver());
