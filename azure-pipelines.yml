@@ -37,8 +37,6 @@ variables:
   azure.aks.resourcegroup: 'ss-$(env)-00-rg'
   azure.aks.cluster: 'ss-$(env)-00-aks'
   azure.prom.subscription.endpoint: 'DTS-SHAREDSERVICES-$(env.prom.upper)'
-  azure.prom.aks.resourcegroup: 'ss-$(env.prom)-00-aks-rg'
-  azure.prom.aks.cluster: 'ss-$(env.prom)-00-aks'
   manual.branch.prefix: 'master'
   product: 'mi'
   vault: 'mi-vault-$(env)'
