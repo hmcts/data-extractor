@@ -129,7 +129,7 @@ class ExtractionComponentTest {
 
         classToTest.execute(true);
 
-        verify(writer, times(2)).outputStream(BlobFileUtils.getFileName(TEST_EXTRACTOR_DATA, updatedDate));
+        verify(writer, times(2)).getOutputStream(BlobFileUtils.getFileName(TEST_EXTRACTOR_DATA, updatedDate));
         verify(blobService, times(1)).setLastUpdated(CONTAINER_NAME, updatedDate);
         verify(blobService, times(1)).setLastUpdated(CONTAINER_NAME2, updatedDate);
         verify(queryExecutor, times(2)).close();
@@ -158,7 +158,7 @@ class ExtractionComponentTest {
         when(caseDataService.getCaseDefinitions()).thenReturn(Arrays.asList(new CaseDefinition("", CASE_TYPE1), new CaseDefinition("", CASE_TYPE2)));
         classToTest.execute(true);
 
-        verify(writer, times(2)).outputStream(BlobFileUtils.getFileName(TEST_EXTRACTOR_DATA, updatedDate));
+        verify(writer, times(2)).getOutputStream(BlobFileUtils.getFileName(TEST_EXTRACTOR_DATA, updatedDate));
     }
 
     @Test
@@ -224,7 +224,7 @@ class ExtractionComponentTest {
         when(caseDataService.getCaseDefinitions()).thenReturn(Arrays.asList(new CaseDefinition("", CASE_TYPE1), new CaseDefinition("", CASE_TYPE2)));
         classToTest.execute(true);
 
-        verify(writer, times(2)).outputStream(blobName);
+        verify(writer, times(2)).getOutputStream(blobName);
         verify(queryExecutor, times(2)).close();
         verify(blobService, times(1)).deleteBlob(CONTAINER_NAME, blobName);
         verify(blobService, times(1)).deleteBlob(CONTAINER_NAME2, blobName);
@@ -272,7 +272,7 @@ class ExtractionComponentTest {
 
         classToTest.execute(false);
 
-        verify(writer, times(1)).outputStream(BlobFileUtils.getFileName(TEST_EXTRACTOR_DATA, updatedDate));
+        verify(writer, times(1)).getOutputStream(BlobFileUtils.getFileName(TEST_EXTRACTOR_DATA, updatedDate));
     }
 
     @Test
@@ -298,7 +298,7 @@ class ExtractionComponentTest {
 
         classToTest.execute(true);
         LocalDate toDate = DateTimeUtils.stringToLocalDate("20200303");
-        verify(writer, times(1)).outputStream(BlobFileUtils.getFileName(TEST_EXTRACTOR_DATA, toDate));
+        verify(writer, times(1)).getOutputStream(BlobFileUtils.getFileName(TEST_EXTRACTOR_DATA, toDate));
         verify(blobService, times(1)).setLastUpdated(CONTAINER_NAME, toDate);
         verify(queryExecutor, times(1)).close();
     }

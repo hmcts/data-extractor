@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.1.xsd">
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
   <suppress>
     <notes><![CDATA[
      Suppressing as it's a false positive (see: https://pivotal.io/security/cve-2018-1258)
    ]]></notes>
-    <gav regex="true">org\.springframework\.security:spring-security-\w+:5.2.[0-1].RELEASE</gav>
+    <gav regex="true">org\.springframework\.security:spring-security-\w+:5.[0-3].[0-9].RELEASE</gav>
     <cpe>cpe:/a:pivotal_software:spring_security</cpe>
     <cve>CVE-2018-1258</cve>
   </suppress>
@@ -21,5 +21,43 @@
       Checkstyle library not part of production.
    ]]></notes>
     <cve>CVE-2019-10782</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+            CVE is a json vulnerability that applies only to Ruby or Node projects
+        ]]></notes>
+    <cve>CVE-2020-10663</cve>
+    <cve>CVE-2020-7712</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+            CVE an openid vulnerability. We do not use openid.
+        ]]></notes>
+    <cve>CVE-2007-1651</cve>
+    <cve>CVE-2007-1652</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+            This CVE is fixed in junit 4.13.1 for Java 1.7+. DependencyCheck is still erroring for 4.13.1 erroneously however.
+        ]]></notes>
+    <packageUrl regex="true">^pkg:maven/junit/junit@.*$</packageUrl>
+    <cve>CVE-2020-15250</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+            This CVE is for an older version of guava which only the checkstyle gradle plugin is currently using.
+        ]]></notes>
+    <packageUrl regex="true">^pkg:maven/com.google.guava/guava@.*$</packageUrl>
+    <cve>CVE-2020-8908</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+            This CVE is related to file type tag parsing. However, the associated CVE seems to be a false positive on the lang-tag jar.
+        ]]></notes>
+    <packageUrl regex="true">^pkg:maven/com.nimbusds/lang-tag@.*$</packageUrl>
+    <cve>CVE-2020-29242</cve>
+    <cve>CVE-2020-29243</cve>
+    <cve>CVE-2020-29244</cve>
+    <cve>CVE-2020-29245</cve>
   </suppress>
 </suppressions>

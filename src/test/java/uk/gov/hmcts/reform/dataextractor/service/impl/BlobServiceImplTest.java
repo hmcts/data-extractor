@@ -49,8 +49,12 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.dataextractor.service.ContainerConstants.UPDATE_DATE_METADATA;
 import static uk.gov.hmcts.reform.dataextractor.service.impl.BlobServiceImpl.DATE_TIME_FORMATTER;
 
+@SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.LawOfDemeter"})
 @ExtendWith(MockitoExtension.class)
 class BlobServiceImplTest {
+
+    private static final String INVALID_BLOB_ASSERT_MESSAGE = "Expected invalid blob";
+    private static final String VALID_BLOB_ASSERT_MESSAGE = "Expected valid blob";
 
     private static final String STORAGE_ACCOUNT = "testStorageAccount";
     private static final String CLIENT_ID = "testClientId";
@@ -205,7 +209,7 @@ class BlobServiceImplTest {
         when(blobContainerClientMock.getBlobClient(BLOB_NAME)).thenReturn(blobClientMock);
         when(blobClientMock.openInputStream()).thenReturn(blobInputStream);
         doThrow(new IOException("Test error")).when(blobInputStream).read(any(), anyInt(), anyInt());
-        assertFalse(classToTest.validateBlob(TEST_CONTAINER_NAME, BLOB_NAME, Output.JSON_LINES));
+        assertFalse(classToTest.validateBlob(TEST_CONTAINER_NAME, BLOB_NAME, Output.JSON_LINES), INVALID_BLOB_ASSERT_MESSAGE);
         verify(blobInputStream, times(1)).close();
 
     }
@@ -214,25 +218,27 @@ class BlobServiceImplTest {
     void givenValidBlob_whenValidateBlob_thenReturnTrue() throws IOException {
         classToTest = spy(new BlobServiceImpl(StringUtils.EMPTY, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory,
             blobOutputValidatorFactory));
-        InputStream inputStream = spy(new ByteArrayInputStream("{}\n{}".getBytes()));
-        doReturn(inputStream).when(classToTest).getInputStream(eq(TEST_CONTAINER_NAME), anyString());
-        when(blobOutputValidatorFactory.provide(Output.JSON_LINES)).thenReturn(blobOutputValidator);
-        assertTrue(classToTest.validateBlob(TEST_CONTAINER_NAME, BLOB_NAME, Output.JSON_LINES));
-        verify(inputStream, times(1)).close();
-        verify(blobOutputValidator, times(2)).isNotValid("{}");
+        try (InputStream inputStream = spy(new ByteArrayInputStream("{}\n{}".getBytes()))) {
+            doReturn(inputStream).when(classToTest).getInputStream(eq(TEST_CONTAINER_NAME), anyString());
+            when(blobOutputValidatorFactory.provide(Output.JSON_LINES)).thenReturn(blobOutputValidator);
+            assertTrue(classToTest.validateBlob(TEST_CONTAINER_NAME, BLOB_NAME, Output.JSON_LINES), VALID_BLOB_ASSERT_MESSAGE);
+            verify(inputStream, times(1)).close();
+            verify(blobOutputValidator, times(2)).isNotValid("{}");
+        }
     }
 
     @Test
     void givenInvalidBlob_whenValidateBlob_thenReturnFalse() throws IOException {
         classToTest = spy(new BlobServiceImpl(StringUtils.EMPTY, CONNECTION_STRING, STORAGE_ACCOUNT, blobServiceClientFactory,
             blobOutputValidatorFactory));
-        InputStream inputStream = spy(new ByteArrayInputStream("{}\n{}".getBytes()));
-        when(blobOutputValidatorFactory.provide(Output.JSON_LINES)).thenReturn(blobOutputValidator);
-        doReturn(inputStream).when(classToTest).getInputStream(eq(TEST_CONTAINER_NAME), anyString());
-        when(blobOutputValidator.isNotValid("{}")).thenReturn(true);
-        assertFalse(classToTest.validateBlob(TEST_CONTAINER_NAME, BLOB_NAME, Output.JSON_LINES));
-        verify(inputStream, times(1)).close();
-        verify(blobOutputValidator, times(1)).isNotValid("{}");
+        try (InputStream inputStream = spy(new ByteArrayInputStream("{}\n{}".getBytes()))) {
+            when(blobOutputValidatorFactory.provide(Output.JSON_LINES)).thenReturn(blobOutputValidator);
+            doReturn(inputStream).when(classToTest).getInputStream(eq(TEST_CONTAINER_NAME), anyString());
+            when(blobOutputValidator.isNotValid("{}")).thenReturn(true);
+            assertFalse(classToTest.validateBlob(TEST_CONTAINER_NAME, BLOB_NAME, Output.JSON_LINES), INVALID_BLOB_ASSERT_MESSAGE);
+            verify(inputStream, times(1)).close();
+            verify(blobOutputValidator, times(1)).isNotValid("{}");
+        }
     }
 
     @Test

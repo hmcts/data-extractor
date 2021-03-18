@@ -30,9 +30,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("PMD.TooManyMethods")
 @ExtendWith(MockitoExtension.class)
 class CaseDataServiceTest {
 
+    private static final String ASSERTION_MESSAGE_EXTRACTOR_ERROR = "Expected ExtractorException";
+    
     private static final String JURISDICTION_COLUMN = "jurisdiction";
     private static final String CASE_TYPE_COLUMN = "case_type_id";
     public static final String COUNT_COLUMN = "count";
@@ -66,7 +69,7 @@ class CaseDataServiceTest {
         when(resultSet.next()).thenReturn(false);
 
         assertThrows(ExtractorException.class, () -> classToTest.getFirstEventDate(""),
-            "Expected ExtractorException");
+            ASSERTION_MESSAGE_EXTRACTOR_ERROR);
 
         verify(queryExecutor, times(1)).close();
     }
@@ -80,7 +83,7 @@ class CaseDataServiceTest {
         when(resultSet.next()).thenThrow(new SQLException());
 
         assertThrows(ExtractorException.class, () -> classToTest.getFirstEventDate(""),
-            "Expected ExtractorException");
+            ASSERTION_MESSAGE_EXTRACTOR_ERROR);
 
         verify(queryExecutor, times(1)).close();
     }
@@ -103,7 +106,7 @@ class CaseDataServiceTest {
         when(resultSet.next()).thenThrow(new SQLException());
 
         assertThrows(ExtractorException.class, () -> classToTest.checkConnection(),
-            "Expected ExtractorException");
+            ASSERTION_MESSAGE_EXTRACTOR_ERROR);
 
         verify(queryExecutor, times(1)).close();
     }
@@ -116,10 +119,10 @@ class CaseDataServiceTest {
         when(queryExecutorFactory.provide(expectedQuery)).thenReturn(queryExecutor);
         when(queryExecutor.execute()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true, false);
-        when(resultSet.getString(JURISDICTION_COLUMN)).thenReturn("jurisdiction");
-        when(resultSet.getString(CASE_TYPE_COLUMN)).thenReturn("case_type_id");
+        when(resultSet.getString(JURISDICTION_COLUMN)).thenReturn(JURISDICTION_COLUMN);
+        when(resultSet.getString(CASE_TYPE_COLUMN)).thenReturn(CASE_TYPE_COLUMN);
 
-        List<CaseDefinition> expected = Arrays.asList(new CaseDefinition("jurisdiction", "case_type_id"));
+        List<CaseDefinition> expected = Arrays.asList(new CaseDefinition(JURISDICTION_COLUMN, CASE_TYPE_COLUMN));
 
         List<CaseDefinition> definitions = classToTest.getCaseDefinitions();
 
@@ -134,10 +137,10 @@ class CaseDataServiceTest {
         when(queryExecutorFactory.provide(expectedQuery)).thenReturn(queryExecutor);
         when(queryExecutor.execute()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true, false);
-        when(resultSet.getString(JURISDICTION_COLUMN)).thenReturn("jurisdiction");
-        when(resultSet.getString(CASE_TYPE_COLUMN)).thenReturn("case_type_id");
+        when(resultSet.getString(JURISDICTION_COLUMN)).thenReturn(JURISDICTION_COLUMN);
+        when(resultSet.getString(CASE_TYPE_COLUMN)).thenReturn(CASE_TYPE_COLUMN);
 
-        List<CaseDefinition> expected = Arrays.asList(new CaseDefinition("jurisdiction", "case_type_id"));
+        List<CaseDefinition> expected = Arrays.asList(new CaseDefinition(JURISDICTION_COLUMN, CASE_TYPE_COLUMN));
 
         List<CaseDefinition> definitions = classToTest.getCaseDefinitions();
 
@@ -155,7 +158,7 @@ class CaseDataServiceTest {
         when(resultSet.next()).thenThrow(new SQLException());
 
         assertThrows(ExtractorException.class, () -> classToTest.getCaseDefinitions(),
-            "Expected ExtractorException");
+            ASSERTION_MESSAGE_EXTRACTOR_ERROR);
 
         verify(queryExecutor, times(1)).close();
     }
@@ -176,7 +179,8 @@ class CaseDataServiceTest {
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getLong(COUNT_COLUMN)).thenReturn(totalCount);
 
-        assertEquals(expectedWindow, classToTest.calculateExtractionWindow(CASE_TYPE, LocalDate.parse(initDate), LocalDate.parse(endDate), true));
+        assertEquals(expectedWindow, classToTest.calculateExtractionWindow(CASE_TYPE, LocalDate.parse(initDate), LocalDate.parse(endDate), true),
+            "Expected window");
 
         verify(queryExecutor, times(1)).close();
     }
@@ -192,7 +196,7 @@ class CaseDataServiceTest {
         when(resultSet.next()).thenThrow(new SQLException());
         LocalDate executionTime = LocalDate.now();
         assertThrows(ExtractorException.class, () -> classToTest.calculateExtractionWindow(CASE_TYPE, executionTime, executionTime, true),
-            "Expected ExtractorException");
+            ASSERTION_MESSAGE_EXTRACTOR_ERROR);
 
         verify(queryExecutor, times(1)).close();
     }
@@ -208,7 +212,7 @@ class CaseDataServiceTest {
         when(queryExecutor.execute()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
 
-        assertEquals(0, classToTest.getCaseTypeRows(CASE_TYPE));
+        assertEquals(0, classToTest.getCaseTypeRows(CASE_TYPE), "Expected 0 rows");
 
         verify(queryExecutor, times(1)).close();
     }

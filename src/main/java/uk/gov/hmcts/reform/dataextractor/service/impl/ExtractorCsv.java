@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.dataextractor.service.impl;
 
-import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.springframework.stereotype.Component;
 
@@ -14,13 +13,16 @@ import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static org.apache.commons.csv.CSVFormat.DEFAULT;
 
 @Component
 public class ExtractorCsv implements Extractor {
 
+    @SuppressWarnings("PMD.LawOfDemeter")
+    @Override
     public int apply(ResultSet resultSet, OutputStream outputStream) {
         int count = 0;
-        try (CSVPrinter printer = new CSVPrinter(new PrintWriter(outputStream, false), CSVFormat.DEFAULT.withHeader(resultSet))) {
+        try (CSVPrinter printer = new CSVPrinter(new PrintWriter(outputStream, false), DEFAULT.withHeader(resultSet))) {
             count = printRecordsWithCounter(printer, resultSet);
             printer.flush();
         } catch (IOException | SQLException e) {

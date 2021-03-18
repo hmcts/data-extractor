@@ -24,18 +24,14 @@ variables:
   env.prom: 'prod'
   env.prom.upper: 'PROD'
   application.name: 'data-extractor-job'
-  azure.container.registry: 'ssprivate$(env).azurecr.io'
   azure.subscription.endpoint: 'DTS-SHAREDSERVICES-$(env.upper)'
-  azure.aks.resourcegroup: 'ss_$(env)_kubernetes_resource_group'
-  azure.aks.cluster: 'ss_aks_$(env)'
+  azure.aks.resourcegroup: 'ss-$(env)-00-rg'
+  azure.aks.cluster: 'ss-$(env)-00-aks'
   azure.prom.subscription.endpoint: 'DTS-SHAREDSERVICES-$(env.prom.upper)'
-  azure.prom.aks.resourcegroup: 'ss_$(env.prom)_kubernetes_resource_group'
-  azure.prom.aks.cluster: 'ss_aks_$(env.prom)'
   manual.branch.prefix: 'master'
   product: 'mi'
   vault: 'mi-vault-$(env)'
-  azure.prom.acr: 'ssprivate$(env.prom)'
-  helm.repo: 'ssprivate$(env)'
+  helm.repo: 'sdshmctspublic'
 resources:
   repositories:
     - repository: mi-core
@@ -55,6 +51,7 @@ stages:
       functionalTest: true
       preIntegrationTest: true
       helmRepo: $(helm.repo)
+      agentPool: hmcts-ss-$(environment)
       envMapping:
       - key: BUILD_VERSION
         value: Build.BuildId
