@@ -56,7 +56,7 @@ public class BlobServiceImpl implements OutputStreamProvider {
         this.blobOutputValidatorFactory = blobOutputValidatorFactory;
     }
 
-    public LocalDate getContainerLastUpdated(String containerName) {
+    public LocalDate getContainerLastUpdated(String containerName, boolean initialise) {
         BlobServiceClient blobServiceClient = getConnection();
         BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(containerName);
         if (containerClient.exists()) {
@@ -65,7 +65,7 @@ public class BlobServiceImpl implements OutputStreamProvider {
                 String updated = containerClient.getProperties().getMetadata().get(UPDATE_DATE_METADATA);
                 return LocalDate.parse(updated, DATE_TIME_FORMATTER);
             }
-        } else {
+        } else if (initialise) {
             containerClient.create();
             log.info("Container {} created", containerName);
         }
