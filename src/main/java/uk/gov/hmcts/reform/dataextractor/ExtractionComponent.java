@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import uk.gov.hmcts.reform.dataextractor.config.ExtractionData;
 import uk.gov.hmcts.reform.dataextractor.config.Extractions;
+import uk.gov.hmcts.reform.dataextractor.exception.CaseTypeNotInitialisedException;
 import uk.gov.hmcts.reform.dataextractor.exception.ExportCorruptedException;
 import uk.gov.hmcts.reform.dataextractor.model.CaseDefinition;
 import uk.gov.hmcts.reform.dataextractor.model.Output;
@@ -99,7 +100,7 @@ public class ExtractionComponent {
 
         LocalDate lastUpdated = null;
         try {
-            lastUpdated = getLastUpdateFromContainer(extractionData);
+            lastUpdated = getLastUpdateFromContainer(extractionData, initialLoad);
         } catch (Exception e) {
             log.warn("Case type not initialised {}", extractionData.getCaseType());
             return;
@@ -179,10 +180,14 @@ public class ExtractionComponent {
             .collect(Collectors.toMap(ExtractionData::getCaseType, Function.identity()));
     }
 
-    private LocalDate getLastUpdateFromContainer(ExtractionData extractionData) {
-        LocalDate lastUpdated = blobService.getContainerLastUpdated(extractionData.getContainer());
+    private LocalDate getLastUpdateFromContainer(ExtractionData extractionData, boolean initialLoad) throws CaseTypeNotInitialisedException {
+        LocalDate lastUpdated = blobService.getContainerLastUpdated(extractionData.getContainer(), initialLoad);
         if (lastUpdated == null) {
-            return caseDataService.getFirstEventDate(extractionData.getCaseType());
+            if (initialLoad) {
+                return caseDataService.getFirstEventDate(extractionData.getCaseType());
+            } else {
+                throw new CaseTypeNotInitialisedException(String.format("Case type %s not initialised", extractionData.getCaseType()));
+            }
         }
 
         return lastUpdated;
