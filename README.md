@@ -76,3 +76,5 @@ global:
 
 For an example of how to run this using flux please see:
 [flux github repo](https://github.com/hmcts/cnp-flux-config/blob/master/k8s/aat/software-engineering/data-extractor-job/data-extractor-job.yaml)
+
+Update readmen
