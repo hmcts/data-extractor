@@ -309,7 +309,7 @@ dependencies {
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
 
-  functionalTestCompile 'org.testcontainers:postgresql:1.15.1'
+  functionalTestCompile 'org.testcontainers:postgresql:1.16.0'
   functionalTestCompile 'org.testcontainers:junit-jupiter:1.15.1'
   functionalTestCompile 'com.ninja-squad:DbSetup:2.1.0'
   functionalTestCompile group: 'uk.gov.hmcts.reform.mi', name: 'mi-core-lib', version: versions.miCoreLib
