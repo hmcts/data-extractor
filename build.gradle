@@ -203,11 +203,11 @@ dependencyCheck {
 
 repositories {
   mavenLocal()
-  maven {
-    url "https://dl.bintray.com/hmcts/hmcts-maven"
-  }
   jcenter()
   mavenCentral()
+  maven {
+    url 'https://jitpack.io'
+  }
 }
 
 jar {
@@ -230,8 +230,10 @@ def versions = [
     pitest          : '1.4.10',
     gradlePitest    : '1.4.5',
     sonarPitest     : '0.5',
-    miCoreLib       : '3.4.4',
-    guava           : '30.0-jre'
+    miCoreLib       : '3.5.2',
+    guava           : '30.0-jre',
+    commonsIo       : '2.8.0'
+
 ]
 
 dependencies {
@@ -260,6 +262,34 @@ configurations.all {
     }
   }
 }
+
+dependencyManagement {
+  dependencies {
+    dependency group: 'commons-io', name: 'commons-io', version: versions.commonsIo
+
+    //CVE-2021-22118
+    dependencySet(group: 'org.springframework', version: '5.2.15.RELEASE') {
+      entry 'spring-core'
+    }
+
+    dependencySet(group: 'io.netty', version: '4.1.61.Final') {
+      entry 'netty-buffer'
+      entry 'netty-codec'
+      entry 'netty-codec-http'
+      entry 'netty-codec-http2'
+      entry 'netty-codec-socks'
+      entry 'netty-common'
+      entry 'netty-handler'
+      entry 'netty-handler-proxy'
+      entry 'netty-resolver'
+      entry 'netty-transport'
+      entry 'netty-transport-native-epoll'
+      entry 'netty-transport-native-kqueue'
+      entry 'netty-transport-native-unix-common'
+    }
+  }
+}
+
 
 dependencies {
   compile group: 'org.postgresql', name: 'postgresql', version: versions.postgresql
@@ -294,7 +324,7 @@ dependencies {
   compile group: 'org.pitest', name: 'pitest', version: versions.pitest
   compile group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
   compile group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: versions.sonarPitest
-  compile group: 'uk.gov.hmcts.reform.mi', name: 'mi-core-lib', version: versions.miCoreLib
+  compile group: 'com.github.hmcts', name: 'mi-core-lib', version: versions.miCoreLib
 
   testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
   testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
@@ -312,7 +342,7 @@ dependencies {
   functionalTestCompile 'org.testcontainers:postgresql:1.15.1'
   functionalTestCompile 'org.testcontainers:junit-jupiter:1.15.1'
   functionalTestCompile 'com.ninja-squad:DbSetup:2.1.0'
-  functionalTestCompile group: 'uk.gov.hmcts.reform.mi', name: 'mi-core-lib', version: versions.miCoreLib
+  functionalTestCompile group: 'com.github.hmcts', name: 'mi-core-lib', version: versions.miCoreLib
   functionalTestCompile group: 'com.azure', name: 'azure-storage-blob', version: versions.azureStorage
   functionalTestCompile group: 'org.postgresql', name: 'postgresql', version: versions.postgresql
 
@@ -323,7 +353,7 @@ dependencies {
   integrationTestAnnotationProcessor "org.projectlombok:lombok"
   integrationTestCompile sourceSets.main.runtimeClasspath
   integrationTestCompile sourceSets.test.runtimeClasspath
-  integrationTestCompile group: 'uk.gov.hmcts.reform.mi', name: 'mi-core-lib', version: versions.miCoreLib
+  integrationTestCompile group: 'com.github.hmcts', name: 'mi-core-lib', version: versions.miCoreLib
 }
 
 pitest {

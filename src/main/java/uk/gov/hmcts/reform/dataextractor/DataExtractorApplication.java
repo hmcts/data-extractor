@@ -59,9 +59,9 @@ public class DataExtractorApplication implements ApplicationRunner {
             throw e;
         } finally {
             client.flush();
-            waitTelemetryGracefulPeriod();
         }
         log.info("CCD Data extractor process completed");
+        waitTelemetryGracefulPeriod();
     }
 
     @PostConstruct

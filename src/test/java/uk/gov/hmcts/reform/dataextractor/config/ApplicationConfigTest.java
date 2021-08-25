@@ -6,7 +6,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import uk.gov.hmcts.reform.dataextractor.BlobOutputWriter;
 import uk.gov.hmcts.reform.dataextractor.Factory;
@@ -84,19 +83,5 @@ class ApplicationConfigTest {
     void testDefaultValidator() {
 
         assertThat(classToTest.blobOutputValidator().provide(mockOutput)).isEqualTo(defaultBlobValidator);
-    }
-
-    @Test
-    void givenInitialization_whenBlobOutputFactory_thenCreateQueryExecutor() {
-        dbConfig.setBaseDir("BaseDir");
-        dbConfig.setClonePassword("password");
-        dbConfig.setCloneUrl("ulr");
-        dbConfig.setCloneUser("user");
-        ReflectionTestUtils.setField(classToTest, "initialise", true);
-        Factory<String, QueryExecutor> queryExecutorFactory = classToTest.queryExecutorFactory();
-        try (QueryExecutor result = queryExecutorFactory.provide(SQL_QUERY);
-            QueryExecutor expected = new QueryExecutor(dbConfig.getCloneUrl(), dbConfig.getCloneUser(), dbConfig.getClonePassword(), SQL_QUERY)) {
-            assertThat(result).isEqualToComparingFieldByField(expected);
-        }
     }
 }

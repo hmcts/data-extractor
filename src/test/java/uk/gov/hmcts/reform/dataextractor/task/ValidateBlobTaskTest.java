@@ -84,7 +84,7 @@ class ValidateBlobTaskTest {
         when(blobService.listContainerBlobs(anyString())).thenReturn(blobs);
 
         when(blobService.validateBlob(CONTAINER_1_NAME, blobItem1.getName(), Output.JSON_LINES)).thenReturn(true);
-        classToTest = new ValidateBlobTask(blobService, true);
+        classToTest = new ValidateBlobTask(blobService, true, false);
         classToTest.execute();
         verify(testRecorder, times(1)).append("[WARN] Blob in container2 with name blobItem2 not valid");
         verify(testRecorder, times(1)).append("[WARN] Blob in container1 with name blobItem2 not valid");
@@ -93,7 +93,7 @@ class ValidateBlobTaskTest {
 
     @Test
     void executeWhenDisabled() {
-        classToTest = new ValidateBlobTask(blobService, false);
+        classToTest = new ValidateBlobTask(blobService, false, false);
         classToTest.execute();
         verifyNoInteractions(blobService);
     }

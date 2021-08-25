@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -54,9 +53,6 @@ public class ApplicationConfig {
     @Autowired
     private ExtractorCsv extractorCsv;
 
-    @Value("${extraction.initialise:false}")
-    private boolean initialise;
-
     @Bean
     public Clock clock() {
         return Clock.systemDefaultZone();
@@ -97,9 +93,6 @@ public class ApplicationConfig {
     }
 
     private QueryExecutor queryExecutor(String sqlQuery) {
-        if (initialise) {
-            return new QueryExecutor(dbConfig.getCloneUrl(), dbConfig.getCloneUser(), dbConfig.getClonePassword(), sqlQuery);
-        }
         return new QueryExecutor(dbConfig.getUrl(), dbConfig.getUser(), dbConfig.getPassword(), sqlQuery);
     }
 
