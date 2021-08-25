@@ -21,7 +21,7 @@ mi-job:
     app.kubernetes.io/instance : data-extractor-job-001
     app.kubernetes.io/name: data-extractor-job
   environment:
-    ETL_DB_URL: jdbc:postgresql://ccd-data-store-api-postgres-db-{{ .Values.global.ccd_environment }}.postgres.database.azure.com:5432/ccd_data_store
+    ETL_DB_URL: jdbc:postgresql://ccd-data-store-api-postgres-db-v11-{{ .Values.global.ccd_environment }}.postgres.database.azure.com:5432/ccd_data_store
     ETL_DB_CLONE_URL: jdbc:postgresql://ccd-data-store-api-postgres-db-{{ .Values.global.ccd_environment }}.postgres.database.azure.com:5432/ccd_data_store
     ETL_ACCOUNT: midataextractor{{ .Values.global.environment }}
     EXTRACTION_CASETYPES_0__CONTAINER: "test-container-${BUILD_VERSION}"
