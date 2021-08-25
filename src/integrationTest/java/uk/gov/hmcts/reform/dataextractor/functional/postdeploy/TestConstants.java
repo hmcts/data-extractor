@@ -11,7 +11,7 @@ public final class TestConstants {
     public static final Output OUTPUT_TYPE = Output.JSON_LINES;
     public static final String BREAK_LINE = "\r\n";
     public static final int DATA_DAYS = 2;
-    public static final String CASE_TYPE = "Asylum";
+    public static final String CASE_TYPE = "DIVORCE";
 
     private TestConstants() {
 

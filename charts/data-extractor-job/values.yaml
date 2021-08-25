@@ -25,10 +25,10 @@ mi-job:
     ETL_DB_CLONE_URL: jdbc:postgresql://ccd-data-store-api-postgres-db-{{ .Values.global.ccd_environment }}.postgres.database.azure.com:5432/ccd_data_store
     ETL_ACCOUNT: midataextractor{{ .Values.global.environment }}
     EXTRACTION_CASETYPES_0__CONTAINER: "test-container-${BUILD_VERSION}"
-    EXTRACTION_CASETYPES_0__CASETYPE: "Asylum"
+    EXTRACTION_CASETYPES_0__CASETYPE: "DIVORCE"
     EXTRACTION_CASETYPES_0__TYPE: "jsonlines"
     EXTRACTION_CASETYPES_0__PREFIX: "CCD-TEST"
-    EXTRACTION_FILTER_JURISDICTION_IN: "'IA'"
+    EXTRACTION_FILTER_JURISDICTION_IN: "'DIVORCE'"
     EXTRACTION_INITIALISE: false
 global:
   enableKeyVaults: true
