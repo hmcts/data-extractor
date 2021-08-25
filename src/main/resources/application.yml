@@ -44,3 +44,4 @@ azure:
 task:
   SetLastUpdateMetadata: ${TASK_SET_LAST_UPDATE:false}
   validateBlob: ${TASK_VALIDATE_BLOB:false}
+  deleteInvalidBlob: ${TASK_DELETE_INVALID_BLOB:false}

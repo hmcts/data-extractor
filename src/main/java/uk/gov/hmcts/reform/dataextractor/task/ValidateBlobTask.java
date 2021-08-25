@@ -19,6 +19,7 @@ public class ValidateBlobTask implements PreExecutor {
     private final BlobServiceImpl blobService;
 
     private final  @Value("${task.validateBlob:false}") boolean enabled;
+    private final  @Value("${task.deleteInvalidBlob:false}") boolean deleteInvalidBlob;
 
     @Override
     public void execute() {
@@ -32,6 +33,10 @@ public class ValidateBlobTask implements PreExecutor {
                             log.info("Blob in {} with name {} is correct", containerItem.getName(), blobItem.getName());
                         } else {
                             log.warn("Blob in {} with name {} not valid", containerItem.getName(), blobItem.getName());
+                            if (deleteInvalidBlob) {
+                                blobService.deleteBlob(containerItem.getName(), blobItem.getName());
+                                log.warn("Blob in {} with name {} has been deleted", containerItem.getName(), blobItem.getName());
+                            }
                         }
 
                     });
