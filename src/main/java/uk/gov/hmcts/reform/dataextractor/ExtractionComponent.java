@@ -34,7 +34,7 @@ public class ExtractionComponent {
 
     private static final Output DEFAULT_OUTPUT = Output.JSON_LINES;
     private static final Locale GB_LOCALE = Locale.ENGLISH;
-    private static final LocalDate DEFAULT_FIRST_EVENT = LocalDate.parse("20170101", DATE_TIME_FORMATTER);
+    private static final LocalDate DEFAULT_FIRST_EVENT = LocalDate.parse("20200101", DATE_TIME_FORMATTER);
 
 
     @Autowired
