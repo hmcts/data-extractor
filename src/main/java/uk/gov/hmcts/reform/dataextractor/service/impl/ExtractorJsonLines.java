@@ -41,8 +41,12 @@ public class ExtractorJsonLines extends ExtractorJson {
     protected void writeRow(JsonGenerator jsonGenerator, String columnName, Object data, String dataType)
         throws IOException {
         if (dataType.contains("json")) {
-            jsonGenerator.writeFieldName(columnName);
-            jsonGenerator.writeRawValue(data.toString());
+            if (data == null) {
+                log.warn("Data is null for field {} , skipping value", columnName);
+            } else {
+                jsonGenerator.writeFieldName(columnName);
+                jsonGenerator.writeRawValue(data.toString());
+            }
         } else {
             jsonGenerator.writeObjectField(columnName, data);
         }

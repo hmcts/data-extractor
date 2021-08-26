@@ -63,4 +63,19 @@ class ExtractorJsonLinesTest {
 
         assertEquals(2, classToTest.writeResultSetToJson(resultSet, jsonGenerator), "Return expected rows");
     }
+
+    @Test
+    void whenWriteResult_thenReturnRowsWritten1() throws SQLException, IOException {
+        when(resultSet.getMetaData()).thenReturn(resultSetMetaData);
+        when(resultSetMetaData.getColumnCount()).thenReturn(1);
+        when(resultSetMetaData.getColumnName(1)).thenReturn("TestColumn");
+        when(resultSetMetaData.getColumnTypeName(1)).thenReturn("json");
+        when(resultSet.getObject(1)).thenReturn(null);
+        when(resultSet.next())
+            .thenReturn(true)
+            .thenReturn(true)
+            .thenReturn(false);
+
+        assertEquals(2, classToTest.writeResultSetToJson(resultSet, jsonGenerator), "Return expected rows");
+    }
 }
