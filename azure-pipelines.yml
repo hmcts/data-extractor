@@ -24,11 +24,11 @@ pr:
 
 variables:
 #  group: pipeline-env-variables
-  ${{ if startsWith( variables['Build.SourceBranch'], 'refs/pull/') }}:
+  ${{ if not(eq(variables['Build.SourceBranch'], 'refs/heads/master')) }}:
     environment: 'test'
     env.upper: 'TEST'
-  ${{ if not(startsWith(variables['Build.SourceBranch'], 'refs/pull/')) }}:
-    environment: 'stg' #Uset test and promoting to stg until prod is ready
+  ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
+    environment: 'stg'
     env.upper: 'STG'
   env.prom: 'prod'
   env.prom.upper: 'PROD'
@@ -61,6 +61,7 @@ stages:
       mutationTest: False
       functionalTest: true
       preIntegrationTest: true
+      dependencyCheck: false
       helmRepo: $(helm.repo)
       agentPool: hmcts-ss-$(environment)
       azureSecreKeys: 'ccdro-user,ccdro-password,data-extractor-connection-string'

@@ -115,7 +115,7 @@ checkstyle {
   maxWarnings = 0
   toolVersion = '8.23'
   // need to set configDir to rootDir otherwise submodule will use submodule/config/checkstyle
-  configDir = new File(rootDir, 'config/checkstyle')
+  configDirectory = new File(rootDir, 'config/checkstyle')
 }
 
 pmd {
@@ -127,7 +127,7 @@ pmd {
 }
 
 jacoco {
-  toolVersion = "0.8.3"
+  toolVersion = "0.8.7"
 }
 
 jacocoTestReport {
@@ -233,19 +233,18 @@ def versions = [
     miCoreLib       : '3.5.2',
     guava           : '30.0-jre',
     commonsIo       : '2.8.0'
-
 ]
 
 dependencies {
-  integrationTestCompile(sourceSets.test.output)
-  functionalTestCompile(sourceSets.test.output)
+  integrationTestImplementation(sourceSets.test.output)
+  functionalTestImplementation(sourceSets.test.output)
 }
 
 configurations {
-  integrationTestCompile.extendsFrom(testCompile)
+  integrationTestImplementation.extendsFrom(testImplementation)
   integrationTestRuntime.extendsFrom(testRuntime)
   functionalTestRuntime.extendsFrom(testRuntime)
-  functionalTestCompile.extendsFrom(testCompile)
+  functionalTestImplementation.extendsFrom(testImplementation)
 }
 
 
@@ -292,68 +291,68 @@ dependencyManagement {
 
 
 dependencies {
-  compile group: 'org.postgresql', name: 'postgresql', version: versions.postgresql
+  implementation group: 'org.postgresql', name: 'postgresql', version: versions.postgresql
 
-  compile group: 'com.microsoft.azure.msi_auth_token_provider', name: 'azure-authentication-msi-token-provider', version: '1.0.0-Beta-2'
-  compile group: 'com.microsoft.azure', name: 'azure-spring-boot-starter', version: versions.azureSpringBoot
+  implementation group: 'com.microsoft.azure.msi_auth_token_provider', name: 'azure-authentication-msi-token-provider', version: '1.0.0-Beta-2'
+  implementation group: 'com.microsoft.azure', name: 'azure-spring-boot-starter', version: versions.azureSpringBoot
 
-  compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
-  compile group: 'org.apache.commons', name: 'commons-csv', version: '1.8'
-  compile group: 'com.google.guava', name: 'guava', version: versions.guava
+  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
+  implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.8'
+  implementation group: 'com.google.guava', name: 'guava', version: versions.guava
 
-  compile group: 'com.typesafe', name: 'config', version: '1.4.1'
+  implementation group: 'com.typesafe', name: 'config', version: '1.4.1'
 
   compileOnly 'org.projectlombok:lombok'
   annotationProcessor 'org.projectlombok:lombok'
 
   implementation 'org.springframework.boot:spring-boot-starter-batch'
-  compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
-  compile group: 'org.springframework.boot', name: 'spring-boot-starter-json'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
   
-  compile group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.logging
-  compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.logging
-  compile('uk.gov.hmcts.reform:properties-volume-spring-boot-starter:0.1.0') {
+  implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.logging
+  implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.logging
+  implementation('uk.gov.hmcts.reform:properties-volume-spring-boot-starter:0.1.0') {
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
   }
 
-  compile group: 'com.azure', name: 'azure-storage-blob', version: versions.azureStorage
+  implementation group: 'com.azure', name: 'azure-storage-blob', version: versions.azureStorage
 
   // needed for app insights
-  compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+  implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
 
-  compile group: 'org.pitest', name: 'pitest', version: versions.pitest
-  compile group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
-  compile group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: versions.sonarPitest
-  compile group: 'com.github.hmcts', name: 'mi-core-lib', version: versions.miCoreLib
+  implementation group: 'org.pitest', name: 'pitest', version: versions.pitest
+  implementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
+  implementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: versions.sonarPitest
+  implementation group: 'com.github.hmcts', name: 'mi-core-lib', version: versions.miCoreLib
 
-  testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
-  testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
   testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
-  testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.6.28'
-  testCompile group: 'com.microsoft.azure', name: 'azure-spring-boot-starter', version: versions.azureSpringBoot
+  testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.6.28'
+  testImplementation group: 'com.microsoft.azure', name: 'azure-spring-boot-starter', version: versions.azureSpringBoot
 
   testCompileOnly 'org.projectlombok:lombok'
   testAnnotationProcessor "org.projectlombok:lombok"
 
-  testCompile('org.springframework.boot:spring-boot-starter-test') {
+  testImplementation('org.springframework.boot:spring-boot-starter-test') {
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
 
-  functionalTestCompile 'org.testcontainers:postgresql:1.15.1'
-  functionalTestCompile 'org.testcontainers:junit-jupiter:1.15.1'
-  functionalTestCompile 'com.ninja-squad:DbSetup:2.1.0'
-  functionalTestCompile group: 'com.github.hmcts', name: 'mi-core-lib', version: versions.miCoreLib
-  functionalTestCompile group: 'com.azure', name: 'azure-storage-blob', version: versions.azureStorage
-  functionalTestCompile group: 'org.postgresql', name: 'postgresql', version: versions.postgresql
+  functionalTestImplementation 'org.testcontainers:postgresql:1.16.2'
+  functionalTestImplementation 'org.testcontainers:junit-jupiter:1.16.2'
+  functionalTestImplementation 'com.ninja-squad:DbSetup:2.1.0'
+  functionalTestImplementation group: 'com.github.hmcts', name: 'mi-core-lib', version: versions.miCoreLib
+  functionalTestImplementation group: 'com.azure', name: 'azure-storage-blob', version: versions.azureStorage
+  functionalTestImplementation group: 'org.postgresql', name: 'postgresql', version: versions.postgresql
 
-  functionalTestCompile sourceSets.main.runtimeClasspath
-  functionalTestCompile sourceSets.test.runtimeClasspath
+  functionalTestImplementation sourceSets.main.runtimeClasspath
+  functionalTestImplementation sourceSets.test.runtimeClasspath
 
   integrationTestCompileOnly 'org.projectlombok:lombok'
   integrationTestAnnotationProcessor "org.projectlombok:lombok"
-  integrationTestCompile sourceSets.main.runtimeClasspath
-  integrationTestCompile sourceSets.test.runtimeClasspath
-  integrationTestCompile group: 'com.github.hmcts', name: 'mi-core-lib', version: versions.miCoreLib
+  integrationTestImplementation sourceSets.main.runtimeClasspath
+  integrationTestImplementation sourceSets.test.runtimeClasspath
+  integrationTestImplementation group: 'com.github.hmcts', name: 'mi-core-lib', version: versions.miCoreLib
 }
 
 pitest {
