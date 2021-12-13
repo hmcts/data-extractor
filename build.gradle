@@ -172,6 +172,9 @@ dependencyManagement {
       entry 'netty-transport-native-kqueue'
       entry 'netty-transport-native-unix-common'
     }
+    dependency group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.15.0'
+    dependency group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.15.0'
+    dependency group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.15.0'
   }
 }
 
