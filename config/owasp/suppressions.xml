@@ -78,4 +78,13 @@
     <cve>CVE-2021-22112</cve>
     <cve>CVE-2021-22119</cve>
   </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: netty-tcnative-classes-2.0.46.Final.jar
+   This is a false positive as it has a different version scheme to the core netty libs.
+   See: https://ossindex.sonatype.org/component/pkg:maven/io.netty/netty-tcnative-classes@2.0.46.Final?utm_source=dependency-check&utm_medium=integration&utm_content=6.5.0
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/io\.netty/netty\-tcnative\-classes@.*$</packageUrl>
+    <cpe>cpe:/a:netty:netty</cpe>
+  </suppress>
 </suppressions>
