@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.dataextractor;
 
+import com.azure.spring.autoconfigure.storage.StorageAutoConfiguration;
 import com.microsoft.applicationinsights.TelemetryClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ import java.util.TimeZone;
 import javax.annotation.PostConstruct;
 
 @Slf4j
-@SpringBootApplication(scanBasePackages = "uk.gov.hmcts.reform", exclude = {DataSourceAutoConfiguration.class})
+@SpringBootApplication(scanBasePackages = "uk.gov.hmcts.reform", exclude = {DataSourceAutoConfiguration.class, StorageAutoConfiguration.class})
 public class DataExtractorApplication implements ApplicationRunner {
 
     private static final String DEFAULT_TIME_ZONE = "UTC";
