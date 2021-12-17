@@ -204,6 +204,7 @@ def versions = [
     azureStorage    : '12.14.2',
     azureSpringBoot : '3.11.0',
     springBoot      : '2.6.1',
+    springCloud     : '3.1.0',
     postgresql      : '42.3.1',
     pitest          : '1.7.3',
     gradlePitest    : '1.7.0',
@@ -299,6 +300,7 @@ dependencies {
   implementation group: 'com.microsoft.azure.msi_auth_token_provider', name: 'azure-authentication-msi-token-provider', version: '1.0.0-Beta-2'
   implementation group: 'com.azure.spring', name: 'azure-spring-boot-starter', version: versions.azureSpringBoot
   implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: versions.azureAppInsights
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: versions.springCloud
 
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
   implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
@@ -313,10 +315,6 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-batch'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
-  
-  implementation('uk.gov.hmcts.reform:properties-volume-spring-boot-starter:0.1.0') {
-    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
-  }
 
   implementation group: 'com.azure', name: 'azure-storage-blob', version: versions.azureStorage
 

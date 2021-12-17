@@ -5,6 +5,8 @@ info:
 spring:
   application:
     name: mi-data-extractor
+  main:
+    allow-circular-references: true
     
 etl:
   db:
