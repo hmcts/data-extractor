@@ -197,19 +197,19 @@ jar {
 }
 
 def versions = [
-    junit           : '5.5.0',
-    logging         : '5.1.1',
-    jackson         : '2.12.0',
+    junit           : '5.8.2',
+    jackson         : '2.13.0',
     commonsBeanUtils: '1.9.4',
+    azureAppInsights: '2.6.4',
     azureStorage    : '12.14.2',
     azureSpringBoot : '3.11.0',
     springBoot      : '2.6.1',
-    postgresql      : '42.2.13',
-    pitest          : '1.4.10',
-    gradlePitest    : '1.4.5',
+    postgresql      : '42.3.1',
+    pitest          : '1.7.3',
+    gradlePitest    : '1.7.0',
     sonarPitest     : '0.5',
     miCoreLib       : '3.6.0-draft-3',
-    guava           : '30.0-jre',
+    guava           : '31.0.1-jre',
     commonsIo       : '2.11.0',
     commonsLang     : '3.12.0'
 ]
@@ -298,9 +298,10 @@ dependencies {
 
   implementation group: 'com.microsoft.azure.msi_auth_token_provider', name: 'azure-authentication-msi-token-provider', version: '1.0.0-Beta-2'
   implementation group: 'com.azure.spring', name: 'azure-spring-boot-starter', version: versions.azureSpringBoot
+  implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: versions.azureAppInsights
 
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
-  implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.8'
+  implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
   implementation group: 'com.google.guava', name: 'guava', version: versions.guava
   implementation group: 'org.apache.commons', name: 'commons-lang3', version: versions.commonsLang
 
@@ -313,8 +314,6 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
   
-  implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.logging
-  implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.logging
   implementation('uk.gov.hmcts.reform:properties-volume-spring-boot-starter:0.1.0') {
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
   }
@@ -329,10 +328,8 @@ dependencies {
   implementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: versions.sonarPitest
   implementation group: 'com.github.hmcts', name: 'mi-core-lib', version: versions.miCoreLib
 
-  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
-  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
-  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
-  testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.6.28'
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: versions.junit
+  testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.1.0'
   testImplementation group: 'com.azure.spring', name: 'azure-spring-boot-starter', version: versions.azureSpringBoot
 
   testCompileOnly 'org.projectlombok:lombok'
