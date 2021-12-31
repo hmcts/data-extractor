@@ -2,13 +2,16 @@ info:
   app:
     name: ${spring.application.name}
   config:
-    import: optional:configtree:/mnt/secrets/mi-vault/
+    import: optional:configtree:/mnt/secrets/*/
 
 spring:
   application:
     name: mi-data-extractor
   main:
     allow-circular-references: true
+
+testing:
+  config: ${ccdro-user:"dumyUser"}
     
 etl:
   db:

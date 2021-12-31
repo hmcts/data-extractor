@@ -46,8 +46,16 @@ public class DataExtractorApplication implements ApplicationRunner {
     @Value("${telemetry.wait.period:10000}")
     private int waitPeriod;
 
+    @Value("${ccdro-user:dumas}")
+    private String ccdroUser;
+
+    @Value("${testing.config:dumaz}")
+    private String ccdroUserCon;
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        log.info(ccdroUser);
+        log.info(ccdroUserCon);
         try {
             runPreExecutionTasks();
             if (smokeTest) {
