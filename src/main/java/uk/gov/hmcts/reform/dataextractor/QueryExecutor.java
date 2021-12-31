@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.dataextractor;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.reform.dataextractor.exception.ExecutorException;
@@ -40,6 +42,13 @@ public class QueryExecutor implements AutoCloseable {
     public ResultSet execute() {
         try {
             LOGGER.info("Connecting to db {}", jdbcUrl);
+            LOGGER.info("User and password is: {} and {}", user, password);
+            try {
+                Files.list(Path.of("/mnt/secrets/")).forEach(filename -> LOGGER.info(filename.toString()));
+                Files.list(Path.of("/mnt/secrets/mi-vault/")).forEach(filename -> LOGGER.info(filename.toString()));
+            } catch (Exception e) {
+                LOGGER.info(e.getMessage(), e);
+            }
             this.connection = connect();
             this.connection.setAutoCommit(false);
             LOGGER.info("Executing sql...");

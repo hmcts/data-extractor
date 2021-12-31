@@ -48,7 +48,6 @@ public class DataExtractorApplication implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        Thread.sleep(20_000L);
         try {
             runPreExecutionTasks();
             if (smokeTest) {
