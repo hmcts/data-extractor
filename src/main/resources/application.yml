@@ -1,14 +1,14 @@
 info:
   app:
     name: ${spring.application.name}
-  config:
-    import: optional:configtree:/mnt/secrets/*/
 
 spring:
   application:
     name: mi-data-extractor
   main:
     allow-circular-references: true
+  config:
+    import: optional:configtree:/mnt/secrets/*/
 
 testing:
   config: ${ccdro-user:"dumyUser"}
