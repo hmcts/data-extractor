@@ -286,7 +286,7 @@ dependencyManagement {
       entry 'netty-transport-native-unix-common'
     }
 
-    dependencySet(group: 'org.apache.logging.log4j', version: '2.17.0') {
+    dependencySet(group: 'org.apache.logging.log4j', version: '2.17.1') {
       entry 'log4j-to-slf4j'
       entry 'log4j-api'
     }
