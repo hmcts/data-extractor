@@ -290,6 +290,11 @@ dependencyManagement {
       entry 'log4j-to-slf4j'
       entry 'log4j-api'
     }
+
+    dependencySet(group: 'ch.qos.logback', version: '1.2.10') {
+      entry 'logback-classic'
+      entry 'logback-core'
+    }
   }
 }
 
