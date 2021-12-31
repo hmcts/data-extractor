@@ -9,9 +9,6 @@ spring:
     allow-circular-references: true
   config:
     import: optional:configtree:/mnt/secrets/*/
-
-testing:
-  config: ${ccdro-user:"dumyUser"}
     
 etl:
   db:
