@@ -8,7 +8,7 @@ spring:
   main:
     allow-circular-references: true
   config:
-    import: optional:configtree:/mnt/secrets/*/
+    import: optional:configtree:/mnt/secrets/mi-vault/
     
 etl:
   db:
