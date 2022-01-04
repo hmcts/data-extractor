@@ -7,6 +7,7 @@ spring:
     name: mi-data-extractor
   main:
     allow-circular-references: true
+    web-application-type: none
   config:
     import: optional:configtree:/mnt/secrets/mi-vault/
     
