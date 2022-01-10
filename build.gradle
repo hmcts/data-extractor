@@ -209,7 +209,7 @@ def versions = [
     pitest          : '1.7.3',
     gradlePitest    : '1.7.0',
     sonarPitest     : '0.5',
-    miCoreLib       : '3.6.0-draft-4',
+    miCoreLib       : '3.6.0',
     guava           : '31.0.1-jre',
     commonsIo       : '2.11.0',
     commonsLang     : '3.12.0'
