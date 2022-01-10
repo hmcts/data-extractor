@@ -61,7 +61,7 @@ stages:
       mutationTest: False
       functionalTest: true
       preIntegrationTest: true
-      dependencyCheck: false
+      dependencyCheck: true
       helmRepo: $(helm.repo)
       agentPool: hmcts-ss-$(environment)
       azureSecreKeys: 'ccdro-user,ccdro-password,data-extractor-connection-string'

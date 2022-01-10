@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.dataextractor;
 
+import com.azure.spring.autoconfigure.storage.StorageAutoConfiguration;
+import com.microsoft.applicationinsights.autoconfigure.ApplicationInsightsWebMvcAutoConfiguration;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -14,6 +16,7 @@ import org.springframework.context.annotation.FilterType;
             @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = ApplicationRunner.class)
         }
     )
-@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
+@EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class, StorageAutoConfiguration.class,
+    ApplicationInsightsWebMvcAutoConfiguration.class })
 public class TestApplicationConfiguration {
 }

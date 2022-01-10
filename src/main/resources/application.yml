@@ -5,17 +5,22 @@ info:
 spring:
   application:
     name: mi-data-extractor
+  main:
+    allow-circular-references: true
+    web-application-type: none
+  config:
+    import: optional:configtree:/mnt/secrets/mi-vault/
     
 etl:
   db:
     url: "jdbc:postgresql://localhost:5432/ccd_data_store?sslmode=require"
-    user: "dumyUser"
-    password: "cdummyPassword"
+    user: ${ccdro-user:"dumyUser"}
+    password: ${ccdro-password:"cdummyPassword"}
     cloneUrl: "jdbc:postgresql://localhost:5432/ccd_data_store?sslmode=require"
-    cloneUser: "cloneUser"
-    clonePassword: "clonePassword"
+    cloneUser: ${ccdro-clone-user:"cloneUser"}
+    clonePassword: ${ccdro-clone-password:"clonePassword"}
   account: "midatastgsbox"
-  connection-string: "dummyConnectionString"
+  connection-string: ${data-extractor-connection-string:"dummyConnectionString"}
 
 smoke.test.enabled: false
 
@@ -39,7 +44,7 @@ application-insights:
 
 azure:
   application-insights:
-    instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:""}
+    instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:${appinsights-instrumentationkey:""}}
 
 task:
   SetLastUpdateMetadata: ${TASK_SET_LAST_UPDATE:false}
