@@ -1,4 +1,9 @@
 # data-extractor
+
+# Archive notice 
+This repository is archive now, SDP ingestion has moved to Azure data factory
+https://github.com/hmcts/mi-data-ingestion
+
 Simple data extractor/shuffler
 
 Runs a sql query against a database and saves the results in an azure storage container.
